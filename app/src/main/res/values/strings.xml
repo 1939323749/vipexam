@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">vipexam</string>
+    <string name="login">Login</string>
+    <string name="back_button">back</string>
+    <string name="examlist">Exam List</string>
+    <string name="exam">Exam</string>
+</resources>

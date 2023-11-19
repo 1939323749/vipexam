@@ -1,53 +1,107 @@
 package app.xlei.vipexam.ui.page
 
+import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Exam
 import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.ui.question.*
 import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import io.ktor.util.reflect.*
 import kotlinx.coroutines.launch
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun ExamPage(
     exam: Exam
 ) {
-    Column {
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ) {
-            Text(exam.examName)
-            for (muban in exam.muban){
-                when(muban.ename){
-                    "ecswriting" -> Ecswriting(muban)
-                    "ecscloze"-> Ecscloze(muban)
-                    "ecsqread"-> Ecsqread(muban)
-                    "ecszread"-> Ecszread(muban)
-                    "ecstranslate"-> Ecstranslate(muban)
-                    "ecfwriting" -> Ecswriting(muban)
-                    "ecfcloze"-> Ecscloze(muban)
-                    "ecfqread"-> Ecsqread(muban)
-                    "ecfzread"-> Ecszread(muban)
-                    "ecftranslate"-> Ecstranslate(muban)
-                    "eylhlisteninga"-> Eylhlisteninga(muban)
-                    "eylhlisteningb"-> Eylhlisteningb(muban)
-                    "eylhlisteningc"-> Eylhlisteningc(muban)
+    questions(
+        tabItems = getTabItems(exam.muban),
+        mubanList = exam.muban
+    )
+}
+
+fun getTabItems(mubanList: List<Muban>):List<TabItem>{
+    val tabItems = mutableListOf<TabItem>()
+    for (muban in mubanList){
+        tabItems.add(
+            TabItem(
+                title = muban.cname,
+            )
+        )
+    }
+    return tabItems
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun questions(
+    tabItems: List<TabItem>,
+    mubanList: List<Muban>
+) {
+    var selectedTabIndex by remember {
+        mutableIntStateOf(0) // or use mutableStateOf(0)
+    }
+
+    var pagerState = rememberPagerState {
+        tabItems.size
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxWidth()
+        ) { index ->
+                when (mubanList[index].ename) {
+                    "ecswriting" -> Ecswriting(mubanList[index])
+                    "ecscloze" -> Ecscloze(mubanList[index])
+                    "ecsqread" -> Ecsqread(mubanList[index])
+                    "ecszread" -> Ecszread(mubanList[index])
+                    "ecstranslate" -> Ecstranslate(mubanList[index])
+                    "ecfwriting" -> Ecswriting(mubanList[index])
+                    "ecfcloze" -> Ecscloze(mubanList[index])
+                    "ecfqread" -> Ecsqread(mubanList[index])
+                    "ecfzread" -> Ecszread(mubanList[index])
+                    "ecftranslate" -> Ecstranslate(mubanList[index])
+                    "eylhlisteninga" -> Eylhlisteninga(mubanList[index])
+                    "eylhlisteningb" -> Eylhlisteninga(mubanList[index])
+                    "eylhlisteningc" -> Eylhlisteninga(mubanList[index])
                 }
-            }
+        }
+    }
+
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+        if (!pagerState.isScrollInProgress) {
+            selectedTabIndex = pagerState.currentPage
         }
     }
 }
+
+data class TabItem(
+    val title: String,
+)
 
 suspend fun getExam(examId: String, account: String, token: String): Exam? {
     val client = HttpClient()
@@ -76,111 +130,4 @@ suspend fun getExam(examId: String, account: String, token: String): Exam? {
     client.close()
     val gson = Gson()
     return gson.fromJson(response.bodyAsText(), Exam::class.java)
-}
-
-@Composable
-fun Ecswriting(muban: Muban){
-    Column {
-        Text(muban.cname)
-        Text(muban.shiti[0].primQuestion)
-    }
-}
-
-@Composable
-fun Ecscloze(muban: Muban){
-    Column {
-        Text(muban.cname)
-        Text(muban.shiti[0].primQuestion)
-        for (ti in muban.shiti[0].children){
-            Text(ti.secondQuestion)
-        }
-    }
-}
-
-@Composable
-fun Ecsqread(muban: Muban){
-    Column {
-        Text(muban.cname)
-        Text(muban.shiti[0].primQuestion)
-        for((no,ti) in muban.shiti[0].children.withIndex()){
-            Text((no+1).toString()+". " + ti.secondQuestion)
-        }
-    }
-}
-
-@Composable
-fun Ecszread(muban: Muban){
-    Column {
-        Text(muban.cname)
-        for ((no,ti) in muban.shiti.withIndex()){
-            Text((no+1).toString())
-            Text(ti.primQuestion)
-            for ((num,t ) in ti.children.withIndex()){
-                Text((num+1).toString()+t.secondQuestion)
-                Text("[A]"+t.first)
-                Text("[B]"+t.second)
-                Text("[C]"+t.third)
-                Text("[D]"+t.fourth)
-            }
-        }
-    }
-}
-
-@Composable
-fun Ecstranslate(muban: Muban){
-    Column{
-        Text(muban.cname)
-        Text(muban.shiti[0].primQuestion)
-    }
-}
-
-@Composable
-fun Eylhlisteninga(muban: Muban){
-    Column {
-        Text(muban.cname)
-        for ((no,ti) in muban.shiti.withIndex()){
-            Text((no+1).toString())
-            for ((n,t) in ti.children.withIndex()){
-                Text((n+1).toString())
-                Text("[A]"+t.first)
-                Text("[B]"+t.second)
-                Text("[C]"+t.third)
-                Text("[D]"+t.fourth)
-            }
-        }
-    }
-}
-
-@Composable
-fun Eylhlisteningb(muban: Muban){
-    Column {
-        Text(muban.cname)
-        for ((no,ti) in muban.shiti.withIndex()){
-            Text((no+1).toString())
-            for ((n,t) in ti.children.withIndex()){
-                Text((n+1).toString())
-                Text("[A]"+t.first)
-                Text("[B]"+t.second)
-                Text("[C]"+t.third)
-                Text("[D]"+t.fourth)
-            }
-        }
-    }
-}
-
-@Composable
-fun Eylhlisteningc(muban: Muban){
-    Column {
-        Text(muban.cname)
-        for ((no,ti) in muban.shiti.withIndex()){
-            Text((no+1).toString())
-            for ((n,t) in ti.children.withIndex()){
-                Text((n+1).toString())
-                Text("[A]"+t.first)
-                Text("[B]"+t.second)
-                Text("[C]"+t.third)
-                Text("[D]"+t.fourth)
-            }
-        }
-    }
 }

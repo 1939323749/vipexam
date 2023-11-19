@@ -6,13 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,16 +45,17 @@ fun ExamListView(
             items(examList.list.size){
                 Box(
                     modifier = Modifier
+                        .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .padding(start = 12.dp, end = 12.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color.DarkGray)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
                         .clickable {
                             onExamClicked(examList.list[it].examid)
                         }
                 ){
                     Text(
-                        examList.list[it].examname,
+                        text = examList.list[it].examname,
                         modifier = Modifier.padding(4.dp)
                     )
                 }

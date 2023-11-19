@@ -55,7 +55,7 @@ fun Ecsqread(muban: Muban){
                     onClick = {},
                     onLongClick = {
                         showBottomSheet=true
-                        haptics.performHapticFeedback(HapticFeedbackType(100))
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
                 )
         ) {

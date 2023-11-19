@@ -1,5 +1,6 @@
 package app.xlei.vipexam.ui.question
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,40 @@ fun Eylhlisteninga(muban: Muban){
         )
         for ((no,ti) in muban.shiti.withIndex()){
             Text((no+1).toString())
+            AudioPlayer("https://rang.vipexam.org/Sound/${ti.audioFiles}.mp3")
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .clickable {
+                        showOptionsSheet = true
+                        selectedChoiceIndex = no to 0
+                    }
+            ) {
+                Column (
+                    modifier = Modifier
+                        .padding(12.dp)
+                ){
+                    Text("${1}")
+                    Text("[A]" + ti.first)
+                    Text("[B]" + ti.second)
+                    Text("[C]" + ti.third)
+                    Text("[D]" + ti.fourth)
+                }
+
+                if(getChoice(no,0,choices)!=null){
+                    if (getChoice(no,0,choices)!!.value.second.second!=null){
+                        SuggestionChip(
+                            onClick = {},
+                            label = {
+                                getChoice(no,0,choices)!!.value.second.second?.let { Text(it) }
+                            }
+                        )
+                    }
+                }
+            }
             for ((n,t) in ti.children.withIndex()) {
                 Column(
                     modifier = Modifier
@@ -48,26 +83,26 @@ fun Eylhlisteninga(muban: Muban){
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .clickable {
                             showOptionsSheet = true
-                            selectedChoiceIndex = no to n
+                            selectedChoiceIndex = no to n+1
                         }
                 ) {
                     Column (
                         modifier = Modifier
                             .padding(12.dp)
                     ){
-                        Text((n + 1).toString())
+                        Text((n + 2).toString())
                         Text("[A]" + t.first)
                         Text("[B]" + t.second)
                         Text("[C]" + t.third)
                         Text("[D]" + t.fourth)
                     }
 
-                    if(getChoice(no,n,choices)!=null){
-                        if (getChoice(no,n,choices)!!.value.second.second!=null){
+                    if(getChoice(no,n+1,choices)!=null){
+                        if (getChoice(no,n+1,choices)!!.value.second.second!=null){
                             SuggestionChip(
                                 onClick = {},
                                 label = {
-                                    getChoice(no,n,choices)!!.value.second.second?.let { Text(it) }
+                                    getChoice(no,n+1,choices)!!.value.second.second?.let { Text(it) }
                                 }
                             )
                         }
@@ -110,9 +145,12 @@ fun getListeningChoices(shiti: List<Shiti>): MutableList<MutableState<Pair<Int, 
     val choices = mutableListOf<MutableState<Pair<Int,Pair<Int, String?>>>>()
 
     for((index,ti) in shiti.withIndex()){
+        choices.add(
+            mutableStateOf(index to (0 to null))
+        )
         for ((i,_) in ti.children.withIndex()){
             choices.add(
-                mutableStateOf(index to (i to null))
+                mutableStateOf(index to (i+1 to null))
             )
         }
     }
@@ -129,4 +167,34 @@ fun getListeningOptions(): List<String> {
     options.add("D")
 
     return options
+}
+
+@Composable
+fun AudioPlayer(audioUrl: String) {
+    var isPlaying by remember { mutableStateOf(false) }
+    val mediaPlayer = remember { MediaPlayer() }
+
+    DisposableEffect(Unit) {
+        mediaPlayer.setDataSource(audioUrl)
+        mediaPlayer.prepare()
+
+        onDispose {
+            mediaPlayer.release()
+        }
+    }
+
+    Column {
+        Button(
+            onClick = {
+                isPlaying = !isPlaying
+                if (isPlaying) {
+                    mediaPlayer.start()
+                } else {
+                    mediaPlayer.pause()
+                }
+            }
+        ) {
+            Text(if (isPlaying) "Pause" else "Play")
+        }
+    }
 }

@@ -22,7 +22,6 @@ class ClozeViewModel: ViewModel() {
     @Composable
     fun init() {
         uiState.value.showBottomSheet = remember { mutableStateOf(false) }
-        uiState.value.showOptionsSheet = remember { mutableStateOf(false) }
         uiState.value.selectedChoiceIndex = remember { mutableStateOf(-1) }
     }
     fun setMuban(muban: Muban){

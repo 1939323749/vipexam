@@ -40,7 +40,9 @@ fun VipExamAppBar(
     currentScreen: String,
     canNavigateBack:Boolean,
     navigateUp:()->Unit,
-    modifier: Modifier=Modifier
+    modifier: Modifier=Modifier,
+    showAnswer: MutableState<Boolean>,
+    onShowAnswerClick: ()->Unit
 ){
     var showMenu by remember { mutableStateOf(false) }
 
@@ -78,26 +80,19 @@ fun VipExamAppBar(
                            modifier = Modifier.align(Alignment.CenterHorizontally)
                         ){
                             Checkbox(
-                                checked = false,
+                                checked = showAnswer.value,
                                 onCheckedChange = null,
                             )
                             Text(
-                                text = "test",
+                                text = "show answer",
                                 modifier = Modifier
                                     .padding(start = 4.dp)
                             )
                         }
                     },
-                    onClick = {}
-                )
-                DropdownMenuItem(
-                    text = {
-                        Text("test")
-                    },
-                    onClick = {}
+                    onClick = onShowAnswerClick
                 )
             }
-
         }
     )
 }
@@ -109,7 +104,7 @@ fun VipExamAppBar(
 fun VipExamApp(
     viewModel: ExamViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
-    ) {
+) {
     val backStackEntry by navController.currentBackStackEntryAsState()
 
     val currentScreen = VipExamScreen.valueOf(
@@ -120,6 +115,8 @@ fun VipExamApp(
 
     var isFirstItemHidden by remember { mutableStateOf(false) }
 
+    var showAnswer = remember { mutableStateOf(false) }
+
     Scaffold (
         topBar={
             VipExamAppBar(
@@ -129,7 +126,11 @@ fun VipExamApp(
                 else
                     currentTitle,
                 canNavigateBack = navController.previousBackStackEntry !=null,
-                navigateUp = {navController.navigateUp()}
+                navigateUp = {navController.navigateUp()},
+                showAnswer = showAnswer,
+                onShowAnswerClick = {
+                    showAnswer.value=!showAnswer.value
+                }
                 )
         }
     ){ padding ->
@@ -208,7 +209,8 @@ fun VipExamApp(
                         },
                         onFirstItemAppear = {
                             isFirstItemHidden = false
-                        }
+                        },
+                        showAnswer = showAnswer
                     )
                 }
             }

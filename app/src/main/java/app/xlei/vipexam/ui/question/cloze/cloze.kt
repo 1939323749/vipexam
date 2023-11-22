@@ -3,9 +3,11 @@ package app.xlei.vipexam.ui.question.cloze
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -25,7 +27,8 @@ fun clozeView(
     viewModel: ClozeViewModel = viewModel(),
     muban: Muban,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     viewModel.init()
     viewModel.setMuban(muban)
@@ -58,11 +61,12 @@ fun clozeView(
         },
         onFirstItemAppear = {
             onFirstItemAppear()
-        }
+        },
+        showAnswer = showAnswer
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun cloze(
     muban: Muban,
@@ -74,7 +78,8 @@ private fun cloze(
     onButtonsClicked:(Int)->Unit,
     onOptionClicked:(String)->Unit,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>
 ){
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
@@ -119,28 +124,41 @@ private fun cloze(
                 }
             }
             item {
-                for (index in choices.indices){
-                    SuggestionChip(
-                        onClick = {
-                            onButtonsClicked(index)
-                        },
-                        label = {
-                            Text(
-                                text = choices[index].value.first +
-                                        if(choices[index].value.second==null){
-                                            ""
-                                        }else{
-                                            choices[index].value.second
-                                        }
+                FlowRow(
+                    horizontalArrangement = Arrangement.Start,
+                    maxItemsInEachRow = 2,
+                ) {
+                    for (index in choices.indices){
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                        ) {
+                            SuggestionChip(
+                                onClick = {
+                                    onButtonsClicked(index)
+                                },
+                                label = {
+                                    Text(
+                                        text = choices[index].value.first +
+                                                if(choices[index].value.second==null){
+                                                    ""
+                                                }else{
+                                                    choices[index].value.second
+                                                }
+                                    )
+                                }
                             )
                         }
-                    )
+                    }
                 }
             }
-            items(muban.shiti[0].children.size){
-                Text(muban.shiti[0].children[it].secondQuestion + muban.shiti[0].children[it].refAnswer)
-                Text(muban.shiti[0].children[it].discription)
+            if(showAnswer.value){
+                items(muban.shiti[0].children.size){
+                    Text(muban.shiti[0].children[it].secondQuestion + muban.shiti[0].children[it].refAnswer)
+                    Text(muban.shiti[0].children[it].discription)
+                }
             }
+
         }
 
 
@@ -151,13 +169,27 @@ private fun cloze(
                     showOptionsSheet.value = false
                 },
             ){
-                for (option in options){
-                    Text(
-                        text = "[${option.first}]${option.second}",
-                        modifier = Modifier
-                            .padding(4.dp)
-                    )
+                FlowRow (
+                    horizontalArrangement = Arrangement.Start,
+                    maxItemsInEachRow = 2,
+                    modifier = Modifier
+                        .padding(bottom = 20.dp)
+                ){
+                    for (option in options){
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                        ) {
+                            Text(
+                                text = "[${option.first}]${option.second}",
+                                modifier = Modifier
+                                    .padding(4.dp)
+                            )
+                        }
+
+                    }
                 }
+
             }
         }
 
@@ -167,16 +199,29 @@ private fun cloze(
                     showBottomSheet.value = false
                 },
             ) {
-                for (option in options){
-                    SuggestionChip(
-                        onClick = {
-                            onOptionClicked(option.second)
-                        },
-                        label = {
-                            Text("[${option.first}]${option.second}")
+                FlowRow(
+                    horizontalArrangement = Arrangement.Start,
+                    maxItemsInEachRow = 2,
+                    modifier = Modifier
+                        .padding(bottom = 20.dp)
+                ) {
+                    for (option in options){
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                        ){
+                            SuggestionChip(
+                                onClick = {
+                                    onOptionClicked(option.second)
+                                },
+                                label = {
+                                    Text("[${option.first}]${option.second}")
+                                },
+                            )
                         }
-                    )
+                    }
                 }
+
             }
         }
 
@@ -186,6 +231,34 @@ private fun cloze(
             onFirstItemAppear()
         }
 
+    }
+}
+
+@Composable
+fun answerSheet(
+    choices: MutableList<MutableState<Pair<String, String?>>>,
+    onButtonsClicked: (Int) -> Unit
+){
+    LazyHorizontalGrid(
+        rows = GridCells.Adaptive(minSize = 20.dp)
+    ){
+        items(choices.size){index->
+            SuggestionChip(
+                onClick = {
+                    onButtonsClicked(index)
+                },
+                label = {
+                    Text(
+                        text = choices[index].value.first +
+                                if(choices[index].value.second==null){
+                                    ""
+                                }else{
+                                    choices[index].value.second
+                                }
+                    )
+                }
+            )
+        }
     }
 }
 

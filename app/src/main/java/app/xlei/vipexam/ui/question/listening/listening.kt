@@ -29,7 +29,8 @@ fun listeningView(
     muban: Muban,
     viewModel: ListeningViewModel = viewModel(),
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     viewModel.init()
     viewModel.setMuban(muban)
@@ -48,6 +49,7 @@ fun listeningView(
         onFirstItemAppear = {
             onFirstItemAppear()
         },
+        showAnswer = showAnswer,
     )
 }
 
@@ -59,7 +61,8 @@ private fun listening(
     options: List<String>,
     selectedChoiceIndex: MutableState<Pair<Int, Int>>,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     val choices by remember { mutableStateOf(getListeningChoices(muban.shiti)) }
     val scrollState = rememberLazyListState()
@@ -156,12 +159,14 @@ private fun listening(
                         }
                     }
                 }
-
-                Text("1"+muban.shiti[it].refAnswer)
-                for((no,children) in muban.shiti[it].children.withIndex()){
-                    Text("${no + 2}"+children.refAnswer)
+                if (showAnswer.value) {
+                    Text("1"+muban.shiti[it].refAnswer)
+                    for((no,children) in muban.shiti[it].children.withIndex()){
+                        Text("${no + 2}"+children.refAnswer)
+                    }
+                    Text(muban.shiti[it].originalText)
                 }
-                Text(muban.shiti[it].originalText)
+
             }
         }
 

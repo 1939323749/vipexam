@@ -35,7 +35,8 @@ import io.ktor.client.statement.*
 fun ExamPage(
     exam: Exam,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>
 ) {
     questions(
         mubanList = exam.muban,
@@ -44,7 +45,8 @@ fun ExamPage(
         },
         onFirstItemAppear = {
             onFirstItemAppear()
-        }
+        },
+        showAnswer = showAnswer
     )
 }
 
@@ -55,7 +57,8 @@ fun questions(
     viewModel: QuestionsViewModel = viewModel(),
     navController: NavHostController = rememberNavController(),
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>
 ) {
     viewModel.setMubanList(mubanList)
     val uiState by viewModel.uiState.collectAsState()
@@ -94,7 +97,8 @@ fun questions(
                                 },
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
-                                }
+                                },
+                                showAnswer = showAnswer,
                             )
                             "ecscloze" -> clozeView(
                                 muban = mubanList[index],
@@ -103,7 +107,8 @@ fun questions(
                                 },
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
-                                }
+                                },
+                                showAnswer = showAnswer,
                             )
                             "ecsqread" -> qreadView(
                                 muban = mubanList[index],
@@ -112,7 +117,8 @@ fun questions(
                                 },
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
-                                }
+                                },
+                                showAnswer = showAnswer,
                             )
                             "ecszread" -> zreadView(
                                 muban = mubanList[index],
@@ -122,6 +128,7 @@ fun questions(
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
                                 },
+                                showAnswer = showAnswer,
                             )
                             "ecstranslate" -> translateView(
                                 muban = mubanList[index],
@@ -131,6 +138,7 @@ fun questions(
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
                                 },
+                                showAnswer = showAnswer,
                             )
                             "ecfwriting" -> writingView(
                                 muban = mubanList[index],
@@ -139,7 +147,8 @@ fun questions(
                                 },
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
-                                }
+                                },
+                                showAnswer = showAnswer,
                             )
                             "ecfcloze" -> clozeView(
                                 muban = mubanList[index],
@@ -148,7 +157,8 @@ fun questions(
                                 },
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
-                                }
+                                },
+                                showAnswer = showAnswer,
                             )
                             "ecfqread" -> qreadView(
                                 muban = mubanList[index],
@@ -157,7 +167,8 @@ fun questions(
                                 },
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
-                                }
+                                },
+                                showAnswer = showAnswer,
                             )
                             "ecfzread" -> zreadView(
                                 muban = mubanList[index],
@@ -167,6 +178,7 @@ fun questions(
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
                                 },
+                                showAnswer = showAnswer,
                             )
                             "ecftranslate" -> translateView(
                                 muban = mubanList[index],
@@ -176,6 +188,7 @@ fun questions(
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
                                 },
+                                showAnswer = showAnswer,
                             )
                             "eylhlisteninga" -> listeningView(
                                 muban = mubanList[index],
@@ -185,6 +198,7 @@ fun questions(
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
                                 },
+                                showAnswer = showAnswer,
                             )
                             "eylhlisteningb" -> listeningView(
                                 muban = mubanList[index],
@@ -194,6 +208,7 @@ fun questions(
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
                                 },
+                                showAnswer = showAnswer,
                             )
                             "eylhlisteningc" -> listeningView(
                                 muban = mubanList[index],
@@ -203,6 +218,7 @@ fun questions(
                                 onFirstItemAppear = {
                                     onFirstItemAppear()
                                 },
+                                showAnswer = showAnswer,
                             )
                         }
                     }

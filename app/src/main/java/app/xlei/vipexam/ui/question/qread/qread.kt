@@ -1,9 +1,7 @@
 package app.xlei.vipexam.ui.question.qread
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +25,8 @@ fun qreadView(
     viewModel: QreadViewModel = viewModel(),
     muban: Muban,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     viewModel.init()
     viewModel.setMuban(muban)
@@ -64,11 +63,12 @@ fun qreadView(
         },
         onFirstItemAppear = {
             onFirstItemAppear()
-        }
+        },
+        showAnswer = showAnswer
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun qread(
     muban: Muban,
@@ -82,7 +82,8 @@ private fun qread(
     onQuestionClicked:(Int)->Unit,
     onOptionClicked:(String)->Unit,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
@@ -159,10 +160,11 @@ private fun qread(
                     }
                 }
             }
-
-            items(muban.shiti[0].children.size){
-                Text("${it + 1}"+ muban.shiti[0].children[it].refAnswer)
-                Text(muban.shiti[0].children[it].discription)
+            if (showAnswer.value){
+                items(muban.shiti[0].children.size){
+                    Text("${it + 1}"+ muban.shiti[0].children[it].refAnswer)
+                    Text(muban.shiti[0].children[it].discription)
+                }
             }
         }
 
@@ -204,15 +206,27 @@ private fun qread(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
                 ){
-                    for(option in options){
-                        SuggestionChip(
-                            onClick = {
-                                onOptionClicked(option)
-                            },
-                            label = {
-                                Text(option)
+                    FlowRow(
+                        horizontalArrangement = Arrangement.Start,
+                        maxItemsInEachRow = 5,
+                        modifier = Modifier
+                            .padding(bottom = 20.dp)
+                    ) {
+                        for(option in options){
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                            ) {
+                                SuggestionChip(
+                                    onClick = {
+                                        onOptionClicked(option)
+                                    },
+                                    label = {
+                                        Text(option)
+                                    }
+                                )
                             }
-                        )
+                        }
                     }
                 }
             }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -43,7 +45,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ExamListView(
@@ -65,11 +67,11 @@ fun ExamListView(
             if(firstVisibleItemIndex >0) FloatingActionButton(
                 onClick = {
                     coroutineScope.launch {
-                        scrollState.scrollToItem(0)
+                        scrollState.animateScrollToItem(0)
                     }
                 }
             ){
-                Icons.Filled.KeyboardArrowUp
+                Icon(Icons.Default.KeyboardArrowUp,"back to top")
             }
         }
     ) {
@@ -93,39 +95,60 @@ fun ExamListView(
                     modifier = Modifier.weight(9f)
                 ){
                     items(examList.list.size){
-                        Box(
+                        ListItem(
+                            headlineContent = { Text(getExamNameAndNo(examList.list[it].examname).first) },
+                            trailingContent = { Text(getExamNameAndNo(examList.list[it].examname).second) },
+                            leadingContent = {
+                                Box(
+                                    modifier = Modifier
+                                        .height(40.dp)
+                                        .clip(CircleShape)
+                                        .aspectRatio(1f)
+                                        .background(MaterialTheme.colorScheme.primaryContainer)
+                                ){
+                                    Text(
+                                        text = getExamCET6Keyword(examList.list[it].examname),
+                                        modifier = Modifier
+                                            .align(Alignment.Center)
+                                    )
+                                }
+                            },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .defaultMinSize(minHeight = 60.dp)
-                                .padding(vertical = 4.dp)
-                                .padding(start = 12.dp, end = 12.dp)
-                                .clip(RoundedCornerShape(10.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .clickable {
                                     onExamClicked(examList.list[it].examid)
                                 }
-                        ){
-                            Text(
-                                text = examList.list[it].examname,
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .align(Alignment.CenterStart)
-                            )
-                        }
+                        )
+                        HorizontalDivider()
                     }
                 }
-                Row(
-                    modifier = Modifier.weight(1f).align(Alignment.CenterHorizontally)
+                FlowRow(
+                    horizontalArrangement = Arrangement.Center,
+                    maxItemsInEachRow = 2,
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterHorizontally)
+                        .background(Color.Transparent)
                 ){
                     if(currentPage.toInt()>1){
                         Button(
-                            onClick = onPreviousPageClicked
+                            onClick = {
+                                onPreviousPageClicked()
+                                coroutineScope.launch {
+                                    scrollState.scrollToItem(0)
+                                }
+                            },
                         ){
                             Text("Previous page")
                         }
                     }
                     Button(
-                        onClick = onNextPageClicked
+                        onClick = {
+                            onNextPageClicked()
+                            coroutineScope.launch {
+                                scrollState.scrollToItem(0)
+                            }
+                        }
                     ){
                         Text("Next page")
                     }
@@ -135,6 +158,28 @@ fun ExamListView(
             PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
         }
     }
+}
+
+fun getExamNameAndNo(text: String):Pair<String,String>{
+    val result = mutableListOf<String>()
+    val pattern = Regex("""[0-9]+""")
+    val matches = pattern.findAll(text)
+    for(match in matches){
+        result.add(match.value)
+    }
+    return text.split(result.last())[0] to result.last()
+}
+
+fun getExamCET6Keyword(text: String):String{
+    val keywords = listOf("作文", "阅读", "听力","翻译")
+
+    val regex = Regex(keywords.joinToString("|"))
+    val matches = regex.findAll(text)
+
+    matches.forEach {
+        if (keywords.contains(it.value))return it.value
+    }
+    return "模拟"
 }
 
 suspend fun getExamList(account: String,token: String,currentPage: String): ExamList? {

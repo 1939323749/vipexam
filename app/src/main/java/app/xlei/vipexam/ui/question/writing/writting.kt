@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -25,7 +26,8 @@ fun writingView(
     viewModel: WritingViewModel = viewModel(),
     muban: Muban,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
     val uiState by viewModel.uiState.collectAsState()
@@ -36,7 +38,8 @@ fun writingView(
         },
         onFirstItemAppear = {
             onFirstItemAppear()
-        }
+        },
+        showAnswer = showAnswer
     )
 }
 
@@ -44,7 +47,8 @@ fun writingView(
 private fun writing(
     muban: Muban,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit
+    onFirstItemAppear: () -> Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
@@ -82,14 +86,17 @@ private fun writing(
                 )
             }
         }
-        item {
-            Text(muban.shiti[0].refAnswer)
+        if (showAnswer.value){
+            item {
+                Text(muban.shiti[0].refAnswer)
+            }
         }
+
     }
 
-    if(firstVisibleItemIndex>0){
+    if( firstVisibleItemIndex > 0)
         onFirstItemHidden(muban.cname)
-    }else{
+    else
         onFirstItemAppear()
-    }
+
 }

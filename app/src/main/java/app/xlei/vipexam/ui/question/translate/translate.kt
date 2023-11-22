@@ -24,7 +24,8 @@ fun translateView(
     viewModel: WritingViewModel = viewModel(),
     muban: Muban,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
     val uiState by viewModel.uiState.collectAsState()
@@ -35,7 +36,8 @@ fun translateView(
         },
         onFirstItemAppear = {
             onFirstItemAppear()
-        }
+        },
+        showAnswer = showAnswer,
     )
 }
 
@@ -44,7 +46,8 @@ fun translateView(
 private fun translate(
     muban: Muban,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
@@ -79,9 +82,12 @@ private fun translate(
                 )
             }
         }
-        item {
-            Text(muban.shiti[0].refAnswer)
+        if(showAnswer.value){
+            item {
+                Text(muban.shiti[0].refAnswer)
+            }
         }
+
     }
     if(firstVisibleItemIndex>0){
         onFirstItemHidden(muban.cname)

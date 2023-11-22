@@ -30,7 +30,8 @@ fun zreadView(
     muban: Muban,
     viewModel: ZreadViewModel = viewModel(),
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     viewModel.init()
     viewModel.setMuban(muban)
@@ -77,6 +78,7 @@ fun zreadView(
         onFirstItemAppear = {
             onFirstItemAppear()
         },
+        showAnswer = showAnswer
     )
 }
 
@@ -94,7 +96,8 @@ private fun zread(
     onQuestionClicked:(Pair<Int,Int>)->Unit,
     onOptionClicked:(String)->Unit,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit
+    onFirstItemAppear: ()->Unit,
+    showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
@@ -187,11 +190,13 @@ private fun zread(
                         }
                     }
                 }
-
-                for ((no,children) in muban.shiti[it].children.withIndex()){
-                    Text("${no +1}"+children.refAnswer)
-                    Text(children.discription)
+                if (showAnswer.value) {
+                    for ((no,children) in muban.shiti[it].children.withIndex()){
+                        Text("${no +1}"+children.refAnswer)
+                        Text(children.discription)
+                    }
                 }
+
             }
 
 

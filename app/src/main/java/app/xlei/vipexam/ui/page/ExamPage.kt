@@ -2,106 +2,225 @@ package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import app.xlei.vipexam.data.Children
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.data.Exam
 import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
+import app.xlei.vipexam.ui.question.cloze.clozeView
+import app.xlei.vipexam.ui.question.listening.listeningView
+import app.xlei.vipexam.ui.question.qread.qreadView
+import app.xlei.vipexam.ui.question.translate.translateView
+import app.xlei.vipexam.ui.question.writing.writingView
+import app.xlei.vipexam.ui.question.zread.zreadView
 import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.util.reflect.*
-import kotlinx.coroutines.launch
 
 @Composable
 fun ExamPage(
-    exam: Exam
+    exam: Exam,
+    onFirstItemHidden: (String) -> Unit,
+    onFirstItemAppear: ()->Unit
 ) {
     questions(
-        tabItems = getTabItems(exam.muban),
-        mubanList = exam.muban
+        mubanList = exam.muban,
+        onFirstItemHidden = {
+            onFirstItemHidden(it)
+        },
+        onFirstItemAppear = {
+            onFirstItemAppear()
+        }
     )
 }
 
-fun getTabItems(mubanList: List<Muban>):List<TabItem>{
-    val tabItems = mutableListOf<TabItem>()
-    for (muban in mubanList){
-        tabItems.add(
-            TabItem(
-                title = muban.cname,
-            )
-        )
-    }
-    return tabItems
-}
-
-@OptIn(ExperimentalFoundationApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun questions(
-    tabItems: List<TabItem>,
-    mubanList: List<Muban>
+    mubanList: List<Muban>,
+    viewModel: QuestionsViewModel = viewModel(),
+    navController: NavHostController = rememberNavController(),
+    onFirstItemHidden: (String) -> Unit,
+    onFirstItemAppear: ()->Unit
 ) {
-    var selectedTabIndex by remember {
-        mutableIntStateOf(0) // or use mutableStateOf(0)
-    }
+    viewModel.setMubanList(mubanList)
+    val uiState by viewModel.uiState.collectAsState()
+    val questions = getQuestions(uiState.mubanList!!)
 
-    var pagerState = rememberPagerState {
-        tabItems.size
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxWidth()
-        ) { index ->
-                when (mubanList[index].ename) {
-                    "ecswriting" -> Ecswriting(mubanList[index])
-                    "ecscloze" -> Ecscloze(mubanList[index])
-                    "ecsqread" -> Ecsqread(mubanList[index])
-                    "ecszread" -> Ecszread(mubanList[index])
-                    "ecstranslate" -> Ecstranslate(mubanList[index])
-                    "ecfwriting" -> Ecswriting(mubanList[index])
-                    "ecfcloze" -> Ecscloze(mubanList[index])
-                    "ecfqread" -> Ecsqread(mubanList[index])
-                    "ecfzread" -> Ecszread(mubanList[index])
-                    "ecftranslate" -> Ecstranslate(mubanList[index])
-                    "eylhlisteninga" -> Eylhlisteninga(mubanList[index])
-                    "eylhlisteningb" -> Eylhlisteninga(mubanList[index])
-                    "eylhlisteningc" -> Eylhlisteninga(mubanList[index])
+    Scaffold(
+        floatingActionButton = {
+            CustomFloatingActionButton(
+                expandable = true,
+                onFabClick = {},
+                iconExpanded = Icons.Filled.KeyboardArrowDown,
+                iconUnExpanded = Icons.Filled.KeyboardArrowUp,
+                items = questions,
+                onItemClick = {
+                    navController.navigate(it)
                 }
-        }
-    }
-
-    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
-        if (!pagerState.isScrollInProgress) {
-            selectedTabIndex = pagerState.currentPage
+            )
+        },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = questions[0].first,
+                modifier = Modifier
+            ) {
+                for ((index,q) in questions.withIndex()){
+                    composable(route = q.first){
+                        when (q.first) {
+                            "ecswriting" -> writingView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                }
+                            )
+                            "ecscloze" -> clozeView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                }
+                            )
+                            "ecsqread" -> qreadView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                }
+                            )
+                            "ecszread" -> zreadView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                },
+                            )
+                            "ecstranslate" -> translateView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                },
+                            )
+                            "ecfwriting" -> writingView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                }
+                            )
+                            "ecfcloze" -> clozeView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                }
+                            )
+                            "ecfqread" -> qreadView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                }
+                            )
+                            "ecfzread" -> zreadView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                },
+                            )
+                            "ecftranslate" -> translateView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                },
+                            )
+                            "eylhlisteninga" -> listeningView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                },
+                            )
+                            "eylhlisteningb" -> listeningView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                },
+                            )
+                            "eylhlisteningc" -> listeningView(
+                                muban = mubanList[index],
+                                onFirstItemHidden = {
+                                    onFirstItemHidden(it)
+                                },
+                                onFirstItemAppear = {
+                                    onFirstItemAppear()
+                                },
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-data class TabItem(
-    val title: String,
-)
+fun getQuestions(mubanList: List<Muban>): MutableList<Pair<String, String>> {
+    val questions = mutableListOf<Pair<String,String>>()
+
+    for (muban in mubanList){
+        questions.add(muban.ename to muban.cname)
+    }
+
+    return questions
+}
 
 suspend fun getExam(examId: String, account: String, token: String): Exam? {
     val client = HttpClient()

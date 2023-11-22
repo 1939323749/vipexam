@@ -79,4 +79,12 @@ class ExamViewModel: ViewModel() {
         }
         return true
     }
+
+    suspend fun refresh() {
+        _uiState.update {
+            it.copy(
+                examList = it.token?.let { it1 -> getExamList(account = it.account, token = it1, currentPage = it.currentPage) }
+            )
+        }
+    }
 }

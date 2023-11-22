@@ -8,16 +8,30 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import app.xlei.vipexam.R
+import app.xlei.vipexam.constant.Constants
 import app.xlei.vipexam.data.ExamList
 import app.xlei.vipexam.ui.theme.VipexamTheme
 import com.google.gson.Gson
@@ -29,56 +43,98 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@SuppressLint("CoroutineCreationDuringComposition")
+@OptIn(ExperimentalMaterialApi::class)
+@SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ExamListView(
     currentPage: String,
     examList: ExamList,
     onPreviousPageClicked:()->Unit,
     onNextPageClicked:()->Unit,
-    onExamClicked:(String)->Unit
+    onExamClicked:(String)->Unit,
+    refresh: ()->Unit,
+    onFirstItemHidden: ()->Unit,
+    onFirstItemAppear: ()->Unit
 ){
-    Column {
-        LazyColumn(
-            modifier = Modifier.weight(9f)
-        ){
-            items(examList.list.size){
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .padding(start = 12.dp, end = 12.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .clickable {
-                            onExamClicked(examList.list[it].examid)
-                        }
-                ){
-                    Text(
-                        text = examList.list[it].examname,
-                        modifier = Modifier.padding(4.dp)
-                    )
+    val scrollState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
+
+    Scaffold(
+        floatingActionButton = {
+            if(firstVisibleItemIndex >0) FloatingActionButton(
+                onClick = {
+                    coroutineScope.launch {
+                        scrollState.scrollToItem(0)
+                    }
                 }
+            ){
+                Icons.Filled.KeyboardArrowUp
             }
         }
-        Row(
-            modifier = Modifier.weight(1f).align(Alignment.CenterHorizontally)
+    ) {
+        val refreshing by remember{ mutableStateOf(false) }
+
+        val state = rememberPullRefreshState(refreshing, refresh)
+
+        if(firstVisibleItemIndex >0){
+            onFirstItemHidden()
+        }else{
+            onFirstItemAppear()
+        }
+
+        Box (
+            modifier = Modifier
+                .pullRefresh(state)
         ){
-            if(currentPage.toInt()>1){
-                Button(
-                    onClick = onPreviousPageClicked
+            Column {
+                LazyColumn(
+                    state = scrollState,
+                    modifier = Modifier.weight(9f)
                 ){
-                    Text("Previous page")
+                    items(examList.list.size){
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .defaultMinSize(minHeight = 60.dp)
+                                .padding(vertical = 4.dp)
+                                .padding(start = 12.dp, end = 12.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .clickable {
+                                    onExamClicked(examList.list[it].examid)
+                                }
+                        ){
+                            Text(
+                                text = examList.list[it].examname,
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .align(Alignment.CenterStart)
+                            )
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier.weight(1f).align(Alignment.CenterHorizontally)
+                ){
+                    if(currentPage.toInt()>1){
+                        Button(
+                            onClick = onPreviousPageClicked
+                        ){
+                            Text("Previous page")
+                        }
+                    }
+                    Button(
+                        onClick = onNextPageClicked
+                    ){
+                        Text("Next page")
+                    }
                 }
             }
-            Button(
-                onClick = onNextPageClicked
-            ){
-                Text("Next page")
-            }
+
+            PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
         }
     }
-
 }
 
 suspend fun getExamList(account: String,token: String,currentPage: String): ExamList? {
@@ -94,7 +150,7 @@ suspend fun getExamList(account: String,token: String,currentPage: String): Exam
         header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
         header("Connection", "keep-alive")
         header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-        header("Origin", "https://vipexam.cn")
+        header("Origin", Constants.URL)
         header("Referer", "https://vipexam.cn/resources_kinds.html?id=ve01002")
         header("Sec-Fetch-Dest", "empty")
         header("Sec-Fetch-Mode", "cors")

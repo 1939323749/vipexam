@@ -73,6 +73,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material:material:1.5.4")
     implementation("androidx.compose.material3:material3")
     implementation("io.ktor:ktor-client-apache:2.3.6")
     implementation("io.ktor:ktor-client-okhttp-jvm:2.3.6")
@@ -95,7 +96,8 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
 
-    implementation("com.google.code.gson:gson:2.9.0")
+    val gson_version="2.9.0"
+    implementation("com.google.code.gson:gson:$gson_version")
 
     val room_version = "2.5.0"
 
@@ -106,4 +108,13 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
 
     implementation("androidx.collection:collection-ktx:1.3.0")
+
+    val lifecycle_version = "2.5.1"
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    // ViewModel utilities for Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
 }

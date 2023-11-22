@@ -2,13 +2,18 @@ package app.xlei.vipexam.ui
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -32,14 +37,16 @@ enum class VipExamScreen(@StringRes val title: Int) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VipExamAppBar(
-    currentScreen: VipExamScreen,
+    currentScreen: String,
     canNavigateBack:Boolean,
     navigateUp:()->Unit,
     modifier: Modifier=Modifier
 ){
+    var showMenu by remember { mutableStateOf(false) }
+
     TopAppBar(
         title = {
-            Text(stringResource(currentScreen.title))
+            Text(currentScreen)
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -49,11 +56,48 @@ fun VipExamAppBar(
             if(canNavigateBack){
                 IconButton(onClick = navigateUp){
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button)
                     )
                 }
             }
+        },
+        actions = {
+            IconButton(
+                onClick = { showMenu = !showMenu }
+            ) {
+                Icon(Icons.Default.MoreVert, "")
+            }
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ){
+                DropdownMenuItem(
+                    text = {
+                        Row (
+                           modifier = Modifier.align(Alignment.CenterHorizontally)
+                        ){
+                            Checkbox(
+                                checked = false,
+                                onCheckedChange = null,
+                            )
+                            Text(
+                                text = "test",
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                            )
+                        }
+                    },
+                    onClick = {}
+                )
+                DropdownMenuItem(
+                    text = {
+                        Text("test")
+                    },
+                    onClick = {}
+                )
+            }
+
         }
     )
 }
@@ -72,10 +116,18 @@ fun VipExamApp(
         backStackEntry?.destination?.route?: VipExamScreen.Login.name
     )
 
+    var currentTitle by remember { mutableStateOf("Exam") }
+
+    var isFirstItemHidden by remember { mutableStateOf(false) }
+
     Scaffold (
         topBar={
             VipExamAppBar(
-                currentScreen = currentScreen,
+                currentScreen =
+                if(!isFirstItemHidden || currentScreen==VipExamScreen.ExamList)
+                    currentScreen.name
+                else
+                    currentTitle,
                 canNavigateBack = navController.previousBackStackEntry !=null,
                 navigateUp = {navController.navigateUp()}
                 )
@@ -131,6 +183,17 @@ fun VipExamApp(
                                     navController.navigate(VipExamScreen.Exam.name)
                                 }
                             }
+                        },
+                        refresh = {
+                            coroutine.launch {
+                                viewModel.refresh()
+                            }
+                        },
+                        onFirstItemHidden = {
+                            isFirstItemHidden=true
+                        },
+                        onFirstItemAppear = {
+                            isFirstItemHidden=false
                         }
                     )
                 }
@@ -138,10 +201,18 @@ fun VipExamApp(
             composable(route = VipExamScreen.Exam.name){
                 uiState.exam?.let { exam ->
                     ExamPage(
-                        exam = exam
+                        exam = exam,
+                        onFirstItemHidden = {
+                            isFirstItemHidden = true
+                            currentTitle = it
+                        },
+                        onFirstItemAppear = {
+                            isFirstItemHidden = false
+                        }
                     )
                 }
             }
         }
+
     }
 }

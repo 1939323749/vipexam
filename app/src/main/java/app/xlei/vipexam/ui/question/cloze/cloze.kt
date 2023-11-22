@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -30,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
 import io.ktor.util.reflect.*
+import okhttp3.internal.wait
 
 @Composable
 fun clozeView(
@@ -59,6 +61,7 @@ fun clozeView(
             uiState.showBottomSheet!!.value = false
             uiState.choices!![uiState.selectedChoiceIndex!!.value].value=uiState
                 .choices!![uiState.selectedChoiceIndex!!.value].value.first to it
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         onFirstItemHidden = {
             onFirstItemHidden(it)
@@ -115,12 +118,13 @@ private fun cloze(
                     val annotatedStringAndTags = getClickableArticle(muban.shiti[0].primQuestion)
                     ClickableText(
                         text = annotatedStringAndTags.first,
-                        style = LocalTextStyle.current,
+                        style = LocalTextStyle.current.copy(
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        ),
                         onClick = {
                             for ((index,tag) in annotatedStringAndTags.second.withIndex()){
                                 annotatedStringAndTags.first.getStringAnnotations(tag = tag, start = it, end = it).firstOrNull()?.let {
                                     onButtonsClicked(index)
-                                    annotatedStringAndTags.first[index]
                                 }
                             }
                         },
@@ -166,7 +170,6 @@ private fun cloze(
             }
 
         }
-
 
         if (showBottomSheet.value) {
             ModalBottomSheet(
@@ -225,7 +228,7 @@ fun getClickableArticle(text: String): Pair<AnnotatedString,List<String>> {
             val tag = text.substring(startIndex, endIndex)
 
             pushStringAnnotation(tag = tag, annotation = tag )
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color.Unspecified)) {
                 append(text.substring(startIndex, endIndex))
             }
             pop()
@@ -240,9 +243,6 @@ fun getClickableArticle(text: String): Pair<AnnotatedString,List<String>> {
     }
 
     return annotatedString to tags
-}
-fun getArticleAndOptions(text: String):Pair<String,String>{
-    return text.split("A)")[0] to "A)"+text.split("A)")[1]
 }
 
 fun getClozeChoices(children: List<Children>): MutableList<MutableState<Pair<String, String?>>> {

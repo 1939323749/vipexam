@@ -21,7 +21,7 @@ import app.xlei.vipexam.ui.question.writing.WritingViewModel
 
 @Composable
 fun translateView(
-    viewModel: WritingViewModel = viewModel(),
+    viewModel: TranslateViewModel = viewModel(),
     muban: Muban,
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: ()->Unit,

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -20,11 +21,17 @@ import app.xlei.vipexam.data.Exam
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
+import app.xlei.vipexam.ui.question.cloze.ClozeViewModel
 import app.xlei.vipexam.ui.question.cloze.clozeView
+import app.xlei.vipexam.ui.question.listening.ListeningViewModel
 import app.xlei.vipexam.ui.question.listening.listeningView
+import app.xlei.vipexam.ui.question.qread.QreadViewModel
 import app.xlei.vipexam.ui.question.qread.qreadView
+import app.xlei.vipexam.ui.question.translate.TranslateViewModel
 import app.xlei.vipexam.ui.question.translate.translateView
+import app.xlei.vipexam.ui.question.writing.WritingViewModel
 import app.xlei.vipexam.ui.question.writing.writingView
+import app.xlei.vipexam.ui.question.zread.ZreadViewModel
 import app.xlei.vipexam.ui.question.zread.zreadView
 import com.google.gson.Gson
 import io.ktor.client.*

@@ -66,9 +66,29 @@ private fun listening(
     showAnswer: MutableState<Boolean>,
 ){
     val choices by remember { mutableStateOf(getListeningChoices(muban.shiti)) }
+    val midiaPlayers = mutableListOf<Pair<MediaPlayer,String>>()
+    muban.shiti.forEach {
+        midiaPlayers.add(remember { MediaPlayer() } to it.audioFiles)
+    }
+
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
+    val coroutine = rememberCoroutineScope()
 
+    DisposableEffect(Unit) {
+        coroutine.launch {
+            delay(500)
+            midiaPlayers.forEach{
+                it.first.setDataSource("https://rang.vipexam.org/Sound/${it.second}.mp3")
+                it.first.prepare()
+            }
+        }
+        onDispose {
+            midiaPlayers.forEach {
+                it.first.release()
+            }
+        }
+    }
     Column {
         LazyColumn(
             state = scrollState
@@ -88,9 +108,9 @@ private fun listening(
                 )
             }
 
-            items(muban.shiti.size){
+            items(muban.shiti.size) {
                 Text((it+1).toString())
-                AudioPlayer("https://rang.vipexam.org/Sound/${muban.shiti[it].audioFiles}.mp3")
+                AudioPlayer(midiaPlayers[it].first)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -190,15 +210,19 @@ private fun listening(
                         }
                     }
                 }
-                if (showAnswer.value) {
+            }
+
+
+
+
+            if(showAnswer.value)
+                items(muban.shiti.size){
                     Text("1"+muban.shiti[it].refAnswer)
                     for((no,children) in muban.shiti[it].children.withIndex()){
                         Text("${no + 2}"+children.refAnswer)
                     }
                     Text(muban.shiti[it].originalText)
                 }
-
-            }
         }
 
 
@@ -266,24 +290,13 @@ fun getListeningOptions(): List<String> {
     return options
 }
 
+@Stable
 @Composable
 fun AudioPlayer(
-    audioUrl: String
+    mediaPlayer: MediaPlayer
 ) {
     var isPlaying by remember { mutableStateOf(false) }
-    val mediaPlayer = remember { MediaPlayer() }
-    val coroutine = rememberCoroutineScope()
 
-    DisposableEffect(Unit) {
-        coroutine.launch {
-            delay(500)
-            mediaPlayer.setDataSource(audioUrl)
-            mediaPlayer.prepare()
-        }
-        onDispose {
-            mediaPlayer.release()
-        }
-    }
 
     Column {
         Button(

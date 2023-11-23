@@ -175,19 +175,19 @@ private fun zread(
                                 color = Color.Gray
                             )
                             Text(
-                                text = "[A]" + muban.shiti[it].first,
+                                text = "[A]" + t.first,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Text(
-                                text = "[B]" + muban.shiti[it].second,
+                                text = "[B]" + t.second,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Text(
-                                text = "[C]" + muban.shiti[it].third,
+                                text = "[C]" + t.third,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Text(
-                                text = "[D]" + muban.shiti[it].fourth,
+                                text = "[D]" + t.fourth,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
 

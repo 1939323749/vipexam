@@ -192,7 +192,7 @@ private fun qread(
                         ){
                             Text(
                                 text = "${no+1}. " + ti.secondQuestion,
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.padding(12.dp)
                             )
                         }

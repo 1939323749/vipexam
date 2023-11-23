@@ -81,6 +81,7 @@ private fun writing(
             ) {
                 Text(
                     muban.shiti[0].primQuestion,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier
                         .padding(start = 4.dp, end = 4.dp)
                 )

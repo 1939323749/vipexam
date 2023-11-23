@@ -1,12 +1,10 @@
 package app.xlei.vipexam.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,9 +13,10 @@ import androidx.compose.ui.unit.dp
 import app.xlei.vipexam.data.LoginResponse
 import kotlinx.coroutines.DelicateCoroutinesApi
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun login(
+fun loginView(
     account: String,
     password: String,
     loginResponse: LoginResponse?,
@@ -55,3 +54,4 @@ fun login(
         }
     }
 }
+

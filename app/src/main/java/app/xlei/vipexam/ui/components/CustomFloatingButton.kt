@@ -77,6 +77,7 @@ fun CustomFloatingActionButton(
                     ) {
                         Text(
                             text = it.second,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier
                                 .padding(12.dp)

@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.Shiti
@@ -106,11 +107,26 @@ private fun listening(
                         modifier = Modifier
                             .padding(12.dp)
                     ){
-                        Text("${1}")
-                        Text("[A]" + muban.shiti[it].first)
-                        Text("[B]" + muban.shiti[it].second)
-                        Text("[C]" + muban.shiti[it].third)
-                        Text("[D]" + muban.shiti[it].fourth)
+                        Text(
+                            text = "${1}",
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "[A]" + muban.shiti[it].first,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "[B]" + muban.shiti[it].second,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "[C]" + muban.shiti[it].third,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = "[D]" + muban.shiti[it].fourth,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
 
                     if(getChoice(it,0,choices) !=null){
@@ -140,11 +156,26 @@ private fun listening(
                             modifier = Modifier
                                 .padding(12.dp)
                         ){
-                            Text((n + 2).toString())
-                            Text("[A]" + t.first)
-                            Text("[B]" + t.second)
-                            Text("[C]" + t.third)
-                            Text("[D]" + t.fourth)
+                            Text(
+                                text = "${n + 2}",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            Text(
+                                text = "[A]" + muban.shiti[it].first,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                text = "[B]" + muban.shiti[it].second,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                text = "[C]" + muban.shiti[it].third,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                text = "[D]" + muban.shiti[it].fourth,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
                         }
 
                         if(getChoice(it,n+1,choices) !=null){

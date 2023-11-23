@@ -137,6 +137,7 @@ private fun zread(
                 ) {
                     Text(
                         text = "${it + 1}."+muban.shiti[it].primQuestion,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier
                             .padding(12.dp)
                     )
@@ -164,6 +165,7 @@ private fun zread(
                         ) {
                             Text(
                                 text = "${num+1}." + t.secondQuestion,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 fontWeight = FontWeight.Bold
                             )
                             HorizontalDivider(
@@ -172,10 +174,22 @@ private fun zread(
                                 thickness = 1.dp,
                                 color = Color.Gray
                             )
-                            Text("[A]" + t.first)
-                            Text("[B]" + t.second)
-                            Text("[C]" + t.third)
-                            Text("[D]" + t.fourth)
+                            Text(
+                                text = "[A]" + muban.shiti[it].first,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            Text(
+                                text = "[B]" + muban.shiti[it].second,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            Text(
+                                text = "[C]" + muban.shiti[it].third,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            Text(
+                                text = "[D]" + muban.shiti[it].fourth,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
 
                             if(getChoice(it,num,choices.value) !=null){
                                 if (getChoice(it,num,choices.value)!!.value.second.second!=null){
@@ -240,7 +254,8 @@ private fun zread(
                             modifier = Modifier.padding(12.dp)
                         ) {
                             Text(
-                                text = question
+                                text = question,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
                     }

@@ -1,55 +1,38 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
-import android.os.Bundle
-import android.text.Highlights
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import app.xlei.vipexam.R
 import app.xlei.vipexam.constant.Constants
 import app.xlei.vipexam.data.ExamList
-import app.xlei.vipexam.ui.theme.VipexamTheme
 import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ExamListView(
+fun examListView(
     currentPage: String,
     examList: ExamList,
     onPreviousPageClicked:()->Unit,
@@ -109,13 +92,14 @@ fun ExamListView(
                                 ){
                                     Text(
                                         text = getExamCET6Keyword(examList.list[it].examname),
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         modifier = Modifier
                                             .align(Alignment.Center)
                                     )
                                 }
                             },
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                //.background(MaterialTheme.colorScheme.primaryContainer)
                                 .clickable {
                                     onExamClicked(examList.list[it].examid)
                                 }
@@ -123,35 +107,38 @@ fun ExamListView(
                         HorizontalDivider()
                     }
                 }
-                FlowRow(
-                    horizontalArrangement = Arrangement.Center,
-                    maxItemsInEachRow = 2,
+                AnimatedVisibility(
+                    visible = !scrollState.isScrollInProgress,
                     modifier = Modifier
                         .weight(1f)
                         .align(Alignment.CenterHorizontally)
-                        .background(Color.Transparent)
-                ){
-                    if(currentPage.toInt()>1){
+                ) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.Center,
+                        maxItemsInEachRow = 2,
+                    ){
+                        if(currentPage.toInt()>1){
+                            Button(
+                                onClick = {
+                                    onPreviousPageClicked()
+                                    coroutineScope.launch {
+                                        scrollState.scrollToItem(0)
+                                    }
+                                },
+                            ){
+                                Text("Previous page")
+                            }
+                        }
                         Button(
                             onClick = {
-                                onPreviousPageClicked()
+                                onNextPageClicked()
                                 coroutineScope.launch {
                                     scrollState.scrollToItem(0)
                                 }
-                            },
-                        ){
-                            Text("Previous page")
-                        }
-                    }
-                    Button(
-                        onClick = {
-                            onNextPageClicked()
-                            coroutineScope.launch {
-                                scrollState.scrollToItem(0)
                             }
+                        ){
+                            Text("Next page")
                         }
-                    ){
-                        Text("Next page")
                     }
                 }
             }

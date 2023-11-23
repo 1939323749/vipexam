@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -70,17 +72,21 @@ fun questions(
     viewModel.setMubanList(mubanList)
     val uiState by viewModel.uiState.collectAsState()
     val questions = getQuestions(uiState.mubanList!!)
+    val haptics = LocalHapticFeedback.current
 
     Scaffold(
         floatingActionButton = {
             CustomFloatingActionButton(
                 expandable = true,
-                onFabClick = {},
+                onFabClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                },
                 iconExpanded = Icons.Filled.KeyboardArrowDown,
                 iconUnExpanded = Icons.Filled.KeyboardArrowUp,
                 items = questions,
                 onItemClick = {
                     navController.navigate(it)
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
             )
         },

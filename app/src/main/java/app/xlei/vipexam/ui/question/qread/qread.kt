@@ -119,6 +119,7 @@ private fun qread(
                 ) {
                     Text(
                         text = title,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontSize = 24.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -126,6 +127,7 @@ private fun qread(
                     )
                     Text(
                         text = article,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier
                             .padding(12.dp)
                     )
@@ -144,6 +146,7 @@ private fun qread(
                 ){
                     Text(
                         text = "${it+1}. " + choices.value[it].value.first,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.padding(12.dp)
                     )
                     choices.value[it].value.second?.let{ choice ->
@@ -153,7 +156,8 @@ private fun qread(
                             },
                             label = {
                                 Text(
-                                    text = choice
+                                    text = choice,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 )
                             }
                         )
@@ -188,6 +192,7 @@ private fun qread(
                         ){
                             Text(
                                 text = "${no+1}. " + ti.secondQuestion,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.padding(12.dp)
                             )
                         }

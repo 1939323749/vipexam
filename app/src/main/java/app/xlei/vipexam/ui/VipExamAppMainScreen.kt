@@ -2,7 +2,6 @@ package app.xlei.vipexam.ui
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -22,9 +21,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
 import app.xlei.vipexam.data.LoginResponse
-import app.xlei.vipexam.ui.page.ExamListView
+import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.ExamPage
-import io.ktor.http.websocket.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 
@@ -101,9 +99,10 @@ fun VipExamAppBar(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @OptIn(ExperimentalMaterial3Api::class, DelicateCoroutinesApi::class)
 @Composable
-fun VipExamApp(
+fun VipExamAppMainScreen(
     viewModel: ExamViewModel = viewModel(),
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    showBottomBar: MutableState<Boolean>
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
 
@@ -115,7 +114,11 @@ fun VipExamApp(
 
     var isFirstItemHidden by remember { mutableStateOf(false) }
 
-    var showAnswer = remember { mutableStateOf(false) }
+    val showAnswer = remember { mutableStateOf(false) }
+
+    if (navController.previousBackStackEntry == null){
+        showBottomBar.value = true
+    }
 
     Scaffold (
         topBar={
@@ -126,7 +129,7 @@ fun VipExamApp(
                 else
                     currentTitle,
                 canNavigateBack = navController.previousBackStackEntry !=null,
-                navigateUp = {navController.navigateUp()},
+                navigateUp = { navController.navigateUp() },
                 showAnswer = showAnswer,
                 onShowAnswerClick = {
                     showAnswer.value=!showAnswer.value
@@ -143,7 +146,7 @@ fun VipExamApp(
             composable(route = VipExamScreen.Login.name){
                 val coroutine= rememberCoroutineScope()
                 var loginResponse by remember { mutableStateOf<LoginResponse?>(null) }
-                login(
+                loginView(
                     account = uiState.account,
                     password = uiState.password,
                     loginResponse = loginResponse,
@@ -156,6 +159,7 @@ fun VipExamApp(
                             password = uiState.password
                         )
                         if(loginResponse!!.code=="1"){
+                            showBottomBar.value = false
                             viewModel._getExamList()
                             navController.navigate(VipExamScreen.ExamList.name)
                         }
@@ -165,7 +169,7 @@ fun VipExamApp(
             composable(route= VipExamScreen.ExamList.name){
                 val coroutine= rememberCoroutineScope()
                 uiState.examList?.let { examList ->
-                    ExamListView(
+                    examListView(
                         currentPage = uiState.currentPage,
                         examList = examList,
                         onPreviousPageClicked = {

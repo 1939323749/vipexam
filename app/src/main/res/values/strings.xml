@@ -4,4 +4,7 @@
     <string name="back_button">back</string>
     <string name="examlist">Exam List</string>
     <string name="exam">Exam</string>
+    <string name="setting">Setting</string>
+    <string name="main">Main</string>
+    <string name="second">Second</string>
 </resources>

@@ -78,6 +78,7 @@ private fun translate(
             ) {
                 Text(
                     text = muban.shiti[0].primQuestion,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(12.dp)
                 )
             }

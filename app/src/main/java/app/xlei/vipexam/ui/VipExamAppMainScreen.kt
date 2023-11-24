@@ -1,6 +1,7 @@
 package app.xlei.vipexam.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -21,10 +22,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
 import app.xlei.vipexam.data.LoginResponse
+import app.xlei.vipexam.data.models.room.Setting
+import app.xlei.vipexam.data.models.room.User
+import app.xlei.vipexam.logic.SETTING
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.ExamPage
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 enum class VipExamScreen(@StringRes val title: Int) {
     Login(title = R.string.login),
@@ -40,7 +43,7 @@ fun VipExamAppBar(
     navigateUp:()->Unit,
     modifier: Modifier=Modifier,
     showAnswer: MutableState<Boolean>,
-    onShowAnswerClick: ()->Unit
+    onShowAnswerClick: (Boolean)->Unit
 ){
     var showMenu by remember { mutableStateOf(false) }
 
@@ -74,21 +77,23 @@ fun VipExamAppBar(
             ){
                 DropdownMenuItem(
                     text = {
-                        Row (
-                           modifier = Modifier.align(Alignment.CenterHorizontally)
-                        ){
-                            Checkbox(
-                                checked = showAnswer.value,
-                                onCheckedChange = null,
-                            )
-                            Text(
-                                text = "show answer",
-                                modifier = Modifier
-                                    .padding(start = 4.dp)
-                            )
-                        }
+                        Text(
+                            text = "show answer",
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                        )
                     },
-                    onClick = onShowAnswerClick
+                    leadingIcon = {
+                                  Checkbox(
+                                      checked = showAnswer.value,
+                                      onCheckedChange = {
+                                          onShowAnswerClick(it)
+                                      }
+                                  )
+                    },
+                    onClick = {
+                        showMenu = false
+                    }
                 )
             }
         }
@@ -120,6 +125,61 @@ fun VipExamAppMainScreen(
         showBottomBar.value = true
     }
 
+    val coroutine = rememberCoroutineScope()
+
+    var users by remember { mutableStateOf<List<User>>(emptyList()) }
+    var setting by remember { mutableStateOf<Setting?>(null) }
+
+    var initialized by remember { mutableStateOf(false) }
+
+    DisposableEffect(Unit){
+        coroutine.launch {
+            withContext(Dispatchers.IO){
+                users = SETTING.repository.getAllUsers()
+                setting = SETTING.repository.getSetting()
+                setting?.let {
+                    Log.d("", it.isRememberAccount.toString())
+                    Log.d("", it.isAutoLogin.toString())
+                    viewModel.setSetting(it)
+                }
+            }
+            if (setting == null) {
+                withContext(Dispatchers.IO){
+                    SETTING.repository.insertSetting(
+                        Setting(
+                            id = 0,
+                            isRememberAccount = false,
+                            isAutoLogin = false,
+                        )
+                    )
+                    setting = SETTING.repository.getSetting()
+                }
+                viewModel.setSetting(setting!!)
+            }
+            setting?.let {
+                if (it.isRememberAccount){
+                    if (users.isNotEmpty()) {
+                        viewModel.setAccount(users[0].account)
+                        viewModel.setPassword(users[0].password)
+                    }
+                    if (it.isAutoLogin) {
+                        if (users.isNotEmpty()) {
+                            viewModel.login(
+                                users[0].account,
+                                users[0].password
+                            )
+                            viewModel._getExamList()
+                        }
+                        showBottomBar.value = false
+                        navController.navigate(VipExamScreen.ExamList.name)
+                    }
+                }
+            }
+            initialized = true
+        }
+        onDispose {  }
+    }
+
     Scaffold (
         topBar={
             VipExamAppBar(
@@ -132,7 +192,7 @@ fun VipExamAppMainScreen(
                 navigateUp = { navController.navigateUp() },
                 showAnswer = showAnswer,
                 onShowAnswerClick = {
-                    showAnswer.value=!showAnswer.value
+                    showAnswer.value=it
                 }
                 )
         }
@@ -144,14 +204,35 @@ fun VipExamAppMainScreen(
             modifier = Modifier.padding(padding)
         ){
             composable(route = VipExamScreen.Login.name){
-                val coroutine= rememberCoroutineScope()
                 var loginResponse by remember { mutableStateOf<LoginResponse?>(null) }
-                loginView(
+                if(initialized) loginView(
                     account = uiState.account,
                     password = uiState.password,
+                    users = users,
+                    setting = uiState.setting?: Setting(
+                        id = 0,
+                        isRememberAccount = false,
+                        isAutoLogin = false
+                    ),
                     loginResponse = loginResponse,
                     onAccountChange = {viewModel.setAccount(it)},
                     onPasswordChange = {viewModel.setPassword(it)},
+                    onDeleteUser = {
+                        coroutine.launch {
+                            withContext(Dispatchers.IO){
+                                SETTING.repository.deleteUser(it)
+                                users = SETTING.repository.getAllUsers()
+                            }
+                        }
+                    },
+                    onSettingChange = {
+                        viewModel.setSetting(it)
+                        coroutine.launch {
+                            withContext(Dispatchers.IO){
+                                SETTING.repository.updateSetting(it)
+                            }
+                        }
+                    }
                 ) {
                     coroutine.launch {
                         loginResponse=viewModel.login(
@@ -163,11 +244,23 @@ fun VipExamAppMainScreen(
                             viewModel._getExamList()
                             navController.navigate(VipExamScreen.ExamList.name)
                         }
+                        setting?.let {
+                            if (it.isRememberAccount && loginResponse!!.code=="1") {
+                                withContext(Dispatchers.IO){
+                                    SETTING.repository.insertUser(
+                                        User(
+                                            account = uiState.account,
+                                            password = uiState.password,
+                                        )
+                                    )
+                                    users = SETTING.repository.getAllUsers()
+                                }
+                            }
+                        }
                     }
                 }
             }
             composable(route= VipExamScreen.ExamList.name){
-                val coroutine= rememberCoroutineScope()
                 uiState.examList?.let { examList ->
                     examListView(
                         currentPage = uiState.currentPage,
@@ -219,6 +312,5 @@ fun VipExamAppMainScreen(
                 }
             }
         }
-
     }
 }

@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.graphics.drawable.Icon
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
@@ -16,42 +19,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
+import kotlinx.coroutines.launch
 
 enum class AppScreen(@StringRes val title: Int,val icon: ImageVector) {
     First(title = R.string.main, icon = Icons.Filled.Home),
     Second(title = R.string.second, icon = Icons.Filled.Edit),
     Third(title = R.string.setting, icon = Icons.Filled.Settings)
 }
-@Composable
-private fun MainScreenNavigationConfigurations(
-    navController: NavHostController,
-    showBottomBar: MutableState<Boolean>
-) {
-    NavHost(navController, startDestination = AppScreen.First.name) {
-        composable(AppScreen.First.name) {
-            VipExamAppMainScreen(
-                showBottomBar = showBottomBar
-            )
-        }
-        composable(AppScreen.Second.name) {
-            Text("todo")
-        }
-        composable(AppScreen.Third.name) {
-            Text("todo")
-        }
-    }
-}
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalFoundationApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @Composable
-fun App(
-    navController: NavHostController = rememberNavController()
-){
+fun App(){
     val items = listOf(
         AppScreen.First,
         AppScreen.Second,
@@ -59,29 +44,29 @@ fun App(
     )
     var selectedItem by remember { mutableIntStateOf(0) }
     val showBottomBar = remember { mutableStateOf(true) }
+    val pageState = rememberPagerState(pageCount = { items.size })
+    val coroutine = rememberCoroutineScope()
 
     Scaffold (
         bottomBar = {
             AnimatedVisibility(showBottomBar.value){
-                val backStackEntry by navController.currentBackStackEntryAsState()
-                val currentScreen = AppScreen.valueOf(
-                    backStackEntry?.destination?.route?: AppScreen.First.name
-                )
                 NavigationBar {
                     items.forEachIndexed { index, item ->
                         NavigationBarItem(
                             icon = { Icon(item.icon, contentDescription = item.name) },
                             label = {
-                                AnimatedVisibility(selectedItem == index){
-                                    if(selectedItem == index)Text(stringResource(items[selectedItem].title))else{
+                                AnimatedVisibility(pageState.currentPage == index){
+                                    if(pageState.currentPage == index)Text(stringResource(items[selectedItem].title))else{
                                         Spacer(Modifier)
                                     }
                                 } },
-                            selected = selectedItem == index,
+                            selected = pageState.currentPage == index,
                             onClick = {
                                 selectedItem = index
-                                if (currentScreen != items[selectedItem]) {
-                                    navController.navigate(items[selectedItem].name)
+                                if (pageState.currentPage != selectedItem) {
+                                    coroutine.launch {
+                                        pageState.animateScrollToPage(selectedItem)
+                                    }
                                 }
                             }
                         )
@@ -90,9 +75,17 @@ fun App(
             }
         }
     ){
-        MainScreenNavigationConfigurations(
-            navController = navController,
-            showBottomBar = showBottomBar
-        )
+        HorizontalPager(
+            state = pageState,
+            userScrollEnabled = showBottomBar.value
+        ){page ->
+            when (page){
+                0 -> VipExamAppMainScreen(
+                    showBottomBar = showBottomBar
+                )
+                1 -> Text("todo")
+                2 -> Text("todo")
+            }
+        }
     }
 }

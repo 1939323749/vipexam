@@ -85,7 +85,9 @@ fun questions(
                 iconUnExpanded = Icons.Filled.KeyboardArrowUp,
                 items = questions,
                 onItemClick = {
-                    navController.navigate(it)
+                    navController.navigate(it){
+                        restoreState = true
+                    }
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
             )

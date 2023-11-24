@@ -1,8 +1,11 @@
 package app.xlei.vipexam.ui
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.data.LoginResponse
+import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.ui.page.getExam
 import app.xlei.vipexam.ui.page.getExamList
 import app.xlei.vipexam.ui.page.getToken
@@ -84,6 +87,14 @@ class ExamViewModel: ViewModel() {
         _uiState.update {
             it.copy(
                 examList = it.token?.let { it1 -> getExamList(account = it.account, token = it1, currentPage = it.currentPage) }
+            )
+        }
+    }
+
+    fun setSetting(setting: Setting) {
+        _uiState.update {
+            it.copy(
+                setting = setting
             )
         }
     }

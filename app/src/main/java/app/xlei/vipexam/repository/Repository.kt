@@ -17,8 +17,6 @@ class Repository (
 
     suspend fun deleteUser(user: User) = userDao.delete(user)
 
-    suspend fun updateUser(user: User) = userDao.update(user)
-
     suspend fun insertSetting(setting: Setting)  = settingDao.insert(setting)
 
     suspend fun updateSetting(setting: Setting) = settingDao.update(setting)

@@ -117,4 +117,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
     // LiveData
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+
+    val MLkit_version = "17.0.2"
+    implementation("com.google.mlkit:translate:${MLkit_version}")
 }

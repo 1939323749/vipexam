@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.Shiti
+import kotlinx.coroutines.launch
 
 @Composable
 fun zreadView(
@@ -101,6 +102,8 @@ private fun zread(
 ){
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
+    val coroutine = rememberCoroutineScope()
+    var selectedArticle by remember { mutableStateOf(0) }
 
     Column {
         LazyColumn(
@@ -122,34 +125,37 @@ private fun zread(
                     color = Color.Gray
                 )
             }
-            items(muban.shiti.size){
-                Column(
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .combinedClickable(
-                            onClick = {},
-                            onLongClick = {
-                                onArticleLongClick(it)
-                            }
-                        )
-                ) {
-                    Text(
-                        text = "${it + 1}."+muban.shiti[it].primQuestion,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+            muban.shiti.forEachIndexed {it,ti->
+                item{
+                    Column(
                         modifier = Modifier
                             .padding(12.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .combinedClickable(
+                                onClick = {},
+                                onLongClick = {
+                                    selectedArticle = it
+                                    onArticleLongClick(it)
+                                }
+                            )
+                    ) {
+                        Text(
+                            text = "${it + 1}."+muban.shiti[it].primQuestion,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier
+                                .padding(12.dp)
+                        )
+                    }
+
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .padding(start = 12.dp, end = 12.dp),
+                        thickness = 1.dp,
+                        color = Color.Gray
                     )
                 }
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(start = 12.dp, end = 12.dp),
-                    thickness = 1.dp,
-                    color = Color.Gray
-                )
-                for ((num, t) in muban.shiti[it].children.withIndex()) {
+                items(ti.children.size){index->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -157,14 +163,14 @@ private fun zread(
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .clickable {
-                                onQuestionClicked(it to num)
+                                onQuestionClicked(it to index)
                             }
                     ) {
                         Column(
                             modifier = Modifier.padding(12.dp)
                         ) {
                             Text(
-                                text = "${num+1}." + t.secondQuestion,
+                                text = "${index+1}." + ti.children[index].secondQuestion,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 fontWeight = FontWeight.Bold
                             )
@@ -175,28 +181,28 @@ private fun zread(
                                 color = Color.Gray
                             )
                             Text(
-                                text = "[A]" + t.first,
+                                text = "[A]" + ti.children[index].first,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Text(
-                                text = "[B]" + t.second,
+                                text = "[B]" + ti.children[index].second,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Text(
-                                text = "[C]" + t.third,
+                                text = "[C]" + ti.children[index].third,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Text(
-                                text = "[D]" + t.fourth,
+                                text = "[D]" + ti.children[index].fourth,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
 
-                            if(getChoice(it,num,choices.value) !=null){
-                                if (getChoice(it,num,choices.value)!!.value.second.second!=null){
+                            if(getChoice(it,index,choices.value) !=null){
+                                if (getChoice(it,index,choices.value)!!.value.second.second!=null){
                                     SuggestionChip(
                                         onClick = {},
                                         label = {
-                                            getChoice(it,num,choices.value)!!.value.second.second?.let { Text(it) }
+                                            getChoice(it,index,choices.value)!!.value.second.second?.let { Text(it) }
                                         }
                                     )
                                 }
@@ -204,17 +210,15 @@ private fun zread(
                         }
                     }
                 }
-                if (showAnswer.value) {
-                    for ((no,children) in muban.shiti[it].children.withIndex()){
-                        Text("${no +1}"+children.refAnswer)
-                        Text(children.discription)
+                item {
+                    if (showAnswer.value) {
+                        for ((no,children) in muban.shiti[it].children.withIndex()){
+                            Text("${no +1}"+children.refAnswer)
+                            Text(children.discription)
+                        }
                     }
                 }
-
             }
-
-
-
         }
 
         if(showBottomSheet.value){
@@ -242,13 +246,21 @@ private fun zread(
                     showQuestionsSheet.value = false
                 },
             ){
-                for (question in questions.value) {
+                for ((index,question) in questions.value.withIndex()) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(12.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.primaryContainer)
+                            .clickable {
+                                coroutine.launch{
+                                    scrollState.scrollToItem(
+                                        index = index + 2 + selectedArticle * 7
+                                    )
+                                }
+                                showQuestionsSheet.value = false
+                            }
                     ) {
                         Column(
                             modifier = Modifier.padding(12.dp)

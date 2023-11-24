@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
+import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 @Composable
 fun qreadView(
@@ -87,6 +89,7 @@ private fun qread(
 ){
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
+    val coroutine = rememberCoroutineScope()
 
     Column {
         LazyColumn(
@@ -189,6 +192,12 @@ private fun qread(
                                 .padding(12.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
+                                .clickable {
+                                    coroutine.launch {
+                                        scrollState.animateScrollToItem(no+2)
+                                    }
+                                    showOptionsSheet.value = false
+                                }
                         ){
                             Text(
                                 text = "${no+1}. " + ti.secondQuestion,

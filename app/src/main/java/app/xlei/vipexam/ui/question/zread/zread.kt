@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -34,44 +35,34 @@ fun zreadView(
     onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
 ){
-    viewModel.init()
     viewModel.setMuban(muban)
-    viewModel.setChoices()
-    viewModel.setOptions()
-    viewModel.setQuestions()
+    viewModel.setArticles()
+
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
+    var selectedQuestionIndex by rememberSaveable { mutableStateOf(0) }
 
     zread(
-        muban = muban,
-        showBottomSheet = uiState.showBottomSheet!!,
-        showQuestionsSheet = uiState.showQuestionsSheet!!,
-        options = uiState.options!!,
-        choices = uiState.choices!!,
-        questions = uiState.questions!!,
+        name = uiState.muban!!.cname,
+        articles = uiState.articles,
+        showBottomSheet = uiState.showBottomSheet,
+        showQuestionsSheet = uiState.showQuestionsSheet,
+        toggleBottomSheet = { viewModel.toggleBottomSheet() },
+        toggleQuestionsSheet = { viewModel.toggleQuestionsSheet() },
         onArticleLongClick = {
-            uiState.questions!!.value = getZreadQuestions(shiti = uiState.muban!!.shiti[it])
-            uiState.showQuestionsSheet!!.value = true
+            selectedQuestionIndex = it
+            viewModel.toggleQuestionsSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
         onQuestionClicked = {
-            uiState.selectedChoiceIndex!!.value = it
-            uiState.showBottomSheet!!.value = true
+            selectedQuestionIndex = it
+            viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
-        onOptionClicked = {
-            if(uiState.selectedChoiceIndex!!.value!=-1 to -1){
-                for(choice in  uiState.choices!!.value){
-                    if(choice.value.first==uiState.selectedChoiceIndex!!.value.first){
-                        if(choice.value.second.first==uiState.selectedChoiceIndex!!.value.second){
-                            choice.value=choice.value.first to (choice.value.second.first to it)
-                        }
-                    }
-                }
-            }
-            uiState.showBottomSheet!!.value = false
+        onOptionClicked = {selectedArticleIndex,option->
+            viewModel.setOption(selectedArticleIndex,selectedQuestionIndex,option)
+            viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
-
         },
         onFirstItemHidden = {
             onFirstItemHidden(it)
@@ -87,15 +78,15 @@ fun zreadView(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun zread(
-    muban: Muban,
-    showBottomSheet:MutableState<Boolean>,
-    showQuestionsSheet:MutableState<Boolean>,
-    options:List<String>,
-    choices: MutableState<MutableList<MutableState<Pair<Int, Pair<Int, String?>>>>>,
-    questions: MutableState<MutableList<String>>,
+    name: String,
+    articles: List<ZreadUiState.Article>,
+    showBottomSheet: Boolean,
+    showQuestionsSheet: Boolean,
+    toggleBottomSheet: () -> Unit,
+    toggleQuestionsSheet: () -> Unit,
     onArticleLongClick:(Int)->Unit,
-    onQuestionClicked:(Pair<Int,Int>)->Unit,
-    onOptionClicked:(String)->Unit,
+    onQuestionClicked: (Int)->Unit,
+    onOptionClicked: (Int,String)->Unit,
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
@@ -103,7 +94,7 @@ private fun zread(
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
     val coroutine = rememberCoroutineScope()
-    var selectedArticle by remember { mutableStateOf(0) }
+    var selectedArticle by rememberSaveable { mutableStateOf(0) }
 
     Column {
         LazyColumn(
@@ -120,7 +111,7 @@ private fun zread(
             item {
                 Column{
                     Text(
-                        muban.cname,
+                        text = name,
                         fontSize = 24.sp,
                         modifier = Modifier
                             .padding(start = 12.dp)
@@ -133,7 +124,7 @@ private fun zread(
                     color = Color.Gray
                 )
             }
-            muban.shiti.forEachIndexed {it,ti->
+            articles.forEachIndexed {articleIndex,ti->
                 item{
                     Column(
                         modifier = Modifier
@@ -143,13 +134,14 @@ private fun zread(
                             .combinedClickable(
                                 onClick = {},
                                 onLongClick = {
-                                    selectedArticle = it
-                                    onArticleLongClick(it)
+                                    selectedArticle = articleIndex
+                                    onArticleLongClick(articleIndex)
                                 }
                             )
                     ) {
+                        Text(ti.index)
                         Text(
-                            text = "${it + 1}."+muban.shiti[it].primQuestion,
+                            text = ti.content,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier
                                 .padding(12.dp)
@@ -163,7 +155,7 @@ private fun zread(
                         color = Color.Gray
                     )
                 }
-                items(ti.children.size){index->
+                items(ti.questions.size){index->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -171,14 +163,15 @@ private fun zread(
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .clickable {
-                                onQuestionClicked(it to index)
+                                selectedArticle = articleIndex
+                                onQuestionClicked(index)
                             }
                     ) {
                         Column(
                             modifier = Modifier.padding(12.dp)
                         ) {
                             Text(
-                                text = "${index+1}." + ti.children[index].secondQuestion,
+                                text = "${ti.questions[index].index}. "+ti.questions[index].question,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 fontWeight = FontWeight.Bold
                             )
@@ -188,73 +181,66 @@ private fun zread(
                                 thickness = 1.dp,
                                 color = Color.Gray
                             )
-                            Text(
-                                text = "[A]" + ti.children[index].first,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                            Text(
-                                text = "[B]" + ti.children[index].second,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                            Text(
-                                text = "[C]" + ti.children[index].third,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                            Text(
-                                text = "[D]" + ti.children[index].fourth,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
 
-                            if(getChoice(it,index,choices.value) !=null){
-                                if (getChoice(it,index,choices.value)!!.value.second.second!=null){
-                                    SuggestionChip(
-                                        onClick = {},
-                                        label = {
-                                            getChoice(it,index,choices.value)!!.value.second.second?.let { Text(it) }
-                                        }
-                                    )
-                                }
+                            ti.questions[index].options.forEach {option->
+//                                Column(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .padding(12.dp)
+//                                        .clip(RoundedCornerShape(12.dp))
+//                                        .background(MaterialTheme.colorScheme.primaryContainer)
+//                                        .clickable {
+//                                        }
+//                                ) {
+//                                    Column(
+//                                        modifier = Modifier.padding(12.dp)
+//                                    ) {
+                                        Text(
+                                            text = "[${option.index}]"+option.option,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        )
+//                                    }
+//                                }
                             }
+                        if (ti.questions[index].choice.value!="")
+                            SuggestionChip(
+                                onClick = {},
+                                label = { Text(ti.questions[index].choice.value) }
+                            )
                         }
                     }
-                }
-                item {
-                    if (showAnswer.value) {
-                        for ((no,children) in muban.shiti[it].children.withIndex()){
-                            Text("${no +1}"+children.refAnswer)
-                            Text(children.discription)
+                    if (showAnswer.value)
+                        articles[articleIndex].questions.forEach {
+                            Text("${it.index}."+it.refAnswer)
+                            Text(it.description)
                         }
-                    }
                 }
             }
         }
 
-        if(showBottomSheet.value){
+        if(showBottomSheet){
             ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet.value = false
-                },
+                onDismissRequest = toggleBottomSheet,
             ){
-                for (option in options){
+                articles[selectedArticle].options.forEach{
                     SuggestionChip(
                         onClick = {
-                            onOptionClicked(option)
+                            onOptionClicked(selectedArticle , it)
                         },
                         label = {
-                            Text(option)
+                            Text(it)
                         }
                     )
                 }
             }
         }
 
-        if(showQuestionsSheet.value){
+        if(showQuestionsSheet){
             ModalBottomSheet(
-                onDismissRequest = {
-                    showQuestionsSheet.value = false
-                },
+                onDismissRequest = toggleQuestionsSheet,
             ){
-                for ((index,question) in questions.value.withIndex()) {
+                articles[selectedArticle].questions.forEach {
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -262,19 +248,14 @@ private fun zread(
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .clickable {
-                                coroutine.launch{
-                                    scrollState.scrollToItem(
-                                        index = index + 3 + selectedArticle * 7
-                                    )
-                                }
-                                showQuestionsSheet.value = false
+                                toggleQuestionsSheet()
                             }
                     ) {
                         Column(
                             modifier = Modifier.padding(12.dp)
                         ) {
                             Text(
-                                text = question,
+                                text = it.question,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
@@ -284,7 +265,7 @@ private fun zread(
         }
 
         if ( firstVisibleItemIndex > 0 )
-            onFirstItemHidden(muban.cname)
+            onFirstItemHidden(name)
         else
             onFirstItemAppear()
     }

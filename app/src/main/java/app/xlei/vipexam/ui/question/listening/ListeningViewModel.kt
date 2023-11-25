@@ -1,5 +1,6 @@
 package app.xlei.vipexam.ui.question.listening
 
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberTooltipState
@@ -63,11 +64,20 @@ class ListeningViewModel:ViewModel() {
                     audioFile = "https://rang.vipexam.org/Sound/${it.audioFiles}.mp3",
                     questions = getQuestions(it),
                     options = listOf("A","B","C","D"),
+                    player = getPlayers()
                 )
             )
         }
 
         return listenings
+    }
+
+    @Composable
+    fun getPlayers(): ListeningUiState.Player {
+        return ListeningUiState.Player(
+            mediaPlayer = remember { MediaPlayer() },
+            prepared = rememberSaveable { mutableStateOf(false) }
+        )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

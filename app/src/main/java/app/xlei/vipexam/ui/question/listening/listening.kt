@@ -79,12 +79,8 @@ private fun listening(
     onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
 ){
-    val mediaPlayers = mutableListOf<Pair<MediaPlayer,ListeningUiState.Listening>>()
     var selectedListening by rememberSaveable { mutableStateOf(0) }
 
-    listenings.forEach {
-        mediaPlayers.add(remember { MediaPlayer() } to it)
-    }
 
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
@@ -94,15 +90,16 @@ private fun listening(
     DisposableEffect(Unit) {
         coroutine.launch {
             withContext(Dispatchers.IO){
-                mediaPlayers.forEach{
-                    it.first.setDataSource(it.second.audioFile)
-                    it.first.prepare()
+                listenings.forEach{
+                    it.player.mediaPlayer.setDataSource(it.audioFile)
+                    it.player.mediaPlayer.prepare()
+                    it.player.prepared.value = true
                 }
             }
         }
         onDispose {
-            mediaPlayers.forEach {
-                it.first.release()
+            listenings.forEach {
+                it.player.mediaPlayer.release()
             }
         }
     }
@@ -127,7 +124,10 @@ private fun listening(
 
             items(listenings.size) {
                 Text("${it + 1}")
-                AudioPlayer(mediaPlayers[it].first)
+                AudioPlayer(
+                    mediaPlayer = listenings[it].player.mediaPlayer,
+                    enabled = listenings[it].player.prepared.value
+                )
                 listenings[it].questions.forEachIndexed {index,question ->
                     TooltipBox(
                         positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
@@ -206,7 +206,8 @@ private fun listening(
 @Stable
 @Composable
 fun AudioPlayer(
-    mediaPlayer: MediaPlayer
+    mediaPlayer: MediaPlayer,
+    enabled: Boolean,
 ) {
     var isPlaying by rememberSaveable { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
@@ -220,7 +221,8 @@ fun AudioPlayer(
                     mediaPlayer.pause()
                 }
                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-            }
+            },
+            enabled = enabled
         ) {
             Text(if (isPlaying) "Pause" else "Play")
         }

@@ -1,15 +1,33 @@
 package app.xlei.vipexam.ui.question.zread
 
+import android.net.wifi.WifiManager.SubsystemRestartTrackingCallback
 import androidx.compose.runtime.MutableState
 import app.xlei.vipexam.data.Muban
 
 data class ZreadUiState(
     val muban: Muban?=null,
-    var showBottomSheet: MutableState<Boolean>?=null,
-    var showQuestionsSheet: MutableState<Boolean>?=null,
-    var selectedChoiceIndex: MutableState<Pair<Int,Int>>?=null,
+    var showBottomSheet: Boolean = false,
+    var showQuestionsSheet: Boolean = false,
 
-    val options: List<String>?=null,
-    val choices: MutableState< MutableList<MutableState<Pair<Int, Pair<Int, String?>>>>>?=null,
-    val questions: MutableState<MutableList<String>>?=null,
-)
+    val articles: List<Article>,
+){
+    data class Article(
+        val index: String,
+        val content: String,
+        val questions: List<Question>,
+        val options: List<String> = listOf("A","B","C","D")
+    )
+    data class Question(
+        val index: String,
+        val question: String,
+        val options: List<Option>,
+        val choice: MutableState<String>,
+        val refAnswer: String,
+        val description: String,
+    )
+
+    data class Option(
+        val index: String,
+        val option: String,
+    )
+}

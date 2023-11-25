@@ -1,5 +1,6 @@
 package app.xlei.vipexam.ui.question.listening
 
+import android.media.MediaPlayer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TooltipState
 import androidx.compose.runtime.MutableState
@@ -16,6 +17,7 @@ data class ListeningUiState(
         val audioFile: String,
         val questions: List<Question>,
         val options: List<String>,
+        val player: Player,
     )
 
     data class Question @OptIn(ExperimentalMaterial3Api::class) constructor(
@@ -29,5 +31,10 @@ data class ListeningUiState(
     data class Option(
         val index: String,
         val option: String,
+    )
+
+    data class Player(
+        val mediaPlayer: MediaPlayer,
+        val prepared: MutableState<Boolean>,
     )
 }

@@ -28,9 +28,13 @@ fun translateView(
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
+    viewModel.setTranslations()
+
     val uiState by viewModel.uiState.collectAsState()
+
     translate(
-        muban = uiState.muban!!,
+        name = uiState.muban!!.cname,
+        translations = uiState.translations,
         onFirstItemHidden = {
             onFirstItemHidden(it)
         },
@@ -44,7 +48,8 @@ fun translateView(
 
 @Composable
 private fun translate(
-    muban: Muban,
+    name: String,
+    translations: List<TranslateUiState.Translation>,
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
@@ -57,7 +62,7 @@ private fun translate(
     ){
         item{
             Text(
-                muban.cname,
+                name,
                 fontSize = 24.sp,
                 modifier = Modifier
                     .padding(start = 12.dp)
@@ -69,7 +74,8 @@ private fun translate(
                 color = Color.Gray
             )
         }
-        item {
+        items(translations.size){
+
             Column(
                 modifier = Modifier
                     .padding(12.dp)
@@ -77,22 +83,24 @@ private fun translate(
                     .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
-                    text = muban.shiti[0].primQuestion,
+                    text = translations[it].question,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(12.dp)
                 )
             }
-        }
-        if(showAnswer.value){
-            item {
-                Text(muban.shiti[0].refAnswer)
+
+            if(showAnswer.value){
+                Text(translations[it].refAnswer)
             }
+
         }
 
     }
-    if(firstVisibleItemIndex>0){
-        onFirstItemHidden(muban.cname)
-    }else{
+
+    if ( firstVisibleItemIndex > 0 )
+        onFirstItemHidden(name)
+    else
         onFirstItemAppear()
-    }
+
+
 }

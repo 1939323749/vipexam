@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -41,28 +42,28 @@ fun clozeView(
     onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
 ){
-    viewModel.init()
     viewModel.setMuban(muban)
-    viewModel.setChoices()
-    viewModel.setOptions()
+    viewModel.setClozes()
+
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
+    var selectedQuestionIndex by rememberSaveable { mutableStateOf(0) }
+
     cloze(
-        muban = muban,
-        showBottomSheet = uiState.showBottomSheet!!,
-        options = uiState.options!!,
-        choices = uiState.choices!!,
-        onButtonsClicked = {
-            uiState.showBottomSheet!!.value=true
-            uiState.selectedChoiceIndex!!.value=it
+        name = uiState.muban!!.cname,
+        clozes = uiState.clozes,
+        showBottomSheet = uiState.showBottomSheet,
+        onBlankClick = {
+            selectedQuestionIndex = it
+            viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        onOptionClicked = {
-            uiState.showBottomSheet!!.value = false
-            uiState.choices!![uiState.selectedChoiceIndex!!.value].value=uiState
-                .choices!![uiState.selectedChoiceIndex!!.value].value.first to it
+        onOptionClicked = {selectedClozeIndex,option->
+            viewModel.setOption(selectedClozeIndex,selectedQuestionIndex,option)
+            viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
+        toggleBottomSheet = {viewModel.toggleBottomSheet()},
         onFirstItemHidden = {
             onFirstItemHidden(it)
         },
@@ -76,18 +77,19 @@ fun clozeView(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun cloze(
-    muban: Muban,
-    showBottomSheet:MutableState<Boolean>,
-    options: List<Pair<String,String>>,
-    choices : MutableList<MutableState<Pair<String, String?>>>,
-    onButtonsClicked:(Int)->Unit,
-    onOptionClicked:(String)->Unit,
+    name: String,
+    clozes: List<ClozeUiState.Cloze>,
+    showBottomSheet: Boolean,
+    onBlankClick: (Int)->Unit,
+    onOptionClicked: (Int,ClozeUiState.Option)->Unit,
+    toggleBottomSheet: () -> Unit,
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>
 ){
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
+    var selectedClozeIndex by rememberSaveable { mutableStateOf(0) }
 
     Column{
         LazyColumn(
@@ -96,7 +98,7 @@ private fun cloze(
         ) {
             item {
                 Text(
-                    muban.cname,
+                    name,
                     fontSize = 24.sp,
                     modifier = Modifier
                         .padding(start = 12.dp)
@@ -108,74 +110,66 @@ private fun cloze(
                     color = Color.Gray
                 )
             }
-            item {
+            items(clozes.size){ clozeIndex ->
                 Column(
                     modifier = Modifier
                         .padding(top = 12.dp,start = 12.dp, end = 12.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    val annotatedStringAndTags = getClickableArticle(muban.shiti[0].primQuestion)
-                    ClickableText(
-                        text = annotatedStringAndTags.first,
-                        style = LocalTextStyle.current.copy(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                        onClick = {
-                            for ((index,tag) in annotatedStringAndTags.second.withIndex()){
-                                annotatedStringAndTags.first.getStringAnnotations(tag = tag, start = it, end = it).firstOrNull()?.let {
-                                    onButtonsClicked(index)
+                        ClickableText(
+                            text = clozes[clozeIndex].article.article,
+                            style = LocalTextStyle.current.copy(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            onClick = {
+                                clozes[clozeIndex].article.tags.forEachIndexed { index,tag->
+                                    clozes[clozeIndex].article.article.getStringAnnotations(tag = tag, start = it, end = it).firstOrNull()?.let {
+                                        selectedClozeIndex = clozeIndex
+                                        onBlankClick(index)
+                                    }
                                 }
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(start = 4.dp, end = 4.dp)
-                    )
+                            },
+                            modifier = Modifier
+                                .padding(start = 4.dp, end = 4.dp)
+                        )
                 }
-            }
-            item {
                 FlowRow(
                     horizontalArrangement = Arrangement.Start,
                     maxItemsInEachRow = 2,
                 ) {
-                    for (index in choices.indices){
+                    clozes[clozeIndex].blanks.forEachIndexed {index,blank->
                         Column(
                             modifier = Modifier
                                 .weight(1f)
                         ) {
                             SuggestionChip(
                                 onClick = {
-                                    onButtonsClicked(index)
+                                    onBlankClick(index)
                                 },
                                 label = {
                                     Text(
-                                        text = choices[index].value.first +
-                                                if(choices[index].value.second==null){
-                                                    ""
-                                                }else{
-                                                    choices[index].value.second
-                                                }
+                                        text = blank.index + blank.choice.value
                                     )
                                 }
                             )
                         }
                     }
                 }
+                if(showAnswer.value)
+                    clozes[clozeIndex].blanks.forEach {blank->
+                        Text(blank.index+blank.refAnswer)
+                        Text(blank.description)
+                    }
+
             }
-            if(showAnswer.value){
-                items(muban.shiti[0].children.size){
-                    Text(muban.shiti[0].children[it].secondQuestion + muban.shiti[0].children[it].refAnswer)
-                    Text(muban.shiti[0].children[it].discription)
-                }
-            }
+
 
         }
 
-        if (showBottomSheet.value) {
+        if (showBottomSheet) {
             ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet.value = false
-                },
+                onDismissRequest = toggleBottomSheet,
             ) {
                 FlowRow(
                     horizontalArrangement = Arrangement.Start,
@@ -183,17 +177,17 @@ private fun cloze(
                     modifier = Modifier
                         .padding(bottom = 20.dp)
                 ) {
-                    for (option in options){
+                    clozes[selectedClozeIndex].options.forEach{
                         Column(
                             modifier = Modifier
                                 .weight(1f)
                         ){
                             SuggestionChip(
                                 onClick = {
-                                    onOptionClicked(option.second)
+                                    onOptionClicked(selectedClozeIndex,it)
                                 },
                                 label = {
-                                    Text("[${option.first}]${option.second}")
+                                    Text("[${it.index}]${it.word}")
                                 },
                             )
                         }
@@ -203,68 +197,11 @@ private fun cloze(
             }
         }
 
-        if(firstVisibleItemIndex>0){
-            onFirstItemHidden(muban.cname)
-        }else{
+        if(firstVisibleItemIndex>0)
+            onFirstItemHidden(name)
+        else
             onFirstItemAppear()
-        }
+
     }
 }
 
-fun getClickableArticle(text: String): Pair<AnnotatedString,List<String>> {
-    val pattern = Regex("""C\d+""")
-    val matches = pattern.findAll(text)
-
-    val tags = mutableListOf<String>()
-
-    val annotatedString = buildAnnotatedString {
-        var currentPosition = 0
-        for (match in matches) {
-            val startIndex = match.range.first
-            val endIndex = match.range.last + 1
-
-            append(text.substring(currentPosition, startIndex))
-
-            val tag = text.substring(startIndex, endIndex)
-
-            pushStringAnnotation(tag = tag, annotation = tag )
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color.Unspecified)) {
-                append(text.substring(startIndex, endIndex))
-            }
-            pop()
-            tags.add(tag)
-
-            currentPosition = endIndex
-        }
-
-        if (currentPosition < text.length) {
-            append(text.substring(currentPosition, text.length))
-        }
-    }
-
-    return annotatedString to tags
-}
-
-fun getClozeChoices(children: List<Children>): MutableList<MutableState<Pair<String, String?>>> {
-    val choices = mutableListOf<MutableState<Pair<String, String?>>>()
-
-    for(ti in children){
-        choices.add(mutableStateOf(ti.secondQuestion to null) )
-    }
-
-    return choices
-}
-
-fun getClozeOptions(text: String):List<Pair<String,String>>{
-    val pattern = Regex("""([A-O])\)\s*([^A-O]+)""")
-    val matches = pattern.findAll(text)
-    val options = mutableListOf<Pair<String, String>>()
-
-    for (match in matches) {
-        val option = match.groupValues[1]
-        val optionText = match.groupValues[2].trim()
-        options.add(option to optionText)
-    }
-
-    return options.sortedBy { it.first }
-}

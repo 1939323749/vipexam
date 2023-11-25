@@ -30,9 +30,11 @@ fun writingView(
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
+    viewModel.setWritings()
     val uiState by viewModel.uiState.collectAsState()
     writing(
-        muban = uiState.muban!!,
+        name = uiState.muban!!.cname,
+        writings = uiState.writings,
         onFirstItemHidden = {
             onFirstItemHidden(it)
         },
@@ -45,7 +47,8 @@ fun writingView(
 
 @Composable
 private fun writing(
-    muban: Muban,
+    name: String,
+    writings: List<WritingUiState.Writing>,
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
@@ -60,7 +63,7 @@ private fun writing(
     ) {
         item {
             Text(
-                muban.cname,
+                text = name,
                 fontSize = 24.sp,
                 modifier = Modifier
                     .padding(start = 12.dp)
@@ -69,10 +72,10 @@ private fun writing(
                 modifier = Modifier
                     .padding(start = 12.dp, end = 12.dp),
                 thickness = 1.dp,
-                color = Color.Gray
+                color = Color.Gray,
             )
         }
-        item {
+        items(writings.size){
             Column(
                 modifier = Modifier
                     .padding(top = 12.dp,start = 12.dp, end = 12.dp)
@@ -80,23 +83,22 @@ private fun writing(
                     .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
-                    muban.shiti[0].primQuestion,
+                    text = writings[it].question,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier
                         .padding(start = 4.dp, end = 4.dp)
                 )
             }
-        }
-        if (showAnswer.value){
-            item {
-                Text(muban.shiti[0].refAnswer)
-            }
+            if (showAnswer.value)
+                Text(
+                    text = writings[it].refAnswer
+                )
         }
 
     }
 
     if( firstVisibleItemIndex > 0)
-        onFirstItemHidden(muban.cname)
+        onFirstItemHidden(name)
     else
         onFirstItemAppear()
 

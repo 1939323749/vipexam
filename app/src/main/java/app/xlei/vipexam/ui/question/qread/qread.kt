@@ -18,10 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.ui.question.cloze.getClozeOptions
-import kotlinx.coroutines.launch
 
 @Composable
 fun qreadView(
@@ -85,7 +82,6 @@ private fun qread(
     val scrollState = rememberLazyListState()
     var selectedArticle by remember { mutableStateOf(0) }
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
-    val coroutine = rememberCoroutineScope()
 
     Column {
         LazyColumn(

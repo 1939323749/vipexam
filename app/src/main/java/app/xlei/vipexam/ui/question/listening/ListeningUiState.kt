@@ -1,14 +1,33 @@
 package app.xlei.vipexam.ui.question.listening
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TooltipState
 import androidx.compose.runtime.MutableState
 import app.xlei.vipexam.data.Muban
 
 data class ListeningUiState(
     val muban: Muban?=null,
-    var showBottomSheet: MutableState<Boolean>?=null,
-    var showOptionsSheet: MutableState<Boolean>?=null,
-    var selectedChoiceIndex: MutableState<Pair<Int, Int>>?=null,
+    var showOptionsSheet: Boolean=false,
 
-    val options: List<String>?=null,
-    val choices: MutableList<MutableState<Pair<Int, Pair<Int, String?>>>>?=null,
-)
+    val listenings: List<Listening>,
+){
+    data class Listening(
+        val originalText: String,
+        val audioFile: String,
+        val questions: List<Question>,
+        val options: List<String>,
+    )
+
+    data class Question @OptIn(ExperimentalMaterial3Api::class) constructor(
+        val index: String,
+        val options: List<Option>,
+        var choice: MutableState<String>,
+        val refAnswer: String,
+        val tooltipState: TooltipState,
+    )
+
+    data class Option(
+        val index: String,
+        val option: String,
+    )
+}

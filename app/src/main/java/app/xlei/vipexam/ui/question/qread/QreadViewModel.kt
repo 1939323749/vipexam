@@ -1,26 +1,25 @@
 package app.xlei.vipexam.ui.question.qread
 
+import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
+import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.data.Shiti
+import app.xlei.vipexam.ui.page.getQuestions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class QreadViewModel : ViewModel(){
-    private val _uiState = MutableStateFlow(QreadUiState())
+    private val _uiState = MutableStateFlow(QreadUiState(
+        articles = emptyList()
+    ))
     val uiState: StateFlow<QreadUiState> = _uiState.asStateFlow()
-
-    @Composable
-    fun init() {
-        uiState.value.showBottomSheet = remember { mutableStateOf(false) }
-        uiState.value.showOptionsSheet = remember { mutableStateOf(false) }
-        uiState.value.selectedChoiceIndex = remember { mutableStateOf(-1) }
-    }
 
     fun setMuban(muban: Muban){
         _uiState.update {
@@ -30,55 +29,101 @@ class QreadViewModel : ViewModel(){
         }
     }
 
-    fun setTitle() {
+    @Composable
+
+    fun setArticles () {
+        val articles = mutableListOf<QreadUiState.Article>()
+        _uiState.value.muban!!.shiti.forEach {
+            articles.add(
+                QreadUiState.Article(
+                    title = extractFirstPart(it.primQuestion),
+                    content = extractSecondPart(it.primQuestion),
+                    questions = getQuestions(it.children),
+                    options = getOptions(it.primQuestion),
+            ))
+        }
         _uiState.update {
             it.copy(
-                title = extractFirstPart(
-                    text = it.muban!!.shiti[0].primQuestion
-                ).trim()
+                articles = articles
             )
         }
     }
 
-    fun setArticle() {
+    fun toggleBottomSheet(){
         _uiState.update {
             it.copy(
-                article = extractSecondPart(
-                    text = it.muban!!.shiti[0].primQuestion
+                showBottomSheet = !it.showBottomSheet
+            )
+        }
+    }
+
+    fun toggleOptionsSheet(){
+        _uiState.update {
+            it.copy(
+                showOptionsSheet = !it.showOptionsSheet
+            )
+        }
+    }
+
+    fun setOption(selectedArticleIndex: Int,selectedQuestion: Int,option: QreadUiState.Option) {
+        _uiState.value.articles[selectedArticleIndex].questions[selectedQuestion].choice.value = option.option
+        _uiState.value.articles.forEach {article ->
+            article.questions.forEach {question ->
+                Log.d("",question.choice.value)
+            }
+        }
+    }
+
+    private fun getOptions(text: String): MutableList<QreadUiState.Option> {
+        val result = mutableListOf<QreadUiState.Option>()
+        val pattern = Regex("""([A-Z])([)])""")
+        val matches = pattern.findAll(text)
+        for((index,match) in matches.withIndex()){
+            result.add(
+                QreadUiState.Option(
+                    index = index + 1,
+                    option = match.groupValues[1]
                 )
             )
         }
+        return result
     }
 
     @Composable
-    fun setChoices() {
-        _uiState.update {
-            it.copy(
-                choices = remember { mutableStateOf(getQreadChoices(it.muban!!.shiti[0].children)) }
+    private fun getQuestions(children: List<Children>): MutableList<QreadUiState.Question> {
+        val questions = mutableListOf<QreadUiState.Question>()
+
+        children.forEachIndexed {index,it->
+            questions.add(
+                QreadUiState.Question(
+                    index = "${index + 1}",
+                    question = it.secondQuestion,
+                    choice = remember { mutableStateOf("") },
+                    refAnswer = it.refAnswer,
+                    description = it.discription
+                )
             )
         }
-    }
 
-    fun setOptions() {
-        _uiState.update {
-            it.copy(
-                options = getQreadOptions(it.article!!)
-            )
+        return questions
+    }
+    private fun extractFirstPart(text: String): String {
+        val lines = text.split("\n")
+        if (lines.isNotEmpty()) {
+            return lines.first().trim()
         }
+        return ""
     }
 
-    fun setChoice(option: String) {
-        _uiState.update { uiState ->
-            val selectedChoiceIndex = uiState.selectedChoiceIndex?.value ?: return@update uiState
-            val newChoices = uiState.choices
-
-            if (selectedChoiceIndex >= 0 && selectedChoiceIndex < newChoices!!.value.size) {
-                val pair = newChoices.value[selectedChoiceIndex].value
-                newChoices.value[selectedChoiceIndex].value = pair.first to option
-            }
-
-            uiState.copy(choices = newChoices)
+    private fun extractSecondPart(text: String): String {
+        val index = text.indexOf("\n")
+        if (index != -1) {
+            return text.substring(index + 1)
         }
+        return ""
     }
+
+
+
 
 }

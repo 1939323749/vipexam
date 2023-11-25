@@ -1,5 +1,6 @@
 package app.xlei.vipexam.ui.question.qread
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,8 +20,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.ui.question.cloze.getClozeOptions
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
 
 @Composable
 fun qreadView(
@@ -30,35 +31,29 @@ fun qreadView(
     onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
 ){
-    viewModel.init()
     viewModel.setMuban(muban)
-    viewModel.setTitle()
-    viewModel.setArticle()
-    viewModel.setChoices()
-    viewModel.setOptions()
+    viewModel.setArticles()
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
+    var selectedQuestionIndex by remember { mutableStateOf(0) }
 
     qread(
-        muban = uiState.muban!!,
-        showBottomSheet = uiState.showBottomSheet!!,
-        showOptionsSheet = uiState.showOptionsSheet!!,
-        title = uiState.title!!,
-        article = uiState.article!!,
-        options = uiState.options!!,
-        choices  = uiState.choices!!,
+        name = uiState.muban!!.cname,
+        showBottomSheet = uiState.showBottomSheet,
+        showOptionsSheet = uiState.showOptionsSheet,
+        articles = uiState.articles,
+        toggleBottomSheet = { viewModel.toggleBottomSheet() },
+        toggleOptionsSheet = { viewModel.toggleOptionsSheet() },
         onArticleLongClicked = {
-            uiState.showBottomSheet!!.value=true
+            viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         onQuestionClicked = {
-            uiState.selectedChoiceIndex!!.value = it
-            uiState.showOptionsSheet!!.value = true
+            selectedQuestionIndex = it
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        onOptionClicked = {
-            viewModel.setChoice(it)
-            uiState.showOptionsSheet!!.value = false
+        onOptionClicked = {selectedArticleIndex,option->
+            viewModel.setOption(selectedArticleIndex,selectedQuestionIndex,option)
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         onFirstItemHidden = {
@@ -67,28 +62,28 @@ fun qreadView(
         onFirstItemAppear = {
             onFirstItemAppear()
         },
-        showAnswer = showAnswer
+        showAnswer = showAnswer,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun qread(
-    muban: Muban,
-    showBottomSheet:MutableState<Boolean>,
-    showOptionsSheet:MutableState<Boolean>,
-    title:String,
-    article:String,
-    options:List<String>,
-    choices: MutableState<MutableList<MutableState<Pair<String, String?>>>> ,
+    name: String,
+    showBottomSheet: Boolean,
+    showOptionsSheet: Boolean,
+    articles: List<QreadUiState.Article>,
+    toggleBottomSheet: () -> Unit,
+    toggleOptionsSheet: () -> Unit,
     onArticleLongClicked:()->Unit,
-    onQuestionClicked:(Int)->Unit,
-    onOptionClicked:(String)->Unit,
+    onQuestionClicked: (Int)->Unit,
+    onOptionClicked: (Int,QreadUiState.Option)->Unit,
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
+    var selectedArticle by remember { mutableStateOf(0) }
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
     val coroutine = rememberCoroutineScope()
 
@@ -98,7 +93,7 @@ private fun qread(
         ) {
             item {
                 Text(
-                    muban.cname,
+                    name,
                     fontSize = 24.sp,
                     modifier = Modifier
                         .padding(start = 12.dp)
@@ -110,7 +105,7 @@ private fun qread(
                     color = Color.Gray
                 )
             }
-            item {
+            items(articles.size) {
                 Column(
                     modifier = Modifier
                         .padding(12.dp)
@@ -118,11 +113,13 @@ private fun qread(
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .combinedClickable (
                             onClick = {},
-                            onLongClick = onArticleLongClicked
+                            onLongClick = {
+                                selectedArticle = it
+                                onArticleLongClicked() }
                         )
                 ) {
                     Text(
-                        text = title,
+                        text = articles[it].title,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontSize = 24.sp,
                         textAlign = TextAlign.Center,
@@ -130,63 +127,32 @@ private fun qread(
                             .align(Alignment.CenterHorizontally)
                     )
                     Text(
-                        text = article,
+                        text = articles[it].content,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier
                             .padding(12.dp)
                     )
                 }
+
+                if (showAnswer.value )
+                    articles[it].questions.forEach {question->
+                        Text(question.index+question.refAnswer)
+                        Text(question.description)
+                    }
             }
 
-            items(choices.value.size){
-                Column (
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .clickable {
-                            onQuestionClicked(it)
-                        }
-                ){
-                    Text(
-                        text = "${it+1}. " + choices.value[it].value.first,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.padding(12.dp)
-                    )
-                    choices.value[it].value.second?.let{ choice ->
-                        SuggestionChip(
-                            onClick = {
-                                onQuestionClicked(it)
-                            },
-                            label = {
-                                Text(
-                                    text = choice,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                )
-                            }
-                        )
-                    }
-                }
-            }
-            if (showAnswer.value){
-                items(muban.shiti[0].children.size){
-                    Text("${it + 1}"+ muban.shiti[0].children[it].refAnswer)
-                    Text(muban.shiti[0].children[it].discription)
-                }
-            }
         }
 
-        if(showBottomSheet.value){
+        // questions
+        if(showBottomSheet){
             ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet.value=false
-                },
+                onDismissRequest = toggleBottomSheet,
             ){
                 Column (
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
                 ){
-                    for((no,ti) in muban.shiti[0].children.withIndex()){
+                    articles[selectedArticle].questions.forEachIndexed{index,it->
                         Column (
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -194,28 +160,32 @@ private fun qread(
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .clickable {
-                                    coroutine.launch {
-                                        scrollState.animateScrollToItem(no+2)
-                                    }
-                                    showOptionsSheet.value = false
+                                    onQuestionClicked(index)
+                                    toggleOptionsSheet()
                                 }
                         ){
                             Text(
-                                text = "${no+1}. " + ti.secondQuestion,
+                                text = "${it.index}. ${it.question}",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.padding(12.dp)
                             )
+                            Log.d("",it.choice.value)
+                            if (it.choice.value!="") {
+                                SuggestionChip(
+                                    onClick = toggleOptionsSheet,
+                                    label = { Text(it.choice.value) }
+                                )
+                            }
                         }
                     }
                 }
             }
         }
 
-        if(showOptionsSheet.value){
+        // options
+        if(showOptionsSheet){
             ModalBottomSheet(
-                onDismissRequest = {
-                    showOptionsSheet.value=false
-                },
+                onDismissRequest = toggleOptionsSheet,
             ){
                 Column (
                     modifier = Modifier
@@ -227,17 +197,18 @@ private fun qread(
                         modifier = Modifier
                             .padding(bottom = 20.dp)
                     ) {
-                        for(option in options){
+                        articles[selectedArticle].options.forEach {
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
                             ) {
                                 SuggestionChip(
                                     onClick = {
-                                        onOptionClicked(option)
+                                        onOptionClicked(selectedArticle,it)
+                                        toggleOptionsSheet()
                                     },
                                     label = {
-                                        Text(option)
+                                        Text(it.option)
                                     }
                                 )
                             }
@@ -248,44 +219,9 @@ private fun qread(
         }
 
         if ( firstVisibleItemIndex > 0 )
-            onFirstItemHidden(muban.cname)
+            onFirstItemHidden(name)
         else
             onFirstItemAppear()
     }
 }
 
-fun extractFirstPart(text: String): String {
-    val lines = text.split("\n")
-    if (lines.isNotEmpty()) {
-        return lines.first()
-    }
-    return ""
-}
-
-fun extractSecondPart(text: String): String {
-    val index = text.indexOf("\n")
-    if (index != -1) {
-        return text.substring(index + 1)
-    }
-    return ""
-}
-
-fun getQreadOptions(text: String):List<String>{
-    val result = mutableListOf<String>()
-    val pattern = Regex("""([A-Z])([)])""")
-    val matches = pattern.findAll(text)
-    for(match in matches){
-        result.add(match.groupValues[1])
-    }
-    return result
-}
-
-fun getQreadChoices(children: List<Children>): MutableList<MutableState<Pair<String, String?>>> {
-    val choices = mutableListOf<MutableState<Pair<String, String?>>>()
-
-    for(ti in children){
-        choices.add(mutableStateOf(ti.secondQuestion to null) )
-    }
-
-    return choices
-}

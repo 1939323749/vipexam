@@ -59,6 +59,7 @@ fun qreadView(
         onOptionClicked = {
             viewModel.setChoice(it)
             uiState.showOptionsSheet!!.value = false
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         onFirstItemHidden = {
             onFirstItemHidden(it)

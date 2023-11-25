@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +9,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -19,8 +20,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import app.xlei.vipexam.constant.Constants
+import androidx.compose.ui.unit.sp
 import app.xlei.vipexam.data.ExamList
 import com.google.gson.Gson
 import io.ktor.client.*
@@ -30,23 +32,82 @@ import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
-@SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun examListView(
     currentPage: String,
     examList: ExamList,
-    onPreviousPageClicked:()->Unit,
-    onNextPageClicked:()->Unit,
-    onExamClicked:(String)->Unit,
-    refresh: ()->Unit,
-    onFirstItemHidden: ()->Unit,
-    onFirstItemAppear: ()->Unit
+    isPractice: Boolean,
+    onPreviousPageClicked: () -> Unit,
+    onNextPageClicked: () -> Unit,
+    onExamClicked: (String) -> Unit,
+    refresh: () -> Unit,
+    onFirstItemHidden: () -> Unit,
+    onFirstItemAppear: () -> Unit
 ){
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
 
     Scaffold(
+        bottomBar = {
+            BottomAppBar {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        FilledIconButton(
+                            onClick = {
+                                onPreviousPageClicked()
+                                coroutineScope.launch {
+                                    scrollState.animateScrollToItem(0)
+                                } },
+                            enabled = currentPage.toInt() > 1
+                        ){
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                contentDescription = "previous page",
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.Bottom)
+                    ) {
+                        Text(
+                            text = "${(currentPage.toInt()-1) * 20 +1}-" +
+                                    "${(currentPage.toInt()-1) * 20 +20}/" +
+                                    "${examList.count}",
+                            fontSize = 12.sp
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically)
+                    ) {
+                        FilledIconButton(
+                            onClick = {
+                                onNextPageClicked()
+                                coroutineScope.launch {
+                                    scrollState.animateScrollToItem(0)
+                                } },
+                        ){
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = "next page",
+                            )
+                        }
+
+                    }
+                }
+            }
+        },
         floatingActionButton = {
             if(firstVisibleItemIndex >0) FloatingActionButton(
                 onClick = {
@@ -58,7 +119,7 @@ fun examListView(
                 Icon(Icons.Default.KeyboardArrowUp,"back to top")
             }
         }
-    ) {
+    ) {padding ->
         val refreshing by remember{ mutableStateOf(false) }
 
         val state = rememberPullRefreshState(refreshing, refresh)
@@ -72,73 +133,63 @@ fun examListView(
         Box (
             modifier = Modifier
                 .pullRefresh(state)
+                .padding(padding)
         ){
-            Column {
+            Column{
                 LazyColumn(
                     state = scrollState,
-                    modifier = Modifier.weight(9f)
                 ){
                     items(examList.list.size){
-                        ListItem(
-                            headlineContent = { Text(getExamNameAndNo(examList.list[it].examname).first) },
-                            trailingContent = { Text(getExamNameAndNo(examList.list[it].examname).second) },
-                            leadingContent = {
-                                Box(
-                                    modifier = Modifier
-                                        .height(40.dp)
-                                        .clip(CircleShape)
-                                        .aspectRatio(1f)
-                                        .background(MaterialTheme.colorScheme.primaryContainer)
-                                ){
-                                    Text(
-                                        text = getExamCET6Keyword(examList.list[it].examname),
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        if (isPractice)
+                            ListItem(
+                                headlineContent = { Text(getExamNameAndNo(examList.list[it].examname).first) },
+                                trailingContent = { Text(getExamNameAndNo(examList.list[it].examname).second) },
+                                leadingContent = {
+                                    Box(
                                         modifier = Modifier
-                                            .align(Alignment.Center)
-                                    )
-                                }
-                            },
-                            modifier = Modifier
-                                //.background(MaterialTheme.colorScheme.primaryContainer)
-                                .clickable {
-                                    onExamClicked(examList.list[it].examid)
-                                }
-                        )
-                        HorizontalDivider()
-                    }
-                }
-                AnimatedVisibility(
-                    visible = !scrollState.isScrollInProgress,
-                    modifier = Modifier
-                        .weight(1f)
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    FlowRow(
-                        horizontalArrangement = Arrangement.Center,
-                        maxItemsInEachRow = 2,
-                    ){
-                        if(currentPage.toInt()>1){
-                            Button(
-                                onClick = {
-                                    onPreviousPageClicked()
-                                    coroutineScope.launch {
-                                        scrollState.scrollToItem(0)
+                                            .height(40.dp)
+                                            .clip(CircleShape)
+                                            .aspectRatio(1f)
+                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                    ){
+                                        Text(
+                                            text = getExamCET6Keyword(examList.list[it].examname),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            modifier = Modifier
+                                                .align(Alignment.Center)
+                                        )
                                     }
                                 },
-                            ){
-                                Text("Previous page")
-                            }
-                        }
-                        Button(
-                            onClick = {
-                                onNextPageClicked()
-                                coroutineScope.launch {
-                                    scrollState.scrollToItem(0)
-                                }
-                            }
-                        ){
-                            Text("Next page")
-                        }
+                                modifier = Modifier
+                                    .clickable {
+                                        onExamClicked(examList.list[it].examid)
+                                    }
+                            )
+                        else
+                            ListItem(
+                                headlineContent = { Text(examList.list[it].examname) },
+                                leadingContent = {
+                                    Box(
+                                        modifier = Modifier
+                                            .height(40.dp)
+                                            .clip(CircleShape)
+                                            .aspectRatio(1f)
+                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                    ){
+                                        Text(
+                                            text = "真题",
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            modifier = Modifier
+                                                .align(Alignment.Center)
+                                        )
+                                    }
+                                },
+                                modifier = Modifier
+                                    .clickable {
+                                        onExamClicked(examList.list[it].examid)
+                                    }
+                            )
+                        HorizontalDivider()
                     }
                 }
             }
@@ -170,7 +221,7 @@ fun getExamCET6Keyword(text: String):String{
     return "模拟"
 }
 
-suspend fun getExamList(account: String,token: String,currentPage: String): ExamList? {
+suspend fun getExamList(account: String, token: String, currentPage: String, type: String): ExamList? {
     val client = HttpClient(OkHttp) {
         engine {
             config {
@@ -183,7 +234,7 @@ suspend fun getExamList(account: String,token: String,currentPage: String): Exam
         header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
         header("Connection", "keep-alive")
         header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-        header("Origin", Constants.URL)
+        header("Origin", "https://vipexam.cn")
         header("Referer", "https://vipexam.cn/resources_kinds.html?id=ve01002")
         header("Sec-Fetch-Dest", "empty")
         header("Sec-Fetch-Mode", "cors")
@@ -196,7 +247,7 @@ suspend fun getExamList(account: String,token: String,currentPage: String): Exam
         header("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"")
         header("sec-ch-ua-mobile", "?0")
         header("sec-ch-ua-platform", "\"macOS\"")
-        setBody("data={\"account\":\"$account\",\"token\":\"$token\",\"typeCode\":\"ve01002\",\"resourceType\":\"4\",\"courriculumType\":\"0\",\"classHourS\":\"0\",\"classHourE\":\"0\",\"yearPublishedS\":\"0\",\"yearPublishedE\":\"0\",\"page\":$currentPage,\"limit\":20,\"collegeName\":\"吉林大学\"}")
+        setBody("data={\"account\":\"$account\",\"token\":\"$token\",\"typeCode\":\"ve01002\",\"resourceType\":\"${type}\",\"courriculumType\":\"0\",\"classHourS\":\"0\",\"classHourE\":\"0\",\"yearPublishedS\":\"0\",\"yearPublishedE\":\"0\",\"page\":$currentPage,\"limit\":20,\"collegeName\":\"吉林大学\"}")
     }
 
 

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.data.Muban
@@ -46,7 +47,7 @@ class ClozeViewModel: ViewModel() {
     fun setChoices(){
         _uiState.update {
             it.copy(
-                choices = remember { getClozeChoices(_uiState.value.muban!!.shiti[0].children) }
+                choices = rememberSaveable { getClozeChoices(_uiState.value.muban!!.shiti[0].children) }
             )
         }
     }

@@ -87,6 +87,7 @@ fun questions(
                 onItemClick = {
                     navController.navigate(it){
                         restoreState = true
+                        popUpTo(questions[0].first)
                     }
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                 }

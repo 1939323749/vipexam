@@ -107,8 +107,16 @@ private fun zread(
 
     Column {
         LazyColumn(
-            state = scrollState
+            state = scrollState,
         ) {
+            if (firstVisibleItemIndex > 0)
+                stickyHeader {
+                    LinearProgressIndicator(
+                        progress = { scrollState.firstVisibleItemIndex / scrollState.layoutInfo.totalItemsCount.toFloat() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
             item {
                 Column{
                     Text(
@@ -256,7 +264,7 @@ private fun zread(
                             .clickable {
                                 coroutine.launch{
                                     scrollState.scrollToItem(
-                                        index = index + 2 + selectedArticle * 7
+                                        index = index + 3 + selectedArticle * 7
                                     )
                                 }
                                 showQuestionsSheet.value = false
@@ -281,7 +289,6 @@ private fun zread(
             onFirstItemAppear()
     }
 }
-
 
 fun getZreadQuestions(shiti: Shiti): MutableList<String> {
     val questions = mutableListOf<String>()

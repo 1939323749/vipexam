@@ -7,20 +7,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.room.util.foreignKeyCheck
 import app.xlei.vipexam.data.LoginResponse
 import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.models.room.User
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun loginView(
@@ -42,50 +40,46 @@ fun loginView(
         Column(
             modifier = Modifier.weight(3f).align(Alignment.CenterHorizontally)
         ) {
-            TextField(
-                value = account,
-                onValueChange = { onAccountChange(it) },
-                label = { Text("account") },
-                leadingIcon = {
-                    Icon(
-                        imageVector =  Icons.Default.KeyboardArrowDown,
-                        contentDescription = "",
-                        modifier = Modifier
-                            .clickable {
-                                showUsers = !showUsers
-                            }
-                    )
-                    if (showUsers) {
-                        DropdownMenu(
-                            expanded = showUsers,
-                            onDismissRequest = {
+            ExposedDropdownMenuBox(
+                expanded = showUsers,
+                onExpandedChange = {showUsers=true}
+            ){
+                TextField(
+                    value = account,
+                    onValueChange = { onAccountChange(it) },
+                    label = { Text("account") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = showUsers)
+                    },
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = showUsers,
+                    onDismissRequest = {showUsers = false}
+                ){
+                    users.forEach {
+                        DropdownMenuItem(
+                            text = { Text(it.account) },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "delete user",
+                                    modifier = Modifier
+                                        .clickable {
+                                            onDeleteUser(it)
+                                        }
+                                )
+                            },
+                            onClick = {
+                                onAccountChange(it.account)
+                                onPasswordChange(it.password)
                                 showUsers = false
                             }
-                        ){
-                            users.forEach {
-                                DropdownMenuItem(
-                                    text = { Text(it.account) },
-                                    trailingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "delete user",
-                                            modifier = Modifier
-                                                .clickable {
-                                                    onDeleteUser(it)
-                                                }
-                                        )
-                                    },
-                                    onClick = {
-                                        onAccountChange(it.account)
-                                        onPasswordChange(it.password)
-                                        showUsers = false
-                                    }
-                                )
-                            }
-                        }
+                        )
                     }
                 }
-            )
+            }
+
             TextField(
                 value = password,
                 onValueChange = { onPasswordChange(it) },

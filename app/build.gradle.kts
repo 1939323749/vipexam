@@ -118,6 +118,10 @@ dependencies {
     // LiveData
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
 
-    val MLkit_version = "17.0.2"
-    implementation("com.google.mlkit:translate:${MLkit_version}")
+    val paging_version = "3.2.1"
+
+    implementation("androidx.paging:paging-runtime:$paging_version")
+
+    val paging_compose_version = "3.3.0-alpha02"
+    implementation("androidx.paging:paging-compose:${paging_compose_version}")
 }

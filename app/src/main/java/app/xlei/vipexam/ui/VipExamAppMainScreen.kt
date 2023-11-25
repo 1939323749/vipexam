@@ -1,16 +1,13 @@
 package app.xlei.vipexam.ui
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -21,16 +18,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
+import app.xlei.vipexam.constant.Constants
 import app.xlei.vipexam.data.LoginResponse
 import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.models.room.User
 import app.xlei.vipexam.logic.SETTING
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.ExamPage
+import app.xlei.vipexam.ui.page.examTypeListView
 import kotlinx.coroutines.*
 
 enum class VipExamScreen(@StringRes val title: Int) {
     Login(title = R.string.login),
+    ExamType(title = R.string.examtype),
     ExamList(title = R.string.examlist),
     Exam(title = R.string.exam)
 }
@@ -138,8 +138,6 @@ fun VipExamAppMainScreen(
                 users = SETTING.repository.getAllUsers()
                 setting = SETTING.repository.getSetting()
                 setting?.let {
-                    Log.d("", it.isRememberAccount.toString())
-                    Log.d("", it.isAutoLogin.toString())
                     viewModel.setSetting(it)
                 }
             }
@@ -168,16 +166,17 @@ fun VipExamAppMainScreen(
                                 users[0].account,
                                 users[0].password
                             )
-                            viewModel._getExamList()
+                            showBottomBar.value = false
+                            navController.navigate(VipExamScreen.ExamType.name)
                         }
-                        showBottomBar.value = false
-                        navController.navigate(VipExamScreen.ExamList.name)
                     }
                 }
             }
             initialized = true
         }
-        onDispose {  }
+        onDispose {
+            initialized = false
+        }
     }
 
     Scaffold (
@@ -241,8 +240,7 @@ fun VipExamAppMainScreen(
                         )
                         if(loginResponse!!.code=="1"){
                             showBottomBar.value = false
-                            viewModel._getExamList()
-                            navController.navigate(VipExamScreen.ExamList.name)
+                            navController.navigate(VipExamScreen.ExamType.name)
                         }
                         setting?.let {
                             if (it.isRememberAccount && loginResponse!!.code=="1") {
@@ -260,11 +258,24 @@ fun VipExamAppMainScreen(
                     }
                 }
             }
+            composable(route = VipExamScreen.ExamType.name){
+                examTypeListView(
+                    onExamTypeClicked = {
+                        viewModel.setExamType(it)
+                        coroutine.launch {
+                            viewModel._getExamList()
+                            navController.navigate(VipExamScreen.ExamList.name)
+                        } },
+                    onFirstItemAppear = {},
+                    onFirstItemHidden = {},
+                )
+            }
             composable(route= VipExamScreen.ExamList.name){
                 uiState.examList?.let { examList ->
                     examListView(
                         currentPage = uiState.currentPage,
                         examList = examList,
+                        isPractice = uiState.examType == Constants.EXAMTYPES.toMap()[R.string.practice_exam],
                         onPreviousPageClicked = {
                             coroutine.launch {
                                 viewModel.previousPage()
@@ -290,10 +301,9 @@ fun VipExamAppMainScreen(
                         onFirstItemHidden = {
                             isFirstItemHidden=true
                         },
-                        onFirstItemAppear = {
-                            isFirstItemHidden=false
-                        }
-                    )
+                    ) {
+                        isFirstItemHidden = false
+                    }
                 }
             }
             composable(route = VipExamScreen.Exam.name){

@@ -1,7 +1,5 @@
 package app.xlei.vipexam.ui
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.data.LoginResponse
@@ -35,7 +33,12 @@ class ExamViewModel: ViewModel() {
     suspend fun _getExamList(){
         _uiState.update {
             it.copy(
-                examList = it.token?.let { it1 -> getExamList(account = it.account, token = it1, currentPage = it.currentPage) }
+                examList = it.token?.let { it1 -> getExamList(
+                    account = it.account,
+                    token = it1,
+                    currentPage = it.currentPage,
+                    type = it.examType!!,
+                ) }
             )
         }
     }
@@ -43,7 +46,12 @@ class ExamViewModel: ViewModel() {
     suspend fun nextPage() {
         _uiState.update {
             it.copy(
-                examList = it.token?.let { it1 -> getExamList(account = it.account, token = it1, currentPage = (it.currentPage.toInt()+1).toString()) },
+                examList = it.token?.let { it1 -> getExamList(
+                    account = it.account,
+                    token = it1,
+                    currentPage = (it.currentPage.toInt()+1).toString(),
+                    type = it.examType!!,
+                ) },
                 currentPage = (it.currentPage.toInt()+1).toString()
             )
         }
@@ -52,7 +60,12 @@ class ExamViewModel: ViewModel() {
     suspend fun previousPage() {
         _uiState.update {
             it.copy(
-                examList = it.token?.let { it1 -> getExamList(account = it.account, token = it1, currentPage = (it.currentPage.toInt()-1).toString()) },
+                examList = it.token?.let { it1 -> getExamList(
+                    account = it.account,
+                    token = it1,
+                    currentPage = (it.currentPage.toInt()-1).toString(),
+                    type = it.examType!!,
+                ) },
                 currentPage = (it.currentPage.toInt()-1).toString()
             )
         }
@@ -86,7 +99,12 @@ class ExamViewModel: ViewModel() {
     suspend fun refresh() {
         _uiState.update {
             it.copy(
-                examList = it.token?.let { it1 -> getExamList(account = it.account, token = it1, currentPage = it.currentPage) }
+                examList = it.token?.let { it1 -> getExamList(
+                    account = it.account,
+                    token = it1,
+                    currentPage = it.currentPage,
+                    type = it.examType!!,
+                ) }
             )
         }
     }
@@ -95,6 +113,14 @@ class ExamViewModel: ViewModel() {
         _uiState.update {
             it.copy(
                 setting = setting
+            )
+        }
+    }
+
+    fun setExamType(type: String) {
+        _uiState.update {
+            it.copy(
+                examType = type
             )
         }
     }

@@ -7,4 +7,7 @@
     <string name="setting">Setting</string>
     <string name="main">Main</string>
     <string name="second">Second</string>
+    <string name="examtype">Exam Type</string>
+    <string name="practice_exam">模拟试题</string>
+    <string name="real_exam">真题试卷</string>
 </resources>

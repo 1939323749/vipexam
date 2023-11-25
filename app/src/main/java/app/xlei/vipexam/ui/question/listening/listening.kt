@@ -1,6 +1,7 @@
 package app.xlei.vipexam.ui.question.listening
 
 import android.media.MediaPlayer
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -11,9 +12,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
@@ -21,8 +25,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.Shiti
 import app.xlei.vipexam.ui.question.zread.getChoice
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @Composable
@@ -54,7 +60,7 @@ fun listeningView(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun listening(
     muban: Muban,
@@ -74,13 +80,16 @@ private fun listening(
     val scrollState = rememberLazyListState()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
     val coroutine = rememberCoroutineScope()
+    val haptics = LocalHapticFeedback.current
 
     DisposableEffect(Unit) {
         coroutine.launch {
             delay(500)
-            midiaPlayers.forEach{
-                it.first.setDataSource("https://rang.vipexam.org/Sound/${it.second}.mp3")
-                it.first.prepare()
+            withContext(Dispatchers.IO){
+                midiaPlayers.forEach{
+                    it.first.setDataSource("https://rang.vipexam.org/Sound/${it.second}.mp3")
+                    it.first.prepare()
+                }
             }
         }
         onDispose {
@@ -121,6 +130,7 @@ private fun listening(
                             //onQuestionClick()
                             showOptionsSheet.value = true
                             selectedChoiceIndex.value= it to 0
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         }
                 ) {
                     Column (
@@ -152,7 +162,9 @@ private fun listening(
                     if(getChoice(it,0,choices) !=null){
                         if (getChoice(it,0,choices)!!.value.second.second!=null){
                             SuggestionChip(
-                                onClick = {},
+                                onClick = {
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
                                 label = {
                                     getChoice(it,0,choices)!!.value.second.second?.let { choice-> Text(choice) }
                                 }
@@ -170,6 +182,7 @@ private fun listening(
                             .clickable {
                                 showOptionsSheet.value = true
                                 selectedChoiceIndex.value = it to n+1
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                             }
                     ) {
                         Column (
@@ -201,7 +214,9 @@ private fun listening(
                         if(getChoice(it,n+1,choices) !=null){
                             if (getChoice(it,n+1,choices)!!.value.second.second!=null){
                                 SuggestionChip(
-                                    onClick = {},
+                                    onClick = {
+                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    },
                                     label = {
                                         getChoice(it,n+1,choices)!!.value.second.second?.let { choice-> Text(choice) }
                                     }
@@ -245,6 +260,7 @@ private fun listening(
                                 }
                             }
                             showOptionsSheet.value = false
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                         },
                         label = {
                             Text(option)
@@ -295,9 +311,8 @@ fun getListeningOptions(): List<String> {
 fun AudioPlayer(
     mediaPlayer: MediaPlayer
 ) {
-    var isPlaying by remember { mutableStateOf(false) }
-
-
+    var isPlaying by rememberSaveable { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
     Column {
         Button(
             onClick = {
@@ -307,6 +322,7 @@ fun AudioPlayer(
                 } else {
                     mediaPlayer.pause()
                 }
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             }
         ) {
             Text(if (isPlaying) "Pause" else "Play")

@@ -10,6 +10,7 @@ data class ExamUiState(
     val examList: ExamList?=null,
     val currentPage:String="1",
     val exam: Exam?=null,
+    val examType: String?=null,
 
     val setting: Setting?=null
 )

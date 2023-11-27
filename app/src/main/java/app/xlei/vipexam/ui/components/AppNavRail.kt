@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import app.xlei.vipexam.logic.UiStateSetting
 import app.xlei.vipexam.ui.AppDestinations
 import app.xlei.vipexam.ui.VipExamScreen
 import io.ktor.http.*
@@ -34,11 +33,24 @@ fun AppNavRail(
     NavigationRail(
         header = {
             Icon(logo.value.icon,"",Modifier.padding(vertical = 24.dp))
-            FloatingActionButton(
-                onClick = { showAnswer.value = !showAnswer.value },
-            ){
-                Icon(Icons.Default.Edit,"")
-            }
+            CustomFloatingActionButton(
+                expandable = true,
+                onFabClick = {},
+                iconUnExpanded = Icons.Default.Edit,
+                iconExpanded = Icons.Default.Edit,
+                items = listOf("SHOW_ANSWER" to "show answer"),
+                onItemClick = {
+                    when (it) {
+                        "SHOW_ANSWER" -> { showAnswer.value = !showAnswer.value }
+                        else -> {}
+                    }
+                }
+            )
+//            FloatingActionButton(
+//                onClick = { showAnswer.value = !showAnswer.value },
+//            ){
+//                Icon(Icons.Default.Edit,"")
+//            }
         },
         modifier = modifier
     ) {

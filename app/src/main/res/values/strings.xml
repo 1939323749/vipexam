@@ -14,4 +14,6 @@
     <string name="examTypeWithExamList">Exam Type With Exam List</string>
     <string name="questionsWithQuestion">Questions With Question</string>
     <string name="examListWithQuestions">Exam List With Questions</string>
+    <string name="expandedLoggedIn">Logged In</string>
+    <string name="compactLoggedIn">Logged In</string>
 </resources>

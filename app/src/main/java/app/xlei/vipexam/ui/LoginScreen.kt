@@ -6,10 +6,13 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -24,6 +27,7 @@ import app.xlei.vipexam.data.LoginResponse
 import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.models.room.User
 import app.xlei.vipexam.ui.components.TextIconDialog
+import io.ktor.network.selector.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -98,6 +102,7 @@ fun loginView(
             if(loginResponse!=null){
                 Text(loginResponse.msg)
             }
+
             Button(
                 onClick = onLoginButtonClicked,
                 modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 20.dp)

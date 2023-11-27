@@ -28,9 +28,6 @@ fun VipExamNavGraph(
 ) {
     val showBottomBar = remember { mutableStateOf(true) }
     val isFirstItemHidden = remember { mutableStateOf(false) }
-    val currentHomeScreenRoute = homeNavController.currentBackStackEntryAsState()
-        .value?.destination?.route?: VipExamScreen.Login.name
-
 
     NavHost(
         navController = navController,
@@ -54,7 +51,6 @@ fun VipExamNavGraph(
                 showAnswer = showAnswer,
                 showBottomBar = showBottomBar,
                 isExpandedScreen = isExpandedScreen,
-                openDrawer = openDrawer,
                 onFirstItemHidden = { },
                 onFirstItemAppear = { },
             )

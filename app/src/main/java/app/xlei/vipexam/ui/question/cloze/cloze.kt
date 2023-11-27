@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -117,6 +118,7 @@ private fun cloze(
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer)
                 ) {
+                    SelectionContainer {
                         ClickableText(
                             text = clozes[clozeIndex].article.article,
                             style = LocalTextStyle.current.copy(
@@ -133,6 +135,8 @@ private fun cloze(
                             modifier = Modifier
                                 .padding(start = 4.dp, end = 4.dp)
                         )
+                    }
+
                 }
                 FlowRow(
                     horizontalArrangement = Arrangement.Start,

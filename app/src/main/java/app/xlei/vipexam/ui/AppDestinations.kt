@@ -7,6 +7,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.data.AppContainer
@@ -50,7 +51,7 @@ fun App(
         VipExamScreen.valueOf(currentHomeScreenRoute)
     ) }
 
-    val showAnswer = remember { mutableStateOf(false) }
+    val showAnswer = rememberSaveable() { mutableStateOf(false) }
 
     var selectedItem by remember { mutableIntStateOf(0) }
     val showBottomBar = remember { mutableStateOf(true) }

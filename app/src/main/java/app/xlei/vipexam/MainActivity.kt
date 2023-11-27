@@ -1,25 +1,32 @@
 package app.xlei.vipexam
 
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.ui.Modifier
-import app.xlei.vipexam.logic.SETTING
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.App
 import app.xlei.vipexam.ui.theme.VipexamTheme
 
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
+        DB.provide(this)
         super.onCreate(savedInstanceState)
-        SETTING.provide(this)
+        val appContainer = (application as VipExamApplication).container
         setContent {
             VipexamTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    App()
-                }
+                val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
+                App(
+                    appContainer,
+                    widthSizeClass,
+                )
             }
         }
     }

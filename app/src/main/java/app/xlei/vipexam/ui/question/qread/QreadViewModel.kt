@@ -2,14 +2,11 @@ package app.xlei.vipexam.ui.question.qread
 
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.data.Shiti
-import app.xlei.vipexam.ui.page.getQuestions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

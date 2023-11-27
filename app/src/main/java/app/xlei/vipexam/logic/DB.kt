@@ -5,7 +5,7 @@ import app.xlei.vipexam.data.models.room.db.SettingDatabase
 import app.xlei.vipexam.data.models.room.db.UserDatabase
 import app.xlei.vipexam.repository.Repository
 
-object SETTING {
+object DB {
     private lateinit var user_db: UserDatabase
     private lateinit var setting_db: SettingDatabase
 

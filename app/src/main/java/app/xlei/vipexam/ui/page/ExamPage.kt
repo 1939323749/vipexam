@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.data.Exam
 import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.data.network.Repository.getQuestions
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
 import app.xlei.vipexam.ui.question.cloze.ClozeViewModel
@@ -86,6 +87,7 @@ fun questions(
                 items = questions,
                 onItemClick = {
                     navController.navigate(it){
+                        launchSingleTop = true
                         restoreState = true
                         popUpTo(questions[0].first)
                     }
@@ -244,41 +246,5 @@ fun questions(
     }
 }
 
-fun getQuestions(mubanList: List<Muban>): MutableList<Pair<String, String>> {
-    val questions = mutableListOf<Pair<String,String>>()
 
-    for (muban in mubanList){
-        questions.add(muban.ename to muban.cname)
-    }
 
-    return questions
-}
-
-suspend fun getExam(examId: String, account: String, token: String): Exam? {
-    val client = HttpClient()
-
-    val response = client.post("https://vipexam.cn/exam/getExamList.action") {
-        header("Accept", "application/json, text/javascript, */*; q=0.01")
-        header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
-        header("Connection", "keep-alive")
-        header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-        header("Origin", "https://vipexam.cn")
-        header("Referer", "https://vipexam.cn/begin_testing2.html?id=$examId")
-        header("Sec-Fetch-Dest", "empty")
-        header("Sec-Fetch-Mode", "cors")
-        header("Sec-Fetch-Site", "same-origin")
-        header(
-            "User-Agent",
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-        )
-        header("X-Requested-With", "XMLHttpRequest")
-        header("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"")
-        header("sec-ch-ua-mobile", "?0")
-        header("sec-ch-ua-platform", "\"macOS\"")
-        setBody("examID=$examId&account=$account&token=$token")
-    }
-    Log.d("",response.bodyAsText())
-    client.close()
-    val gson = Gson()
-    return gson.fromJson(response.bodyAsText(), Exam::class.java)
-}

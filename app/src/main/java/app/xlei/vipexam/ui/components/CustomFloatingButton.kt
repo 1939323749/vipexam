@@ -26,7 +26,7 @@ fun CustomFloatingActionButton(
     onFabClick: () -> Unit,
     iconUnExpanded: ImageVector,
     iconExpanded: ImageVector,
-    items: MutableList<Pair<String, String>>,
+    items: List<Pair<String, String>>,
     onItemClick: (String) -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(false) }

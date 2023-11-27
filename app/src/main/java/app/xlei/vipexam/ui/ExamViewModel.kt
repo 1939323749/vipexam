@@ -1,12 +1,14 @@
 package app.xlei.vipexam.ui
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentComposer
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.data.LoginResponse
 import app.xlei.vipexam.data.models.room.Setting
-import app.xlei.vipexam.ui.page.getExam
-import app.xlei.vipexam.ui.page.getExamList
-import app.xlei.vipexam.ui.page.getToken
+import app.xlei.vipexam.data.network.Repository
+import app.xlei.vipexam.data.network.Repository.getToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,43 +18,28 @@ class ExamViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(ExamUiState())
     val uiState: StateFlow<ExamUiState> = _uiState.asStateFlow()
 
-    suspend fun login(account: String, password: String): LoginResponse {
+    suspend fun login(account: String, password: String):Boolean {
         val loginResponse=getToken(account,password)
-        if(loginResponse.code=="1"){
+        loginResponse?.let {
             _uiState.update {
                 it.copy(
                     account=account,
                     password=password,
-                    token = loginResponse.token
                 )
             }
+            return true
         }
-        return loginResponse
-    }
-
-    suspend fun _getExamList(){
-        _uiState.update {
-            it.copy(
-                examList = it.token?.let { it1 -> getExamList(
-                    account = it.account,
-                    token = it1,
-                    currentPage = it.currentPage,
-                    type = it.examType!!,
-                ) }
-            )
-        }
+        return false
     }
 
     suspend fun nextPage() {
         _uiState.update {
             it.copy(
-                examList = it.token?.let { it1 -> getExamList(
-                    account = it.account,
-                    token = it1,
-                    currentPage = (it.currentPage.toInt()+1).toString(),
-                    type = it.examType!!,
-                ) },
-                currentPage = (it.currentPage.toInt()+1).toString()
+                examList = Repository.getExamList(
+                    page = it.currentPage,
+                    type = it.examType,
+                ),
+                currentPage = (it.currentPage.toInt()+1).toString(),
             )
         }
     }
@@ -60,13 +47,11 @@ class ExamViewModel: ViewModel() {
     suspend fun previousPage() {
         _uiState.update {
             it.copy(
-                examList = it.token?.let { it1 -> getExamList(
-                    account = it.account,
-                    token = it1,
-                    currentPage = (it.currentPage.toInt()-1).toString(),
-                    type = it.examType!!,
-                ) },
-                currentPage = (it.currentPage.toInt()-1).toString()
+                examList = Repository.getExamList(
+                    page = it.currentPage,
+                    type = it.examType,
+                ),
+                currentPage = (it.currentPage.toInt()-1).toString(),
             )
         }
     }
@@ -74,7 +59,7 @@ class ExamViewModel: ViewModel() {
     fun setAccount(account: String){
         _uiState.update {
             it.copy(
-                account = account
+                account = account,
             )
         }
     }
@@ -82,15 +67,15 @@ class ExamViewModel: ViewModel() {
     fun setPassword(password: String){
         _uiState.update {
             it.copy(
-                password = password
+                password = password,
             )
         }
     }
 
-    suspend fun _getExam(examId: String):Boolean{
+    suspend fun getExam(examId: String):Boolean{
         _uiState.update {
             it.copy(
-                exam = uiState.value.token?.let { it1 -> getExam(examId = examId, account = uiState.value.account, token = it1) }
+                exam = Repository.getExam(examId = examId),
             )
         }
         return true
@@ -99,12 +84,11 @@ class ExamViewModel: ViewModel() {
     suspend fun refresh() {
         _uiState.update {
             it.copy(
-                examList = it.token?.let { it1 -> getExamList(
-                    account = it.account,
-                    token = it1,
-                    currentPage = it.currentPage,
-                    type = it.examType!!,
-                ) }
+                examList = Repository.getExamList(
+                    page = it.currentPage,
+                    type = it.examType,
+                ),
+                currentPage = it.currentPage,
             )
         }
     }

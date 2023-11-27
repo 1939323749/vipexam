@@ -10,4 +10,8 @@
     <string name="examtype">Exam Type</string>
     <string name="practice_exam">模拟试题</string>
     <string name="real_exam">真题试卷</string>
+    <string name="question">Question</string>
+    <string name="examTypeWithExamList">Exam Type With Exam List</string>
+    <string name="questionsWithQuestion">Questions With Question</string>
+    <string name="examListWithQuestions">Exam List With Questions</string>
 </resources>

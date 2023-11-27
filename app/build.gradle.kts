@@ -85,12 +85,15 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.compose.material3:material3:1.2.0-alpha11")
-    implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${rootProject.extra["lifecycle_version"]}")
 
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    val activity_version = "1.8.1"
+    implementation("androidx.activity:activity-ktx:$activity_version")
 
     val ktor_version="2.3.6"
     implementation("io.ktor:ktor-client-core:$ktor_version")
@@ -124,4 +127,7 @@ dependencies {
 
     val paging_compose_version = "3.3.0-alpha02"
     implementation("androidx.paging:paging-compose:${paging_compose_version}")
+
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
+
 }

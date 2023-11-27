@@ -3,7 +3,6 @@ package app.xlei.vipexam.ui.components
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.NavigationRail
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Edit
@@ -15,12 +14,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import app.xlei.vipexam.ui.AppDestinations
-import app.xlei.vipexam.ui.VipExamScreen
+import app.xlei.vipexam.ui.HomeScreen
 import io.ktor.http.*
 
 @Composable
 fun AppNavRail(
-    logo: MutableState<VipExamScreen>,
+    logo: MutableState<HomeScreen>,
     showAnswer: MutableState<Boolean>,
     homeNavController: NavHostController,
     currentRoute: String,
@@ -52,6 +51,7 @@ fun AppNavRail(
 //                Icon(Icons.Default.Edit,"")
 //            }
         },
+        containerColor = NavigationRailDefaults.ContainerColor,
         modifier = modifier
     ) {
         Spacer(Modifier.weight(1f))

@@ -8,13 +8,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.xlei.vipexam.data.ExamList
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.expandedHomeGraph(
     showAnswer: MutableState<Boolean>,
-    coroutine: CoroutineScope,
-    viewModel: ExamViewModel,
     selectedExamType: MutableState<String>,
     selectedExamList: MutableState<ExamList>,
     currentPage: MutableState<String>,
@@ -24,28 +20,26 @@ fun NavGraphBuilder.expandedHomeGraph(
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
     onQuestionClick: (String) -> Unit,
+    refresh: () -> Unit,
 ){
     navigation(
-        startDestination = VipExamScreen.ExamTypeWithExamList.name,
-        route = VipExamScreen.ExpandedLoggedIn.name
+        startDestination = HomeScreen.ExamTypeWithExamList.name,
+        route = HomeScreen.ExpandedLoggedIn.name
     ){
         composable(
-            route = VipExamScreen.ExamTypeWithExamList.name,
+            route = HomeScreen.ExamTypeWithExamList.name,
         ){
             examTypeListWithExamListView(
                 onExamTypeClick = { selectedExamType.value = it },
                 onExamClick = onExamClick,
                 onPreviousPageClicked = onPreviousPageClicked,
                 onNextPageClicked = onNextPageClicked,
-                refresh = {
-                    coroutine.launch {
-                        viewModel.refresh()
-                    } },
+                refresh = refresh,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
         }
         composable(
-            route = VipExamScreen.ExamListWithQuestions.name,
+            route = HomeScreen.ExamListWithQuestions.name,
         ){
             examListWithQuestionsView(
                 examList = selectedExamList.value,
@@ -54,15 +48,14 @@ fun NavGraphBuilder.expandedHomeGraph(
                 examId = selectedExamId.value,
                 onPreviousPageClicked = onPreviousPageClicked,
                 onNextPageClicked = onNextPageClicked,
-                onExamClick = {
-                    selectedExamId.value = it },
+                onExamClick = onExamClick,
                 refresh = {},
                 onQuestionClick = onQuestionClick,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
         }
         composable(
-            route = VipExamScreen.QuestionsWithQuestion.name,
+            route = HomeScreen.QuestionsWithQuestion.name,
         ){
             questionsWithQuestionView(
                 examId = selectedExamId.value,

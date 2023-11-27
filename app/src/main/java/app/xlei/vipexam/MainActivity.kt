@@ -2,12 +2,16 @@ package app.xlei.vipexam
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.ui.Modifier
 import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.App
 import app.xlei.vipexam.ui.theme.VipexamTheme
@@ -23,10 +27,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             VipexamTheme {
                 val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
-                App(
-                    appContainer,
-                    widthSizeClass,
-                )
+                Surface(
+                    color = MaterialTheme.colorScheme.background,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    App(
+                        appContainer,
+                        widthSizeClass,
+                    )
+                }
             }
         }
     }

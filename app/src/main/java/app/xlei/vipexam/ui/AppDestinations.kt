@@ -3,8 +3,10 @@ package app.xlei.vipexam.ui
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.*
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -15,7 +17,6 @@ import app.xlei.vipexam.ui.components.AppNavRail
 import kotlinx.coroutines.launch
 
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @Composable
@@ -23,13 +24,6 @@ fun App(
     appContainer: AppContainer,
     widthSizeClass: WindowWidthSizeClass,
 ){
-
-    val items = listOf(
-        AppDestinations.HOME_ROUTE,
-        AppDestinations.SECOND_ROUTE,
-        AppDestinations.SETTINGS_ROUTE
-    )
-
     val navController = rememberNavController()
     val navigationActions = remember(navController) {
         VipExamNavigationActions(navController)
@@ -45,17 +39,14 @@ fun App(
     val sizeAwareDrawerState = rememberSizeAwareDrawerState(isExpandedScreen)
 
     val currentHomeScreenRoute = homeNavController.currentBackStackEntryAsState()
-        .value?.destination?.route?: VipExamScreen.Login.name
+        .value?.destination?.route ?: HomeScreen.Login.name
 
     val logoText = remember { mutableStateOf(
-        VipExamScreen.valueOf(currentHomeScreenRoute)
+        HomeScreen.valueOf(currentHomeScreenRoute)
     ) }
 
     val showAnswer = rememberSaveable() { mutableStateOf(false) }
 
-    var selectedItem by remember { mutableIntStateOf(0) }
-    val showBottomBar = remember { mutableStateOf(true) }
-    val pageState = rememberPagerState(pageCount = { items.size })
     val coroutine = rememberCoroutineScope()
 
     ModalNavigationDrawer(

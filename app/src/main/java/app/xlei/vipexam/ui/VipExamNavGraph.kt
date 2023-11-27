@@ -1,22 +1,21 @@
 package app.xlei.vipexam.ui
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import app.xlei.vipexam.data.AppContainer
 
 @Composable
 fun VipExamNavGraph(
-    logoText: MutableState<VipExamScreen>,
+    logoText: MutableState<HomeScreen>,
     showAnswer: MutableState<Boolean>,
     homeNavController: NavHostController,
     appContainer: AppContainer,

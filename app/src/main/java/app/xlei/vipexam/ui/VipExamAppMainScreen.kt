@@ -4,40 +4,44 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import androidx.annotation.StringRes
 import androidx.compose.animation.*
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.*
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
 import app.xlei.vipexam.constant.Constants
-import app.xlei.vipexam.data.*
+import app.xlei.vipexam.data.Exam
+import app.xlei.vipexam.data.ExamList
+import app.xlei.vipexam.data.LoginResponse
+import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.models.room.User
 import app.xlei.vipexam.data.network.Repository
 import app.xlei.vipexam.data.network.Repository.getExamList
 import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.components.TextIconDialog
-import app.xlei.vipexam.ui.page.*
+import app.xlei.vipexam.ui.page.examListView
+import app.xlei.vipexam.ui.page.examTypeListView
 import app.xlei.vipexam.ui.question.cloze.clozeView
 import app.xlei.vipexam.ui.question.listening.listeningView
 import app.xlei.vipexam.ui.question.qread.qreadView
@@ -45,20 +49,10 @@ import app.xlei.vipexam.ui.question.questionListView
 import app.xlei.vipexam.ui.question.translate.translateView
 import app.xlei.vipexam.ui.question.writing.writingView
 import app.xlei.vipexam.ui.question.zread.zreadView
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-enum class VipExamScreen(@StringRes val title: Int,val icon: ImageVector) {
-    CompactLoggedIn(title = R.string.compactLoggedIn, Icons.Default.Home),
-    Login(title = R.string.login,Icons.Default.Home),
-    ExamType(title = R.string.examtype, Icons.AutoMirrored.Filled.List),
-    ExamList(title = R.string.examlist, Icons.AutoMirrored.Filled.List),
-    Exam(title = R.string.exam, Icons.Default.Edit),
-    ExpandedLoggedIn(title = R.string.expandedLoggedIn, Icons.Default.Edit),
-    Question(title = R.string.question, Icons.Default.Edit),
-    ExamTypeWithExamList(title = R.string.examTypeWithExamList, Icons.AutoMirrored.Filled.List),
-    QuestionsWithQuestion(title = R.string.questionsWithQuestion, Icons.Default.Edit),
-    ExamListWithQuestions(title = R.string.examListWithQuestions, Icons.AutoMirrored.Filled.List),
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,7 +123,7 @@ fun VipExamAppBar(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @Composable
 fun VipExamAppMainScreen(
-    logoText: MutableState<VipExamScreen>,
+    logoText: MutableState<HomeScreen>,
     isExpandedScreen: Boolean,
     showAnswer: MutableState<Boolean>,
     viewModel: ExamViewModel = viewModel(),
@@ -138,10 +132,14 @@ fun VipExamAppMainScreen(
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: () -> Unit,
 ) {
+    val homeScreenNavigationActions = remember(navController) {
+        HomeScreenNavigationActions(navController)
+    }
+
     val backStackEntry by navController.currentBackStackEntryAsState()
 
-    val currentScreen = VipExamScreen.valueOf(
-        backStackEntry?.destination?.route?: VipExamScreen.Login.name
+    val currentScreen = HomeScreen.valueOf(
+        backStackEntry?.destination?.route ?: HomeScreen.Login.name
     )
 
     val currentTitle by remember { mutableStateOf("Exam") }
@@ -205,17 +203,10 @@ fun VipExamAppMainScreen(
                                 users.value[0].password
                             )
                             showBottomBar.value = false
-                            when (isExpandedScreen){
-                                true -> navController.navigate(VipExamScreen.CompactLoggedIn.name){
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                                false -> navController.navigate(VipExamScreen.ExpandedLoggedIn.name){
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                            when (isExpandedScreen) {
+                                true -> homeScreenNavigationActions.navigateToExpandedLoggedIn()
+                                false -> homeScreenNavigationActions.navigateToCompactLoggedIn()
                             }
-
                         }
                     }
                 }
@@ -232,7 +223,7 @@ fun VipExamAppMainScreen(
             if (!isExpandedScreen)
                 VipExamAppBar(
                     currentScreen =
-                    if(!isFirstItemHidden.value || currentScreen==VipExamScreen.ExamList)
+                    if (!isFirstItemHidden.value || currentScreen == HomeScreen.ExamList)
                         currentScreen.name
                     else
                         currentTitle,
@@ -260,31 +251,11 @@ fun VipExamAppMainScreen(
 
         NavHost(
             navController = navController,
-            startDestination = VipExamScreen.Login.name,
+            startDestination = HomeScreen.Login.name,
             modifier = Modifier.padding(padding)
         ){
             composable(
-                route = VipExamScreen.Login.name,
-                enterTransition = {
-                    fadeIn(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideIntoContainer(
-                        animationSpec = tween(300, easing = EaseIn),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start
-                    )
-                },
-                exitTransition = {
-                    fadeOut(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideOutOfContainer(
-                        animationSpec = tween(300, easing = EaseOut),
-                        towards = AnimatedContentTransitionScope.SlideDirection.End
-                    )
-                }
+                route = HomeScreen.Login.name,
             ){
                 connectivity.value = isInternetAvailable(LocalContext.current)
                 val loginResponse by remember { mutableStateOf<LoginResponse?>(null) }
@@ -329,18 +300,9 @@ fun VipExamAppMainScreen(
                         if(loginSuccess){
                             showBottomBar.value = false
                             if (isExpandedScreen) {
-                                navController.navigate(VipExamScreen.ExpandedLoggedIn.name){
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                                logoText.value = VipExamScreen.ExamTypeWithExamList
-                            }
-                            else {
-                                navController.navigate(VipExamScreen.CompactLoggedIn.name){
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
+                                homeScreenNavigationActions.navigateToExpandedLoggedIn()
+                                logoText.value = HomeScreen.ExamTypeWithExamList
+                            } else homeScreenNavigationActions.navigateToCompactLoggedIn()
                         }
                         setting.let {
                             if (it != null) {
@@ -362,9 +324,7 @@ fun VipExamAppMainScreen(
             }
             compactHomeGraph(
                 uiState = uiState,
-                coroutine = coroutine,
                 isFirstItemHidden = isFirstItemHidden,
-                navController = navController,
                 onFirstItemHidden = onFirstItemHidden,
                 onFirstItemAppear = onFirstItemAppear,
                 showAnswer = showAnswer,
@@ -377,21 +337,14 @@ fun VipExamAppMainScreen(
                     viewModel.setExamType(it)
                     coroutine.launch {
                         viewModel.refresh()
-                        navController.navigate(VipExamScreen.ExamList.name){
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                        homeScreenNavigationActions.navigateToExamList()
                     }
                 },
                 onExamClick = {
                     coroutine.launch {
                         val getExamResponse = viewModel.getExam(examId = it)
-                        if(getExamResponse){
-                            navController.navigate(VipExamScreen.Exam.name){
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
+                        if (getExamResponse)
+                            homeScreenNavigationActions.navigateToExam()
                     }
                 },
                 onPreviousPageClicked = {
@@ -406,14 +359,12 @@ fun VipExamAppMainScreen(
                 }
             )
             expandedHomeGraph(
-                showAnswer,
-                coroutine,
-                viewModel,
-                selectedExamType,
-                selectedExamList,
-                currentPage,
-                selectedExamId,
-                selectedQuestion,
+                showAnswer = showAnswer,
+                selectedExamType = selectedExamId,
+                selectedExamList = selectedExamList,
+                currentPage = currentPage,
+                selectedExamId = selectedExamId,
+                selectedQuestion = selectedQuestion,
                 onExamClick = {
                     selectedExamId.value = it
                     coroutine.launch {
@@ -421,11 +372,8 @@ fun VipExamAppMainScreen(
                             page = currentPage.value,
                             type = selectedExamType.value,
                         )!!
-                        navController.navigate(VipExamScreen.ExamListWithQuestions.name){
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                        logoText.value = VipExamScreen.ExamListWithQuestions
+                        homeScreenNavigationActions.navigateToExamListWithQuestions()
+                        logoText.value = HomeScreen.ExamListWithQuestions
                     }
                 },
                 onPreviousPageClicked = {
@@ -435,7 +383,8 @@ fun VipExamAppMainScreen(
                             page = currentPage.value,
                             type = selectedExamType.value,
                         )!!
-                    } },
+                    }
+                },
                 onNextPageClicked = {
                     currentPage.value = "${currentPage.value.toInt() + 1}"
                     coroutine.launch {
@@ -443,15 +392,18 @@ fun VipExamAppMainScreen(
                             page = currentPage.value,
                             type = selectedExamType.value,
                         )!!
-                    } },
+                    }
+                },
                 onQuestionClick = {
                     selectedQuestion.value = it
-                    navController.navigate(VipExamScreen.QuestionsWithQuestion.name){
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                    logoText.value = VipExamScreen.QuestionsWithQuestion
+                    homeScreenNavigationActions.navigateToQuestionsWithQuestion()
+                    logoText.value = HomeScreen.QuestionsWithQuestion
                 },
+                refresh = {
+                    coroutine.launch {
+                        viewModel.refresh()
+                    }
+                }
             )}
     }
 }
@@ -482,10 +434,7 @@ fun examTypeListWithExamListView(
     Row (
         modifier = modifier
     ){
-        Card (
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
+        ElevatedCard(
             modifier = Modifier
                 .width(360.dp)
 //                .weight(1f)
@@ -494,7 +443,8 @@ fun examTypeListWithExamListView(
                 onExamTypeClicked = {
                     currentPage.value = "1"
                     examType.value = it
-                    onExamTypeClick(it) },
+                    onExamTypeClick(it)
+                },
                 onFirstItemAppear = {},
                 onFirstItemHidden = {},
             )
@@ -758,10 +708,40 @@ fun isInternetAvailable(context: Context): Boolean {
     return result
 }
 
-private fun getMuban(question: String,exam: Exam): Muban? {
+private fun getMuban(question: String, exam: Exam): Muban? {
     exam.muban.forEach {
-        if (it.ename==question)
+        if (it.ename == question)
             return it
     }
     return null
+}
+
+private const val TIME_DURATION = 300
+
+val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+    slideInHorizontally(
+        initialOffsetX = { it },
+        animationSpec = tween(durationMillis = TIME_DURATION, easing = LinearOutSlowInEasing)
+    )
+}
+
+val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+    slideOutHorizontally(
+        targetOffsetX = { -it / 3 },
+        animationSpec = tween(durationMillis = TIME_DURATION, easing = LinearOutSlowInEasing)
+    )
+}
+
+val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+    slideInHorizontally(
+        initialOffsetX = { -it / 3 },
+        animationSpec = tween(durationMillis = TIME_DURATION, easing = LinearOutSlowInEasing)
+    )
+}
+
+val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+    slideOutHorizontally(
+        targetOffsetX = { it },
+        animationSpec = tween(durationMillis = TIME_DURATION, easing = LinearOutSlowInEasing)
+    )
 }

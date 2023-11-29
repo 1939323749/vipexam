@@ -12,7 +12,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import app.xlei.vipexam.data.AppContainer
 import app.xlei.vipexam.ui.VipExamAppMainScreen
-import app.xlei.vipexam.ui.examList
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
 
@@ -59,7 +58,6 @@ fun VipExamNavHost(
             route = AppDestinations.SETTINGS_ROUTE.name,
         ) { navBackStackEntry ->
             // setting()
-            examList()
         }
     }
 

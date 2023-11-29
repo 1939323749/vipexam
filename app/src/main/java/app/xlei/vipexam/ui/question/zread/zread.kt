@@ -22,17 +22,16 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.Shiti
-import kotlinx.coroutines.launch
 
 @Composable
 fun zreadView(
     muban: Muban,
-    viewModel: ZreadViewModel = viewModel(),
+    viewModel: ZreadViewModel = hiltViewModel(),
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit,
+    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)

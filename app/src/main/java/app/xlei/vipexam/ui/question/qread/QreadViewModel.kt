@@ -7,18 +7,21 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class QreadViewModel : ViewModel(){
-    private val _uiState = MutableStateFlow(QreadUiState(
-        articles = emptyList()
-    ))
+@HiltViewModel
+class QreadViewModel @Inject constructor(
+    qreadUiState: QreadUiState
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(qreadUiState)
     val uiState: StateFlow<QreadUiState> = _uiState.asStateFlow()
 
-    fun setMuban(muban: Muban){
+    fun setMuban(muban: Muban) {
         _uiState.update {
             it.copy(
                 muban = muban

@@ -1,32 +1,22 @@
-package app.xlei.vipexam.ui
+package app.xlei.vipexam.ui.login
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getSystemService
 import app.xlei.vipexam.data.LoginResponse
 import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.models.room.User
-import app.xlei.vipexam.ui.components.TextIconDialog
 import io.ktor.network.selector.*
 
 @OptIn(ExperimentalMaterial3Api::class)

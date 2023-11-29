@@ -1,30 +1,31 @@
 package app.xlei.vipexam.ui
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentComposer
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.ExamUiState
-import app.xlei.vipexam.data.LoginResponse
 import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.network.Repository
 import app.xlei.vipexam.data.network.Repository.getToken
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class ExamViewModel: ViewModel() {
-    private val _uiState = MutableStateFlow(ExamUiState())
+@HiltViewModel
+class ExamViewModel @Inject constructor(
+    examUiState: ExamUiState
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(examUiState)
     val uiState: StateFlow<ExamUiState> = _uiState.asStateFlow()
 
-    suspend fun login(account: String, password: String):Boolean {
-        val loginResponse=getToken(account,password)
+    suspend fun login(account: String, password: String): Boolean {
+        val loginResponse = getToken(account, password)
         loginResponse?.let {
             _uiState.update {
                 it.copy(
-                    account=account,
-                    password=password,
+                    account = account,
+                    password = password,
                 )
             }
             return true

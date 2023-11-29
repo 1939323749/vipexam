@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.question.listening
 
 import android.media.MediaPlayer
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +20,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.data.Muban
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,9 +30,9 @@ import kotlinx.coroutines.withContext
 @Composable
 fun listeningView(
     muban: Muban,
-    viewModel: ListeningViewModel = viewModel(),
+    viewModel: ListeningViewModel = hiltViewModel(),
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit,
+    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)

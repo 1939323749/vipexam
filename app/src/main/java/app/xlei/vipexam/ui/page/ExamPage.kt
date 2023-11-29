@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -13,8 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,19 +22,12 @@ import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.network.Repository.getQuestions
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
-import app.xlei.vipexam.ui.question.cloze.ClozeViewModel
 import app.xlei.vipexam.ui.question.cloze.clozeView
-import app.xlei.vipexam.ui.question.listening.ListeningViewModel
 import app.xlei.vipexam.ui.question.listening.listeningView
-import app.xlei.vipexam.ui.question.qread.QreadViewModel
 import app.xlei.vipexam.ui.question.qread.qreadView
-import app.xlei.vipexam.ui.question.translate.TranslateViewModel
 import app.xlei.vipexam.ui.question.translate.translateView
-import app.xlei.vipexam.ui.question.writing.WritingViewModel
 import app.xlei.vipexam.ui.question.writing.writingView
-import app.xlei.vipexam.ui.question.zread.ZreadViewModel
 import app.xlei.vipexam.ui.question.zread.zreadView
-import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -64,10 +55,10 @@ fun ExamPage(
 @Composable
 fun questions(
     mubanList: List<Muban>,
-    viewModel: QuestionsViewModel = viewModel(),
+    viewModel: QuestionsViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController(),
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit,
+    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>
 ) {
     viewModel.setMubanList(mubanList)

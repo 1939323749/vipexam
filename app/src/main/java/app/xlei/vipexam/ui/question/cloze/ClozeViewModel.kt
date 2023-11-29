@@ -11,19 +11,21 @@ import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.Shiti
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-
-class ClozeViewModel: ViewModel() {
-    private val _uiState = MutableStateFlow(ClozeUiState(
-        clozes = emptyList()
-    ))
+@HiltViewModel
+class ClozeViewModel @Inject constructor(
+    clozeUiState: ClozeUiState
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(clozeUiState)
     val uiState: StateFlow<ClozeUiState> = _uiState.asStateFlow()
 
-    fun setMuban(muban: Muban){
+    fun setMuban(muban: Muban) {
         _uiState.update {
             it.copy(
                 muban = muban

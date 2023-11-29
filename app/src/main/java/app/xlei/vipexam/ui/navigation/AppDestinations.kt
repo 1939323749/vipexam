@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.navigation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -20,8 +19,6 @@ import app.xlei.vipexam.ui.navgraph.VipExamNavHost
 import app.xlei.vipexam.ui.rememberVipExamAppState
 import kotlinx.coroutines.launch
 
-
-@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @Composable
 fun App(
@@ -31,10 +28,6 @@ fun App(
         windowSizeClass = widthSizeClass,
     )
 ) {
-    val navigationActions = remember(appState.navController) {
-        VipExamNavigationActions(appState.navController)
-    }
-
     val homeNavController = rememberNavController()
 
     val navBackStackEntry by appState.navController.currentBackStackEntryAsState()

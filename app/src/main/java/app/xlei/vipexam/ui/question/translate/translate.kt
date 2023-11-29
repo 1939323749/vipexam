@@ -15,16 +15,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.ui.question.writing.WritingViewModel
 
 @Composable
 fun translateView(
-    viewModel: TranslateViewModel = viewModel(),
+    viewModel: TranslateViewModel = hiltViewModel(),
     muban: Muban,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit,
+    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)

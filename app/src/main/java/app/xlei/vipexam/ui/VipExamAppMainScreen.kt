@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,6 +36,7 @@ import app.xlei.vipexam.data.network.Repository
 import app.xlei.vipexam.data.network.Repository.getExamList
 import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.components.TextIconDialog
+import app.xlei.vipexam.ui.login.loginView
 import app.xlei.vipexam.ui.navgraph.compactHomeGraph
 import app.xlei.vipexam.ui.navgraph.expandedHomeGraph
 import app.xlei.vipexam.ui.navigation.HomeScreen
@@ -126,7 +127,7 @@ fun VipExamAppMainScreen(
     logoText: MutableState<HomeScreen>,
     isExpandedScreen: Boolean,
     showAnswer: MutableState<Boolean>,
-    viewModel: ExamViewModel = viewModel(),
+    viewModel: ExamViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController(),
     showBottomBar: MutableState<Boolean>,
     onFirstItemHidden: (String) -> Unit,
@@ -275,7 +276,7 @@ fun VipExamAppMainScreen(
                         coroutine.launch {
                             withContext(Dispatchers.IO){
                                 DB.repository.deleteUser(it)
-                                users.value = DB.repository.getAllUsers()
+                                users.value -= it
                             }
                         }
                     },
@@ -307,14 +308,13 @@ fun VipExamAppMainScreen(
                         setting.let {
                             if (it != null) {
                                 if (it.isRememberAccount && loginSuccess) {
-                                    withContext(Dispatchers.IO){
-                                        DB.repository.insertUser(
-                                            User(
-                                                account = uiState.account,
-                                                password = uiState.password,
-                                            )
+                                    withContext(Dispatchers.IO) {
+                                        val newUser = User(
+                                            account = uiState.account,
+                                            password = uiState.password,
                                         )
-                                        users.value = DB.repository.getAllUsers()
+                                        DB.repository.insertUser(newUser)
+                                        users.value += newUser
                                     }
                                 }
                             }

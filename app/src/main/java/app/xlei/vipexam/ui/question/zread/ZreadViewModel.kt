@@ -6,17 +6,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class ZreadViewModel: ViewModel() {
-    private val _uiState = MutableStateFlow(
-        ZreadUiState(
-            articles = emptyList()
-        )
-    )
+@HiltViewModel
+class ZreadViewModel @Inject constructor(
+    zreadUiState: ZreadUiState
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(zreadUiState)
     val uiState: StateFlow<ZreadUiState> = _uiState.asStateFlow()
 
     fun setMuban(muban: Muban) {

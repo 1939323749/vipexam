@@ -1,21 +1,22 @@
 package app.xlei.vipexam.ui.question.translate
 
-import android.transition.Transition.TransitionListener
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.ui.question.writing.WritingUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class TranslateViewModel: ViewModel() {
-    private val _uiState = MutableStateFlow(TranslateUiState(
-        translations = emptyList()
-    ))
+@HiltViewModel
+class TranslateViewModel @Inject constructor(
+    translateUiState: TranslateUiState
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(translateUiState)
     val uiState: StateFlow<TranslateUiState> = _uiState.asStateFlow()
 
-    fun setMuban(muban: Muban){
+    fun setMuban(muban: Muban) {
         _uiState.update {
             it.copy(
                 muban = muban

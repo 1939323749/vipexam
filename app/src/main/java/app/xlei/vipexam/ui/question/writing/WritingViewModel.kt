@@ -11,13 +11,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WritingViewModel @Inject constructor(
-    private val muban: Muban
+    writingUiState: WritingUiState
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(
-        WritingUiState(
-            writings = emptyList()
-        )
-    )
+    private val _uiState = MutableStateFlow(writingUiState)
     val uiState: StateFlow<WritingUiState> = _uiState.asStateFlow()
 
     fun setMuban(muban: Muban) {

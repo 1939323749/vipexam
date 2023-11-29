@@ -1,6 +1,5 @@
 package app.xlei.vipexam.data.network
 
-import android.util.Log
 import app.xlei.vipexam.data.Exam
 import app.xlei.vipexam.data.ExamList
 import app.xlei.vipexam.data.LoginResponse
@@ -77,7 +76,6 @@ object Repository {
             header("sec-ch-ua-platform", "\"macOS\"")
             setBody("examID=$examId&account=$account&token=$token")
         }
-        Log.d("",response.bodyAsText())
         client.close()
         val gson = Gson()
         return gson.fromJson(response.bodyAsText(), Exam::class.java)

@@ -323,34 +323,46 @@ fun VipExamAppMainScreen(
                 }
             }
             compactHomeGraph(
-                uiState = uiState,
+                selectedExamType = selectedExamType,
+                selectedExamList = selectedExamList,
+                selectedExamId = selectedExamId,
+                currentPage = currentPage,
                 isFirstItemHidden = isFirstItemHidden,
                 onFirstItemHidden = onFirstItemHidden,
                 onFirstItemAppear = onFirstItemAppear,
                 showAnswer = showAnswer,
                 onNextPageClicked = {
+                    currentPage.value = "${currentPage.value.toInt() + 1}"
                     coroutine.launch {
-                        viewModel.nextPage()
+                        selectedExamList.value = Repository.getExamList(
+                            page = currentPage.value,
+                            type = selectedExamType.value,
+                        )!!
                     }
                 },
                 onExamTypeClicked = {
-                    viewModel.setExamType(it)
+                    selectedExamType.value = it
                     coroutine.launch {
-                        viewModel.refresh()
-                        homeScreenNavigationActions.navigateToExamList()
+                        selectedExamList.value = Repository.getExamList(
+                            page = currentPage.value,
+                            type = selectedExamType.value,
+                        )!!
                     }
+                    homeScreenNavigationActions.navigateToExamList()
                 },
                 onExamClick = {
-                    coroutine.launch {
-                        val getExamResponse = viewModel.getExam(examId = it)
-                        if (getExamResponse)
-                            homeScreenNavigationActions.navigateToExam()
-                    }
+                    selectedExamId.value = it
+                    homeScreenNavigationActions.navigateToExam()
                 },
                 onPreviousPageClicked = {
+                    currentPage.value = "${currentPage.value.toInt() - 1}"
                     coroutine.launch {
-                        viewModel.previousPage()
+                        selectedExamList.value = Repository.getExamList(
+                            page = currentPage.value,
+                            type = selectedExamType.value,
+                        )!!
                     }
+
                 },
                 refresh = {
                     coroutine.launch {

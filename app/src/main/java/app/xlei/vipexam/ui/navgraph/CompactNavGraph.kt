@@ -6,15 +6,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.xlei.vipexam.R
 import app.xlei.vipexam.constant.Constants
-import app.xlei.vipexam.data.ExamUiState
+import app.xlei.vipexam.data.ExamList
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.page.ExamPage
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.examTypeListView
 
 fun NavGraphBuilder.compactHomeGraph(
-    uiState: ExamUiState,
-    onExamTypeClicked:(String)->Unit,
+    selectedExamType: MutableState<String>,
+    selectedExamList: MutableState<ExamList>,
+    currentPage: MutableState<String>,
+    selectedExamId: MutableState<String>,
+    onExamTypeClicked: (String) -> Unit,
     onExamClick: (String) -> Unit,
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
@@ -27,7 +30,7 @@ fun NavGraphBuilder.compactHomeGraph(
     navigation(
         startDestination = HomeScreen.ExamTypeList.name,
         route = HomeScreen.CompactLoggedIn.name,
-    ){
+    ) {
         composable(route = HomeScreen.ExamTypeList.name) {
             examTypeListView(
                 onExamTypeClicked = onExamTypeClicked,
@@ -36,38 +39,34 @@ fun NavGraphBuilder.compactHomeGraph(
             )
         }
         composable(route = HomeScreen.ExamList.name) {
-            uiState.examList?.let { examList ->
-                examListView(
-                    currentPage = uiState.currentPage,
-                    examList = examList,
-                    isPractice = uiState.examType == Constants.EXAMTYPES.toMap()[R.string.practice_exam],
-                    onPreviousPageClicked = onPreviousPageClicked,
-                    onNextPageClicked = onNextPageClicked,
-                    onExamClick = onExamClick,
-                    refresh = refresh,
-                    onFirstItemHidden = {
-                        isFirstItemHidden.value = true
-                    },
-                ) {
-                    isFirstItemHidden.value = false
-                }
+            examListView(
+                currentPage = currentPage.value,
+                examList = selectedExamList.value,
+                isPractice = selectedExamType.value == Constants.EXAMTYPES.toMap()[R.string.practice_exam],
+                onPreviousPageClicked = onPreviousPageClicked,
+                onNextPageClicked = onNextPageClicked,
+                onExamClick = onExamClick,
+                refresh = refresh,
+                onFirstItemHidden = {
+                    isFirstItemHidden.value = true
+                },
+            ) {
+                isFirstItemHidden.value = false
             }
         }
-        composable(route = HomeScreen.Exam.name) {
-            uiState.exam?.let { exam ->
-                ExamPage(
-                    exam = exam,
-                    onFirstItemHidden = {
-                        isFirstItemHidden.value = true
-                        onFirstItemHidden(it)
-                    },
-                    onFirstItemAppear = {
-                        isFirstItemHidden.value = false
-                        onFirstItemAppear()
-                    },
-                    showAnswer = showAnswer,
-                )
-            }
-        }
+    }
+    composable(route = HomeScreen.Exam.name) {
+        ExamPage(
+            examId = selectedExamId.value,
+            onFirstItemHidden = {
+                isFirstItemHidden.value = true
+                onFirstItemHidden(it)
+            },
+            onFirstItemAppear = {
+                isFirstItemHidden.value = false
+                onFirstItemAppear()
+            },
+            showAnswer = showAnswer,
+        )
     }
 }

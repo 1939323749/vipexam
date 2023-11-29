@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -41,12 +43,13 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+        languageVersion = "1.9"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
     packagingOptions {
         exclude("META-INF/DEPENDENCIES")
@@ -127,4 +130,8 @@ dependencies {
 
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
 
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("androidx.datastore:datastore-core:1.1.0-alpha06")
 }

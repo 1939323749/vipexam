@@ -40,6 +40,10 @@ import app.xlei.vipexam.data.network.Repository
 import app.xlei.vipexam.data.network.Repository.getExamList
 import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.components.TextIconDialog
+import app.xlei.vipexam.ui.navgraph.compactHomeGraph
+import app.xlei.vipexam.ui.navgraph.expandedHomeGraph
+import app.xlei.vipexam.ui.navigation.HomeScreen
+import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.examTypeListView
 import app.xlei.vipexam.ui.question.cloze.clozeView
@@ -58,11 +62,11 @@ import kotlinx.coroutines.withContext
 @Composable
 fun VipExamAppBar(
     currentScreen: String,
-    canNavigateBack:Boolean,
-    navigateUp:()->Unit,
-    modifier: Modifier=Modifier,
+    canNavigateBack: Boolean,
+    navigateUp: () -> Unit,
+    modifier: Modifier = Modifier,
     showAnswer: MutableState<Boolean>,
-    onShowAnswerClick: (Boolean)->Unit
+    onShowAnswerClick: (Boolean) -> Unit,
 ){
     var showMenu by remember { mutableStateOf(false) }
 

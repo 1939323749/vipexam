@@ -1,5 +1,6 @@
-package app.xlei.vipexam.ui
+package app.xlei.vipexam.ui.navgraph
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -12,6 +13,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import app.xlei.vipexam.data.AppContainer
+import app.xlei.vipexam.ui.VipExamAppMainScreen
+import app.xlei.vipexam.ui.navigation.AppDestinations
+import app.xlei.vipexam.ui.navigation.HomeScreen
 
 @Composable
 fun VipExamNavGraph(
@@ -62,7 +66,12 @@ fun VipExamNavGraph(
         composable(
             route = AppDestinations.SETTINGS_ROUTE.name,
         ) { navBackStackEntry ->
-            Spacer(Modifier)
+            Column {
+//                SettingsDialog(
+//                    onDismiss = {}
+//                )
+            }
+
         }
     }
 }

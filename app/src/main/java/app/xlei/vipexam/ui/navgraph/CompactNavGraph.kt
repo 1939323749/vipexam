@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui
+package app.xlei.vipexam.ui.navgraph
 
 import androidx.compose.runtime.MutableState
 import androidx.navigation.NavGraphBuilder
@@ -7,6 +7,7 @@ import androidx.navigation.navigation
 import app.xlei.vipexam.R
 import app.xlei.vipexam.constant.Constants
 import app.xlei.vipexam.data.ExamUiState
+import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.page.ExamPage
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.examTypeListView

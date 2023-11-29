@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui
+package app.xlei.vipexam.ui.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -7,13 +7,17 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.data.AppContainer
+import app.xlei.vipexam.ui.AppDrawer
+import app.xlei.vipexam.ui.VipExamState
 import app.xlei.vipexam.ui.components.AppNavRail
+import app.xlei.vipexam.ui.navgraph.VipExamNavGraph
+import app.xlei.vipexam.ui.rememberVipExamAppState
 import kotlinx.coroutines.launch
 
 
@@ -22,7 +26,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun App(
     appContainer: AppContainer,
-    widthSizeClass: WindowWidthSizeClass,
+    widthSizeClass: WindowSizeClass,
+    appState: VipExamState = rememberVipExamAppState(
+        windowSizeClass = widthSizeClass,
+    )
 ){
     val navController = rememberNavController()
     val navigationActions = remember(navController) {
@@ -35,8 +42,7 @@ fun App(
     val currentRoute =
         navBackStackEntry?.destination?.route ?: AppDestinations.HOME_ROUTE.name
 
-    val isExpandedScreen = widthSizeClass == WindowWidthSizeClass.Expanded
-    val sizeAwareDrawerState = rememberSizeAwareDrawerState(isExpandedScreen)
+    val sizeAwareDrawerState = rememberSizeAwareDrawerState(appState.shouldShowBottomBar)
 
     val currentHomeScreenRoute = homeNavController.currentBackStackEntryAsState()
         .value?.destination?.route ?: HomeScreen.Login.name
@@ -60,10 +66,10 @@ fun App(
             )
         },
         drawerState = sizeAwareDrawerState,
-        gesturesEnabled = !isExpandedScreen,
+        gesturesEnabled = appState.shouldShowBottomBar,
     ){
         Row {
-            if (isExpandedScreen) {
+            if (appState.shouldShowNavRail) {
                 AppNavRail(
                     logo = logoText,
                     showAnswer = showAnswer,
@@ -80,7 +86,7 @@ fun App(
                 showAnswer = showAnswer,
                 homeNavController = homeNavController,
                 appContainer = appContainer,
-                isExpandedScreen = isExpandedScreen,
+                isExpandedScreen = appState.shouldShowNavRail,
                 navController = navController,
                 openDrawer = { coroutine.launch { sizeAwareDrawerState.open() } },
             )

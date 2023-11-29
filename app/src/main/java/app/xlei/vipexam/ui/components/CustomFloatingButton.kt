@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -34,32 +33,32 @@ fun CustomFloatingActionButton(
         isExpanded = false
     }
 
-    val fabSize = 64.dp
+    val fabSize = 56.dp
     val expandedFabWidth by animateDpAsState(
         targetValue = if (isExpanded) 200.dp else fabSize,
         animationSpec = spring(dampingRatio = 3f)
     )
     val expandedFabHeight by animateDpAsState(
-        targetValue = if (isExpanded) 58.dp else fabSize,
+        targetValue = if (isExpanded) 56.dp else fabSize,
         animationSpec = spring(dampingRatio = 3f)
     )
 
     Column {
         Column(
             modifier = Modifier
-                .offset(y = (25).dp)
+                .offset(y = (16).dp)
                 .size(
                     width = expandedFabWidth,
                     height = (animateDpAsState(if (isExpanded) 225.dp else 0.dp, animationSpec = spring(dampingRatio = 4f))).value)
                 .background(
                     MaterialTheme.colorScheme.surfaceContainer,
-                    shape = RoundedCornerShape(18.dp)
+                    shape = RoundedCornerShape(16.dp)
                 )
                 .verticalScroll(rememberScrollState())
         ) {
             Column(
                 modifier = Modifier
-                    .padding(bottom = 35.dp)
+                    .padding(bottom = 16.dp)
             ) {
                 items.forEach{
 
@@ -68,7 +67,7 @@ fun CustomFloatingActionButton(
                             .fillMaxWidth()
                             .height(fabSize)
                             .padding(4.dp)
-                            .clip(RoundedCornerShape(18.dp))
+                            .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .clickable {
                                 onItemClick(it.first)
@@ -78,7 +77,7 @@ fun CustomFloatingActionButton(
                         Text(
                             text = it.second,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
                             modifier = Modifier
                                 .padding(12.dp)
                                 .align(Alignment.CenterHorizontally)

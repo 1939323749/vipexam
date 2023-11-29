@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui
+package app.xlei.vipexam.ui.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -6,8 +6,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import app.xlei.vipexam.R
 
 enum class AppDestinations(@StringRes val title: Int, val icon: ImageVector) {
@@ -16,7 +16,7 @@ enum class AppDestinations(@StringRes val title: Int, val icon: ImageVector) {
     SETTINGS_ROUTE(title = R.string.setting, icon = Icons.Filled.Settings)
 }
 
-class VipExamNavigationActions(navController: NavHostController) {
+class VipExamNavigationActions(navController: NavController) {
     val navigateToHome: () -> Unit = {
         navController.navigate(AppDestinations.HOME_ROUTE.name) {
             // Pop up to the start destination of the graph to

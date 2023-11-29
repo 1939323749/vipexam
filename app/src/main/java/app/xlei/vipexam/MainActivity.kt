@@ -1,6 +1,5 @@
 package app.xlei.vipexam
 
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -11,22 +10,32 @@ import androidx.compose.material.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import app.xlei.vipexam.logic.DB
-import app.xlei.vipexam.ui.App
+import app.xlei.vipexam.ui.navigation.App
 import app.xlei.vipexam.ui.theme.VipexamTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    //val viewModel: MainActivityViewModel by viewModels()
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
         DB.provide(this)
         super.onCreate(savedInstanceState)
         val appContainer = (application as VipExamApplication).container
+
         setContent {
             VipexamTheme {
-                val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
+                val widthSizeClass = calculateWindowSizeClass(this)
+                enableEdgeToEdge(
+                    statusBarStyle = SystemBarStyle.auto(lightScrim = lightScrim(), darkScrim = darkScrim()),
+                    navigationBarStyle = SystemBarStyle.auto(lightScrim = lightScrim(), darkScrim = darkScrim()),
+                )
                 Surface(
                     color = MaterialTheme.colorScheme.background,
                     modifier = Modifier
@@ -42,11 +51,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable
+private fun lightScrim() = MaterialTheme.colorScheme.background.toArgb()
 
-
-
-
-
+@Composable
+private fun darkScrim() = MaterialTheme.colorScheme.background.toArgb()
 
 
 

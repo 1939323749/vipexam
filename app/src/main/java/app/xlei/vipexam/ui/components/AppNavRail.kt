@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import app.xlei.vipexam.ui.AppDestinations
-import app.xlei.vipexam.ui.HomeScreen
+import app.xlei.vipexam.ui.navigation.AppDestinations
+import app.xlei.vipexam.ui.navigation.HomeScreen
 import io.ktor.http.*
 
 @Composable

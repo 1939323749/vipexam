@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui
+package app.xlei.vipexam.ui.navgraph
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.MutableState
@@ -8,6 +8,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.xlei.vipexam.data.ExamList
+import app.xlei.vipexam.ui.examListWithQuestionsView
+import app.xlei.vipexam.ui.examTypeListWithExamListView
+import app.xlei.vipexam.ui.navigation.HomeScreen
+import app.xlei.vipexam.ui.questionsWithQuestionView
 
 fun NavGraphBuilder.expandedHomeGraph(
     showAnswer: MutableState<Boolean>,

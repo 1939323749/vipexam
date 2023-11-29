@@ -1,6 +1,5 @@
 package app.xlei.vipexam.ui.navgraph
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -10,32 +9,25 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import app.xlei.vipexam.data.AppContainer
 import app.xlei.vipexam.ui.VipExamAppMainScreen
+import app.xlei.vipexam.ui.examList
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
 
 @Composable
-fun VipExamNavGraph(
+fun VipExamNavHost(
     logoText: MutableState<HomeScreen>,
     showAnswer: MutableState<Boolean>,
+    navHostController: NavHostController,
     homeNavController: NavHostController,
     appContainer: AppContainer,
     isExpandedScreen: Boolean,
-    modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
-    openDrawer: () -> Unit = {},
-    startDestination: String = AppDestinations.HOME_ROUTE.name,
 ) {
-    val showBottomBar = remember { mutableStateOf(true) }
-    val isFirstItemHidden = remember { mutableStateOf(false) }
-
     NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        modifier = modifier
+        navController = navHostController,
+        startDestination = AppDestinations.HOME_ROUTE.name
     ) {
         composable(
             route = AppDestinations.HOME_ROUTE.name,
@@ -52,7 +44,7 @@ fun VipExamNavGraph(
                 logoText = logoText,
                 navController = homeNavController,
                 showAnswer = showAnswer,
-                showBottomBar = showBottomBar,
+                showBottomBar = remember { mutableStateOf(false) },
                 isExpandedScreen = isExpandedScreen,
                 onFirstItemHidden = { },
                 onFirstItemAppear = { },
@@ -66,12 +58,10 @@ fun VipExamNavGraph(
         composable(
             route = AppDestinations.SETTINGS_ROUTE.name,
         ) { navBackStackEntry ->
-            Column {
-//                SettingsDialog(
-//                    onDismiss = {}
-//                )
-            }
-
+            // setting()
+            examList()
         }
     }
+
+
 }

@@ -10,9 +10,7 @@ import app.xlei.vipexam.ui.navigation.AppDestinations
 @Composable
 fun AppDrawer(
     currentRoute: String,
-    navigateToHome: () -> Unit,
-    navigateToSecond: () -> Unit,
-    navigateToSettings: () -> Unit,
+    navigationToTopLevelDestination: (AppDestinations) -> Unit,
     closeDrawer: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -21,21 +19,21 @@ fun AppDrawer(
             label = { Text(stringResource(id = AppDestinations.HOME_ROUTE.title)) },
             icon = { Icon(AppDestinations.HOME_ROUTE.icon, null) },
             selected = currentRoute == AppDestinations.HOME_ROUTE.name,
-            onClick = { navigateToHome(); closeDrawer() },
+            onClick = { navigationToTopLevelDestination(AppDestinations.HOME_ROUTE); closeDrawer() },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(stringResource(id = AppDestinations.SECOND_ROUTE.title)) },
             icon = { Icon(AppDestinations.SECOND_ROUTE.icon, null) },
             selected = currentRoute == AppDestinations.SECOND_ROUTE.name,
-            onClick = { navigateToSecond(); closeDrawer() },
+            onClick = { navigationToTopLevelDestination(AppDestinations.SECOND_ROUTE); closeDrawer() },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         NavigationDrawerItem(
             label = { Text(stringResource(id = AppDestinations.SETTINGS_ROUTE.title)) },
             icon = { Icon(AppDestinations.SETTINGS_ROUTE.icon, null) },
             selected = currentRoute == AppDestinations.SETTINGS_ROUTE.name,
-            onClick = { navigateToSettings(); closeDrawer() },
+            onClick = { navigationToTopLevelDestination(AppDestinations.SETTINGS_ROUTE); closeDrawer() },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
     }

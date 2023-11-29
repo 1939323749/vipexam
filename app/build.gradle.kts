@@ -130,8 +130,8 @@ dependencies {
 
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
 
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("com.google.dagger:hilt-android:2.48.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("androidx.datastore:datastore-core:1.1.0-alpha06")
 }

@@ -4,9 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import androidx.compose.animation.*
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -22,7 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -718,34 +714,4 @@ private fun getMuban(question: String, exam: Exam): Muban? {
             return it
     }
     return null
-}
-
-private const val TIME_DURATION = 300
-
-val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
-    slideInHorizontally(
-        initialOffsetX = { it },
-        animationSpec = tween(durationMillis = TIME_DURATION, easing = LinearOutSlowInEasing)
-    )
-}
-
-val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
-    slideOutHorizontally(
-        targetOffsetX = { -it / 3 },
-        animationSpec = tween(durationMillis = TIME_DURATION, easing = LinearOutSlowInEasing)
-    )
-}
-
-val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
-    slideInHorizontally(
-        initialOffsetX = { -it / 3 },
-        animationSpec = tween(durationMillis = TIME_DURATION, easing = LinearOutSlowInEasing)
-    )
-}
-
-val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
-    slideOutHorizontally(
-        targetOffsetX = { it },
-        animationSpec = tween(durationMillis = TIME_DURATION, easing = LinearOutSlowInEasing)
-    )
 }

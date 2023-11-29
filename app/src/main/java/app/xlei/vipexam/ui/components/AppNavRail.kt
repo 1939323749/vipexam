@@ -23,9 +23,7 @@ fun AppNavRail(
     showAnswer: MutableState<Boolean>,
     homeNavController: NavHostController,
     currentRoute: String,
-    navigateToHome: () -> Unit,
-    navigateToSecond: () -> Unit,
-    navigateToSettings: () -> Unit,
+    navigationToTopLevelDestination: (AppDestinations) -> Unit,
     openDrawer: () -> Unit = {},
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
@@ -57,21 +55,21 @@ fun AppNavRail(
         Spacer(Modifier.weight(1f))
         NavigationRailItem(
             selected = currentRoute == AppDestinations.HOME_ROUTE.name,
-            onClick = navigateToHome,
+            onClick = { navigationToTopLevelDestination(AppDestinations.HOME_ROUTE) },
             icon = { Icon(AppDestinations.HOME_ROUTE.icon, stringResource(AppDestinations.HOME_ROUTE.title)) },
             label = { Text(stringResource(AppDestinations.HOME_ROUTE.title)) },
             alwaysShowLabel = false
         )
         NavigationRailItem(
             selected = currentRoute == AppDestinations.SECOND_ROUTE.name,
-            onClick = navigateToSecond,
+            onClick = { navigationToTopLevelDestination(AppDestinations.SECOND_ROUTE) },
             icon = { Icon(AppDestinations.SECOND_ROUTE.icon, stringResource(AppDestinations.SECOND_ROUTE.title)) },
             label = { Text(stringResource(AppDestinations.SECOND_ROUTE.title)) },
             alwaysShowLabel = false
         )
         NavigationRailItem(
             selected = currentRoute == AppDestinations.SETTINGS_ROUTE.name,
-            onClick = navigateToSettings,
+            onClick = { navigationToTopLevelDestination(AppDestinations.SETTINGS_ROUTE) },
             icon = { Icon(AppDestinations.SETTINGS_ROUTE.icon, stringResource(AppDestinations.SETTINGS_ROUTE.title)) },
             label = { Text(stringResource(AppDestinations.SETTINGS_ROUTE.title)) },
             alwaysShowLabel = false

@@ -16,7 +16,7 @@ import app.xlei.vipexam.data.AppContainer
 import app.xlei.vipexam.ui.AppDrawer
 import app.xlei.vipexam.ui.VipExamState
 import app.xlei.vipexam.ui.components.AppNavRail
-import app.xlei.vipexam.ui.navgraph.VipExamNavGraph
+import app.xlei.vipexam.ui.navgraph.VipExamNavHost
 import app.xlei.vipexam.ui.rememberVipExamAppState
 import kotlinx.coroutines.launch
 
@@ -30,15 +30,14 @@ fun App(
     appState: VipExamState = rememberVipExamAppState(
         windowSizeClass = widthSizeClass,
     )
-){
-    val navController = rememberNavController()
-    val navigationActions = remember(navController) {
-        VipExamNavigationActions(navController)
+) {
+    val navigationActions = remember(appState.navController) {
+        VipExamNavigationActions(appState.navController)
     }
 
     val homeNavController = rememberNavController()
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val navBackStackEntry by appState.navController.currentBackStackEntryAsState()
     val currentRoute =
         navBackStackEntry?.destination?.route ?: AppDestinations.HOME_ROUTE.name
 
@@ -59,9 +58,7 @@ fun App(
         drawerContent = {
             AppDrawer(
                 currentRoute = currentRoute,
-                navigateToHome = navigationActions.navigateToHome,
-                navigateToSecond = navigationActions.navigateToSecond,
-                navigateToSettings = navigationActions.navigateToSettings,
+                navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
                 closeDrawer = { coroutine.launch { sizeAwareDrawerState.close() } }
             )
         },
@@ -75,20 +72,17 @@ fun App(
                     showAnswer = showAnswer,
                     homeNavController = homeNavController,
                     currentRoute = currentRoute,
-                    navigateToHome = navigationActions.navigateToHome,
-                    navigateToSecond = navigationActions.navigateToSecond,
-                    navigateToSettings = navigationActions.navigateToSettings,
+                    navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
                     openDrawer = { coroutine.launch { sizeAwareDrawerState.open() } },
                 )
             }
-            VipExamNavGraph(
+            VipExamNavHost(
                 logoText = logoText,
                 showAnswer = showAnswer,
+                navHostController = appState.navController,
                 homeNavController = homeNavController,
                 appContainer = appContainer,
                 isExpandedScreen = appState.shouldShowNavRail,
-                navController = navController,
-                openDrawer = { coroutine.launch { sizeAwareDrawerState.open() } },
             )
         }
     }

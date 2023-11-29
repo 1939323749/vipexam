@@ -2,22 +2,28 @@ package app.xlei.vipexam.ui.question.writing
 
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.ui.question.cloze.ClozeUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class WritingViewModel :ViewModel(){
-    private val _uiState = MutableStateFlow(WritingUiState(
-        writings = emptyList()
-    ))
+@HiltViewModel
+class WritingViewModel @Inject constructor(
+    private val muban: Muban
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(
+        WritingUiState(
+            writings = emptyList()
+        )
+    )
     val uiState: StateFlow<WritingUiState> = _uiState.asStateFlow()
 
-    fun setMuban(muban: Muban){
+    fun setMuban(muban: Muban) {
         _uiState.update {
             it.copy(
-                muban = muban
+                muban = muban // function scope
             )
         }
     }

@@ -2,25 +2,23 @@ package app.xlei.vipexam.ui.question
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import app.xlei.vipexam.data.ExamUiState
 
 @Composable
 fun questionListView(
-    name: String,
-    questions: List<Pair<String, String>>,
+    questionListUiState: ExamUiState.QuestionListUiState,
     onQuestionClick: (String) -> Unit,
 ){
     Column {
         ListItem(
-            headlineContent = { Text(name) }
+            headlineContent = { Text(questionListUiState.exam.examName) }
         )
-        questions.forEach {
+        questionListUiState.questions.forEach {
             Column {
                 ListItem(
                     headlineContent = { Text(it.second) },

@@ -2,24 +2,23 @@ package app.xlei.vipexam.ui.navgraph
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import app.xlei.vipexam.data.ExamList
+import app.xlei.vipexam.ui.ExamViewModel
 import app.xlei.vipexam.ui.examListWithQuestionsView
 import app.xlei.vipexam.ui.examTypeListWithExamListView
 import app.xlei.vipexam.ui.navigation.HomeScreen
-import app.xlei.vipexam.ui.questionsWithQuestionView
+import app.xlei.vipexam.ui.questionListWithQuestionView
 
 fun NavGraphBuilder.expandedHomeGraph(
+    viewModel: ExamViewModel,
     showAnswer: MutableState<Boolean>,
-    selectedExamType: MutableState<String>,
-    selectedExamList: MutableState<ExamList>,
-    currentPage: MutableState<String>,
-    selectedExamId: MutableState<String>,
-    selectedQuestion: MutableState<String>,
+    onExamTypeClick: (Int) -> Unit,
     onExamClick: (String) -> Unit,
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
@@ -33,11 +32,13 @@ fun NavGraphBuilder.expandedHomeGraph(
         composable(
             route = HomeScreen.ExamTypeWithExamList.name,
         ){
+            val uiState by viewModel.uiState.collectAsState()
             examTypeListWithExamListView(
-                onExamTypeClick = { selectedExamType.value = it },
+                examTypeListUiState = uiState.examTypeListUiState,
+                onExamTypeClick = onExamTypeClick,
                 onExamClick = onExamClick,
-                onPreviousPageClicked = onPreviousPageClicked,
-                onNextPageClicked = onNextPageClicked,
+                onPreviousPageClick = onPreviousPageClicked,
+                onNextPageClick = onNextPageClicked,
                 refresh = refresh,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
@@ -45,11 +46,9 @@ fun NavGraphBuilder.expandedHomeGraph(
         composable(
             route = HomeScreen.ExamListWithQuestions.name,
         ){
+            val uiState by viewModel.uiState.collectAsState()
             examListWithQuestionsView(
-                examList = selectedExamList.value,
-                currentPage = currentPage.value,
-                examType = selectedExamType.value,
-                examId = selectedExamId.value,
+                examListUiState = uiState.examListUiState,
                 onPreviousPageClicked = onPreviousPageClicked,
                 onNextPageClicked = onNextPageClicked,
                 onExamClick = onExamClick,
@@ -59,12 +58,13 @@ fun NavGraphBuilder.expandedHomeGraph(
             )
         }
         composable(
-            route = HomeScreen.QuestionsWithQuestion.name,
-        ){
-            questionsWithQuestionView(
-                examId = selectedExamId.value,
-                question = selectedQuestion.value,
+            route = HomeScreen.QuestionListWithQuestion.name,
+        ) {
+            val uiState by viewModel.uiState.collectAsState()
+            questionListWithQuestionView(
+                questionListUiState = uiState.questionListUiState,
                 showAnswer = showAnswer,
+                onQuestionClick = onQuestionClick,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
         }

@@ -76,9 +76,13 @@ class QreadViewModel @Inject constructor(
 
     private fun getOptions(text: String): MutableList<QreadUiState.Option> {
         val result = mutableListOf<QreadUiState.Option>()
-        val pattern = Regex("""([A-Z])([)])""")
-        val matches = pattern.findAll(text)
-        for((index,match) in matches.withIndex()){
+        var pattern = Regex("""([A-Z])([)])""")
+        var matches = pattern.findAll(text)
+        if (matches.count() < 10) {
+            pattern = Regex("""([A-Z])(])""")
+            matches = pattern.findAll(text)
+        }
+        for ((index, match) in matches.withIndex()) {
             result.add(
                 QreadUiState.Option(
                     index = index + 1,

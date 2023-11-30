@@ -1,6 +1,7 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,7 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.xlei.vipexam.data.ExamList
+import app.xlei.vipexam.R
+import app.xlei.vipexam.data.ExamUiState
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.request.*
@@ -33,20 +35,20 @@ import kotlinx.coroutines.launch
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun examListView(
-    currentPage: String,
-    examList: ExamList,
-    isPractice: Boolean,
+    examListUiState: ExamUiState.ExamListUiState,
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
     onExamClick: (String) -> Unit,
     refresh: () -> Unit,
-    onFirstItemHidden: () -> Unit,
-    onFirstItemAppear: () -> Unit,
-){
+) {
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
 
+    DisposableEffect(Unit) {
+        Log.d("-------------", examListUiState.examList.count.toString())
+        onDispose {}
+    }
     Scaffold(
         bottomBar = {
             BottomAppBar {
@@ -64,7 +66,7 @@ fun examListView(
                                 coroutineScope.launch {
                                     scrollState.animateScrollToItem(0)
                                 } },
-                            enabled = currentPage.toInt() > 1
+                            enabled = examListUiState.currentPage.toInt() > 1
                         ){
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -77,9 +79,9 @@ fun examListView(
                             .align(Alignment.Bottom)
                     ) {
                         Text(
-                            text = "${(currentPage.toInt()-1) * 20 +1}-" +
-                                    "${(currentPage.toInt()-1) * 20 +20}/" +
-                                    "${examList.count}",
+                            text = "${(examListUiState.currentPage.toInt() - 1) * 20 + 1}-" +
+                                    "${(examListUiState.currentPage.toInt() - 1) * 20 + 20}/" +
+                                    "${examListUiState.examList.count}",
                             fontSize = 12.sp
                         )
                     }
@@ -101,7 +103,6 @@ fun examListView(
                                 contentDescription = "next page",
                             )
                         }
-
                     }
                 }
             }
@@ -122,11 +123,6 @@ fun examListView(
 
         val state = rememberPullRefreshState(refreshing, refresh)
 
-        if(firstVisibleItemIndex >0){
-            onFirstItemHidden()
-        }else{
-            onFirstItemAppear()
-        }
 
         Box (
             modifier = Modifier
@@ -136,12 +132,12 @@ fun examListView(
             Column{
                 LazyColumn(
                     state = scrollState,
-                ){
-                    items(examList.list.size){
-                        if (isPractice)
+                ) {
+                    items(examListUiState.examList.list.size) {
+                        if (examListUiState.examType == R.string.practice_exam)
                             ListItem(
-                                headlineContent = { Text(getExamNameAndNo(examList.list[it].examname).first) },
-                                trailingContent = { Text(getExamNameAndNo(examList.list[it].examname).second) },
+                                headlineContent = { Text(getExamNameAndNo(examListUiState.examList.list[it].examname).first) },
+                                trailingContent = { Text(getExamNameAndNo(examListUiState.examList.list[it].examname).second) },
                                 leadingContent = {
                                     Box(
                                         modifier = Modifier
@@ -149,9 +145,9 @@ fun examListView(
                                             .clip(CircleShape)
                                             .aspectRatio(1f)
                                             .background(MaterialTheme.colorScheme.primaryContainer)
-                                    ){
+                                    ) {
                                         Text(
-                                            text = getExamCET6Keyword(examList.list[it].examname),
+                                            text = getExamCET6Keyword(examListUiState.examList.list[it].examname),
                                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                                             modifier = Modifier
                                                 .align(Alignment.Center)
@@ -160,12 +156,12 @@ fun examListView(
                                 },
                                 modifier = Modifier
                                     .clickable {
-                                        onExamClick(examList.list[it].examid)
+                                        onExamClick(examListUiState.examList.list[it].examid)
                                     }
                             )
                         else
                             ListItem(
-                                headlineContent = { Text(examList.list[it].examname) },
+                                headlineContent = { Text(examListUiState.examList.list[it].examname) },
                                 leadingContent = {
                                     Box(
                                         modifier = Modifier
@@ -173,7 +169,7 @@ fun examListView(
                                             .clip(CircleShape)
                                             .aspectRatio(1f)
                                             .background(MaterialTheme.colorScheme.primaryContainer)
-                                    ){
+                                    ) {
                                         Text(
                                             text = "真题",
                                             color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -184,11 +180,12 @@ fun examListView(
                                 },
                                 modifier = Modifier
                                     .clickable {
-                                        onExamClick(examList.list[it].examid)
+                                        onExamClick(examListUiState.examList.list[it].examid)
                                     }
                             )
                         HorizontalDivider()
                     }
+
                 }
             }
 

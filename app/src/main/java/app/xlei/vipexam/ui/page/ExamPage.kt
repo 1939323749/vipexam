@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -18,9 +17,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import app.xlei.vipexam.data.Exam
+import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.data.network.Repository
 import app.xlei.vipexam.data.network.Repository.getQuestions
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
@@ -33,38 +31,24 @@ import app.xlei.vipexam.ui.question.zread.zreadView
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import kotlinx.coroutines.launch
 
 @Composable
 fun ExamPage(
-    examId: String,
+    questionListUiState: ExamUiState.QuestionListUiState,
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>
 ) {
-    var exam by remember { mutableStateOf<Exam?>(null) }
-    val coroutine = rememberCoroutineScope()
-    DisposableEffect(Unit) {
-        Log.d("examid", examId)
-        coroutine.launch {
-            exam = Repository.getExam(examId)!!
-        }
-        onDispose { }
-    }
-
-    exam?.let {
-        questions(
-            mubanList = it.muban,
-            onFirstItemHidden = { title ->
-                onFirstItemHidden(title)
-            },
-            onFirstItemAppear = {
-                onFirstItemAppear()
-            },
-            showAnswer = showAnswer
-        )
-    }
-
+    questions(
+        mubanList = questionListUiState.exam.muban,
+        onFirstItemHidden = { title ->
+            onFirstItemHidden(title)
+        },
+        onFirstItemAppear = {
+            onFirstItemAppear()
+        },
+        showAnswer = showAnswer
+    )
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

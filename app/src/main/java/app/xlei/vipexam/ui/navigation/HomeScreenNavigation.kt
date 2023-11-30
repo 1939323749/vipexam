@@ -6,7 +6,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import app.xlei.vipexam.R
 
 enum class HomeScreen(@StringRes val title: Int, val icon: ImageVector) {
@@ -17,11 +17,11 @@ enum class HomeScreen(@StringRes val title: Int, val icon: ImageVector) {
     Exam(title = R.string.exam, Icons.Default.Edit),
     ExpandedLoggedIn(title = R.string.expandedLoggedIn, Icons.Default.Edit),
     ExamTypeWithExamList(title = R.string.examTypeWithExamList, Icons.AutoMirrored.Filled.List),
-    QuestionsWithQuestion(title = R.string.questionsWithQuestion, Icons.Default.Edit),
+    QuestionListWithQuestion(title = R.string.questionsWithQuestion, Icons.Default.Edit),
     ExamListWithQuestions(title = R.string.examListWithQuestions, Icons.AutoMirrored.Filled.List),
 }
 
-class HomeScreenNavigationActions(navController: NavHostController) {
+class HomeScreenNavigationActions(navController: NavController) {
     val navigateToExamList: () -> Unit = {
         navController.navigate(HomeScreen.ExamList.name) {
             launchSingleTop = true
@@ -41,7 +41,7 @@ class HomeScreenNavigationActions(navController: NavHostController) {
         }
     }
     val navigateToQuestionsWithQuestion: () -> Unit = {
-        navController.navigate(HomeScreen.QuestionsWithQuestion.name) {
+        navController.navigate(HomeScreen.QuestionListWithQuestion.name) {
             launchSingleTop = true
             restoreState = true
         }

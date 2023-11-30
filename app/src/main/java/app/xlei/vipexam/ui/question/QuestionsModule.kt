@@ -1,5 +1,7 @@
 package app.xlei.vipexam.ui.question
 
+import app.xlei.vipexam.data.Exam
+import app.xlei.vipexam.data.ExamList
 import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.ui.question.cloze.ClozeUiState
 import app.xlei.vipexam.ui.question.listening.ListeningUiState
@@ -16,7 +18,49 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object QuestionModule {
     @Provides
-    fun provideExamUiState() = ExamUiState()
+    fun provideExamUiState() = ExamUiState(
+        examListUiState = ExamUiState.ExamListUiState(
+            examType = 0,
+            examList = ExamList(
+                msg = "",
+                code = "",
+                count = 1,
+                list = emptyList(),
+                resourceType = 1,
+            ),
+            currentPage = "1",
+            questionListUiState = null,
+        ),
+        examTypeListUiState = ExamUiState.ExamTypeListUiState(
+            examListUiState = null,
+            examTypeList = emptyList(),
+        ),
+        loginUiState = ExamUiState.LoginUiState(
+            account = "",
+            password = "",
+            connectivity = false,
+            loginResponse = null,
+            setting = null,
+            users = emptyList(),
+        ),
+        questionListUiState = ExamUiState.QuestionListUiState(
+            exam = Exam(
+                code = 1,
+                count = 1,
+                examID = "",
+                examName = "",
+                examstyle = "",
+                examTypeCode = "",
+                timelimit = 0,
+                msg = "",
+                muban = emptyList(),
+                planID = "",
+            ),
+            question = null,
+            questions = emptyList(),
+        ),
+        title = ""
+    )
 
     @Provides
     fun provideClozeUiState() = ClozeUiState(

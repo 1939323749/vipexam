@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
 import app.xlei.vipexam.data.Exam
@@ -49,7 +50,7 @@ import app.xlei.vipexam.ui.question.zread.zreadView
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VipExamAppBar(
-    currentScreen: String,
+    question: String,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
@@ -60,7 +61,7 @@ fun VipExamAppBar(
 
     TopAppBar(
         title = {
-            Text(currentScreen)
+            Text(question)
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -129,7 +130,6 @@ fun HomeRoute(
         }
     )
     viewModel.setNavigationActions(remember(navController) { HomeScreenNavigationActions(navController) })
-
     val uiState by viewModel.uiState.collectAsState()
 
     val openDialog = remember { mutableStateOf(false) }
@@ -145,7 +145,10 @@ fun HomeRoute(
         topBar={
             if (!isExpandedScreen)
                 VipExamAppBar(
-                    currentScreen = uiState.title,
+                    question = when (navController.currentBackStackEntryAsState().value?.destination?.route) {
+                        HomeScreen.Exam.name -> uiState.title
+                        else -> ""
+                    },
                     canNavigateBack = navController.previousBackStackEntry != null,
                     navigateUp = { navController.navigateUp() },
                     showAnswer = showAnswer,

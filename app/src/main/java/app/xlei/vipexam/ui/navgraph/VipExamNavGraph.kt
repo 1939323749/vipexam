@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.navgraph
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -41,11 +40,7 @@ fun VipExamNavHost(
         composable(
             route = AppDestinations.SETTINGS_ROUTE.name,
         ) { navBackStackEntry ->
-            Button(
-                onClick = navHostController::navigateUp
-            ) {
-
-            }
+            Spacer(Modifier)
         }
     }
 }

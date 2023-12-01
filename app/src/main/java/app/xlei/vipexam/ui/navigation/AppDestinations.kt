@@ -2,6 +2,8 @@ package app.xlei.vipexam.ui.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
@@ -9,6 +11,8 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.data.AppContainer
@@ -52,7 +56,10 @@ fun App(
             AppDrawer(
                 currentRoute = currentRoute,
                 navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
-                closeDrawer = { coroutine.launch { sizeAwareDrawerState.close() } }
+                closeDrawer = { coroutine.launch { sizeAwareDrawerState.close() } },
+                modifier = Modifier
+                    .width(300.dp)
+                    .padding(top = 24.dp)
             )
         },
         drawerState = sizeAwareDrawerState,

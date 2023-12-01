@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,10 +44,6 @@ fun examListView(
     val coroutineScope = rememberCoroutineScope()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
 
-    DisposableEffect(Unit) {
-        Log.d("-------------", examListUiState.examList.count.toString())
-        onDispose {}
-    }
     Scaffold(
         bottomBar = {
             BottomAppBar {
@@ -127,7 +122,7 @@ fun examListView(
         Box (
             modifier = Modifier
                 .pullRefresh(state)
-                .padding(padding)
+                .padding(bottom = padding.calculateBottomPadding())
         ){
             Column{
                 LazyColumn(

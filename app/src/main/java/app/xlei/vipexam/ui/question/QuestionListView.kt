@@ -13,8 +13,11 @@ import app.xlei.vipexam.data.ExamUiState
 fun questionListView(
     questionListUiState: ExamUiState.QuestionListUiState,
     onQuestionClick: (String) -> Unit,
-){
-    Column {
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
         ListItem(
             headlineContent = { Text(questionListUiState.exam.examName) }
         )

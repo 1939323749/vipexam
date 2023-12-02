@@ -136,14 +136,78 @@ class ExamViewModel @Inject constructor(
 
     fun navigate(destination: HomeScreen) {
         when (destination) {
-            HomeScreen.Exam -> homeScreenNavigationActions.navigateToExam()
-            HomeScreen.ExamList -> homeScreenNavigationActions.navigateToExamList()
-            HomeScreen.CompactLoggedIn -> homeScreenNavigationActions.navigateToCompactLoggedIn()
-            HomeScreen.ExamListWithQuestions -> homeScreenNavigationActions.navigateToExamListWithQuestions()
-            HomeScreen.ExamTypeList -> homeScreenNavigationActions.navigateToExamList()
-            HomeScreen.ExamTypeWithExamList -> homeScreenNavigationActions.navigateToExamList()
-            HomeScreen.ExpandedLoggedIn -> homeScreenNavigationActions.navigateToExpandedLoggedIn()
-            HomeScreen.QuestionListWithQuestion -> homeScreenNavigationActions.navigateToQuestionsWithQuestion()
+            HomeScreen.Exam -> {
+                homeScreenNavigationActions.navigateToExam()
+                _uiState.update {
+                    it.copy(
+                        currentRoute = HomeScreen.Exam
+                    )
+                }
+            }
+
+            HomeScreen.ExamList -> {
+                homeScreenNavigationActions.navigateToExamList()
+                _uiState.update {
+                    it.copy(
+                        currentRoute = HomeScreen.ExamList
+                    )
+                }
+            }
+
+            HomeScreen.CompactLoggedIn -> {
+                homeScreenNavigationActions.navigateToCompactLoggedIn()
+                _uiState.update {
+                    it.copy(
+                        currentRoute = HomeScreen.CompactLoggedIn
+                    )
+                }
+            }
+
+            HomeScreen.ExamListWithQuestions -> {
+                homeScreenNavigationActions.navigateToExamListWithQuestions()
+                _uiState.update {
+                    it.copy(
+                        currentRoute = HomeScreen.ExamListWithQuestions
+                    )
+                }
+            }
+
+            HomeScreen.ExamTypeList -> {
+                homeScreenNavigationActions.navigateToExamList()
+                _uiState.update {
+                    it.copy(
+                        currentRoute = HomeScreen.ExamTypeList
+                    )
+                }
+            }
+
+            HomeScreen.ExamTypeWithExamList -> {
+                homeScreenNavigationActions.navigateToExamList()
+                _uiState.update {
+                    it.copy(
+                        currentRoute = HomeScreen.ExamTypeWithExamList
+                    )
+                }
+            }
+
+            HomeScreen.ExpandedLoggedIn -> {
+                homeScreenNavigationActions.navigateToExpandedLoggedIn()
+                _uiState.update {
+                    it.copy(
+                        currentRoute = HomeScreen.ExpandedLoggedIn
+                    )
+                }
+            }
+
+            HomeScreen.QuestionListWithQuestion -> {
+                homeScreenNavigationActions.navigateToQuestionsWithQuestion()
+                _uiState.update {
+                    it.copy(
+                        currentRoute = HomeScreen.QuestionListWithQuestion
+                    )
+                }
+            }
+
             else -> return
         }
         _uiState.update {

@@ -36,6 +36,7 @@ import io.ktor.client.statement.*
 @Composable
 fun ExamPage(
     questionListUiState: ExamUiState.QuestionListUiState,
+    navController: NavHostController = rememberNavController(),
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>
@@ -58,6 +59,7 @@ fun questions(
     mubanList: List<Muban>,
     viewModel: QuestionsViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController(),
+    question: String? = null,
     onFirstItemHidden: (String) -> Unit,
     onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>
@@ -96,7 +98,7 @@ fun questions(
         ) {
             NavHost(
                 navController = navController,
-                startDestination = questions[0].first,
+                startDestination = question ?: questions[0].first,
                 modifier = Modifier
             ) {
                 for ((index,q) in questions.withIndex()){

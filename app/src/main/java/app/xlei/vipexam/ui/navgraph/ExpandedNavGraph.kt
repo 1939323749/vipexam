@@ -64,7 +64,6 @@ fun NavGraphBuilder.expandedHomeGraph(
             questionListWithQuestionView(
                 questionListUiState = uiState.questionListUiState,
                 showAnswer = showAnswer,
-                onQuestionClick = onQuestionClick,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
         }

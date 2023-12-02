@@ -135,6 +135,7 @@ private fun cloze(
                         ) {
                             SuggestionChip(
                                 onClick = {
+                                    selectedClozeIndex = clozeIndex
                                     onBlankClick(index)
                                 },
                                 label = {

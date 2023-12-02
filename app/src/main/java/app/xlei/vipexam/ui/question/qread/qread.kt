@@ -1,6 +1,5 @@
 package app.xlei.vipexam.ui.question.qread
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +7,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,17 +30,18 @@ fun qreadView(
 ){
     viewModel.setMuban(muban)
     viewModel.setArticles()
+
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
-    var selectedQuestionIndex by remember { mutableStateOf(0) }
+    var selectedQuestionIndex by rememberSaveable { mutableStateOf(0) }
 
     qread(
         name = uiState.muban!!.cname,
         showBottomSheet = uiState.showBottomSheet,
         showOptionsSheet = uiState.showOptionsSheet,
         articles = uiState.articles,
-        toggleBottomSheet = { viewModel.toggleBottomSheet() },
-        toggleOptionsSheet = { viewModel.toggleOptionsSheet() },
+        toggleBottomSheet = viewModel::toggleBottomSheet,
+        toggleOptionsSheet = viewModel::toggleOptionsSheet,
         onArticleLongClicked = {
             viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -49,16 +50,12 @@ fun qreadView(
             selectedQuestionIndex = it
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        onOptionClicked = {selectedArticleIndex,option->
-            viewModel.setOption(selectedArticleIndex,selectedQuestionIndex,option)
+        onOptionClicked = { selectedArticleIndex, option ->
+            viewModel.setOption(selectedArticleIndex, selectedQuestionIndex, option)
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        onFirstItemHidden = {
-            onFirstItemHidden(it)
-        },
-        onFirstItemAppear = {
-            onFirstItemAppear()
-        },
+        onFirstItemHidden = onFirstItemHidden,
+        onFirstItemAppear = onFirstItemAppear,
         showAnswer = showAnswer,
     )
 }
@@ -72,15 +69,15 @@ private fun qread(
     articles: List<QreadUiState.Article>,
     toggleBottomSheet: () -> Unit,
     toggleOptionsSheet: () -> Unit,
-    onArticleLongClicked:()->Unit,
-    onQuestionClicked: (Int)->Unit,
-    onOptionClicked: (Int,QreadUiState.Option)->Unit,
+    onArticleLongClicked: () -> Unit,
+    onQuestionClicked: (Int) -> Unit,
+    onOptionClicked: (Int, String) -> Unit,
     onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit,
+    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
-    var selectedArticle by remember { mutableStateOf(0) }
+    var selectedArticle by rememberSaveable { mutableStateOf(0) }
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
 
     Column {
@@ -88,85 +85,118 @@ private fun qread(
             state = scrollState
         ) {
             item {
-                Text(
-                    name,
-                    fontSize = 24.sp,
-                    modifier = Modifier
-                        .padding(start = 12.dp)
-                )
+                Column {
+                    Text(
+                        name,
+                        fontSize = 24.sp,
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                    )
+                }
                 HorizontalDivider(
                     modifier = Modifier
-                        .padding(start = 12.dp, end = 12.dp),
+                        .padding(start = 16.dp, end = 16.dp),
                     thickness = 1.dp,
                     color = Color.Gray
                 )
             }
-            items(articles.size) {
-                Column(
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .combinedClickable (
-                            onClick = {},
-                            onLongClick = {
-                                selectedArticle = it
-                                onArticleLongClicked() }
+            articles.forEachIndexed { articleIndex, article ->
+                item {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .combinedClickable(
+                                onClick = {},
+                                onLongClick = {
+                                    selectedArticle = articleIndex
+                                    onArticleLongClicked()
+                                }
+                            )
+                    ) {
+                        Text(
+                            text = articles[articleIndex].title,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
                         )
-                ) {
-                    Text(
-                        text = articles[it].title,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        fontSize = 24.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                    )
-                    Text(
-                        text = articles[it].content,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier
-                            .padding(12.dp)
-                    )
-                }
-
-                if (showAnswer.value )
-                    articles[it].questions.forEach {question->
-                        Text(question.index+question.refAnswer)
-                        Text(question.description)
+                        Text(
+                            text = articles[articleIndex].content,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier
+                                .padding(16.dp)
+                        )
                     }
+                }
+                items(article.questions.size) { it ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .clickable {
+                                onQuestionClicked(it)
+                                toggleOptionsSheet()
+                            }
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = "${article.questions[it].index}. ${article.questions[it].question}",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            if (article.questions[it].choice.value != "") {
+                                SuggestionChip(
+                                    onClick = toggleOptionsSheet,
+                                    label = { Text(article.questions[it].choice.value) }
+                                )
+                            }
+                        }
+                    }
+
+                    if (showAnswer.value)
+                        articles[articleIndex].questions[it].let { question ->
+                            Text(question.index + question.refAnswer)
+                            Text(question.description)
+                        }
+                }
             }
 
         }
 
         // questions
-        if(showBottomSheet){
+        if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = toggleBottomSheet,
-            ){
-                Column (
+            ) {
+                Column(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
-                ){
-                    articles[selectedArticle].questions.forEachIndexed{index,it->
-                        Column (
+                ) {
+                    articles[selectedArticle].questions.forEachIndexed { index, it ->
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                                .padding(16.dp)
+                                .clip(RoundedCornerShape(16.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .clickable {
                                     onQuestionClicked(index)
                                     toggleOptionsSheet()
                                 }
-                        ){
+                        ) {
                             Text(
                                 text = "${it.index}. ${it.question}",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.padding(12.dp)
+                                modifier = Modifier.padding(16.dp)
                             )
-                            Log.d("",it.choice.value)
-                            if (it.choice.value!="") {
+                            if (it.choice.value != "") {
                                 SuggestionChip(
                                     onClick = toggleOptionsSheet,
                                     label = { Text(it.choice.value) }
@@ -179,11 +209,11 @@ private fun qread(
         }
 
         // options
-        if(showOptionsSheet){
+        if (showOptionsSheet) {
             ModalBottomSheet(
                 onDismissRequest = toggleOptionsSheet,
-            ){
-                Column (
+            ) {
+                Column(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
                 ){
@@ -191,7 +221,7 @@ private fun qread(
                         horizontalArrangement = Arrangement.Start,
                         maxItemsInEachRow = 5,
                         modifier = Modifier
-                            .padding(bottom = 20.dp)
+                            .padding(bottom = 24.dp)
                     ) {
                         articles[selectedArticle].options.forEach {
                             Column(
@@ -200,7 +230,7 @@ private fun qread(
                             ) {
                                 SuggestionChip(
                                     onClick = {
-                                        onOptionClicked(selectedArticle,it)
+                                        onOptionClicked(selectedArticle, it.option)
                                         toggleOptionsSheet()
                                     },
                                     label = {

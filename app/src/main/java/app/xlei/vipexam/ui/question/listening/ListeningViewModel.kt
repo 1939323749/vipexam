@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.question.listening
 
 import android.media.MediaPlayer
-import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
@@ -52,7 +51,6 @@ class ListeningViewModel @Inject constructor(
     }
 
     fun setOption(selectedListeningIndex: Int,selectedQuestionIndex: Int, option: String){
-        Log.d("",selectedQuestionIndex.toString())
         _uiState.value.listenings[selectedListeningIndex].questions[selectedQuestionIndex].choice.value = option
     }
 

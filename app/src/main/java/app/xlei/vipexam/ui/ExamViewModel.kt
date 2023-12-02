@@ -1,6 +1,5 @@
 package app.xlei.vipexam.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.constant.Constants
@@ -55,6 +54,15 @@ class ExamViewModel @Inject constructor(
                             )
                         )
                     }
+                }
+                if (_uiState.value.loginUiState.setting == null) {
+                    DB.repository.insertSetting(
+                        Setting(
+                            id = 0,
+                            isAutoLogin = false,
+                            isRememberAccount = false,
+                        )
+                    )
                 }
             }
         }
@@ -113,14 +121,15 @@ class ExamViewModel @Inject constructor(
                     navigate(HomeScreen.ExpandedLoggedIn)
                 else
                     navigate(HomeScreen.CompactLoggedIn)
-                withContext(Dispatchers.IO) {
-                    DB.repository.insertUser(
-                        user = User(
-                            account = _uiState.value.loginUiState.account,
-                            password = _uiState.value.loginUiState.password,
+                if (_uiState.value.loginUiState.setting?.isRememberAccount == true)
+                    withContext(Dispatchers.IO) {
+                        DB.repository.insertUser(
+                            user = User(
+                                account = _uiState.value.loginUiState.account,
+                                password = _uiState.value.loginUiState.password,
+                            )
                         )
-                    )
-                }
+                    }
             }
         }
     }
@@ -155,8 +164,6 @@ class ExamViewModel @Inject constructor(
     fun nextPage() {
         viewModelScope.launch {
             val currentPage = "${_uiState.value.examListUiState.currentPage.toInt() + 1}"
-            Log.d("", currentPage)
-            Log.d("", _uiState.value.examListUiState.examType.toString())
             val examList = Repository.getExamList(
                 page = currentPage,
                 type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
@@ -275,6 +282,7 @@ class ExamViewModel @Inject constructor(
                     examListUiState = it.examListUiState.copy(
                         examType = type,
                         examList = examList,
+                        currentPage = "1",
                     )
                 )
             }
@@ -308,10 +316,6 @@ class ExamViewModel @Inject constructor(
                 DB.repository.deleteUser(user)
             }
         }
-    }
-
-    fun setExamList(examType: String? = null) {
-
     }
 
     fun setExam(examId: String) {

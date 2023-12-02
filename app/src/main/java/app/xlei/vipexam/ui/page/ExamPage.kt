@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -77,10 +78,12 @@ fun questions(
                 iconUnExpanded = Icons.Filled.KeyboardArrowUp,
                 items = questions,
                 onItemClick = {
-                    navController.navigate(it){
+                    navController.navigate(it) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
                         launchSingleTop = true
                         restoreState = true
-                        popUpTo(questions[0].first)
                     }
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
@@ -101,132 +104,80 @@ fun questions(
                         when (q.first) {
                             "ecswriting" -> writingView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecscloze" -> clozeView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecsqread" -> qreadView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecszread" -> zreadView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecstranslate" -> translateView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecfwriting" -> writingView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecfcloze" -> clozeView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecfqread" -> qreadView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecfzread" -> zreadView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "ecftranslate" -> translateView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "eylhlisteninga" -> listeningView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "eylhlisteningb" -> listeningView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                             "eylhlisteningc" -> listeningView(
                                 muban = mubanList[index],
-                                onFirstItemHidden = {
-                                    onFirstItemHidden(it)
-                                },
-                                onFirstItemAppear = {
-                                    onFirstItemAppear()
-                                },
+                                onFirstItemHidden = onFirstItemHidden,
+                                onFirstItemAppear = onFirstItemAppear,
                                 showAnswer = showAnswer,
                             )
                         }

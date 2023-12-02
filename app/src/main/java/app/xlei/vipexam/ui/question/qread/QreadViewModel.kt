@@ -1,9 +1,8 @@
 package app.xlei.vipexam.ui.question.qread
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
@@ -30,7 +29,6 @@ class QreadViewModel @Inject constructor(
     }
 
     @Composable
-
     fun setArticles () {
         val articles = mutableListOf<QreadUiState.Article>()
         _uiState.value.muban!!.shiti.forEach {
@@ -57,7 +55,7 @@ class QreadViewModel @Inject constructor(
         }
     }
 
-    fun toggleOptionsSheet(){
+    fun toggleOptionsSheet() {
         _uiState.update {
             it.copy(
                 showOptionsSheet = !it.showOptionsSheet
@@ -65,13 +63,8 @@ class QreadViewModel @Inject constructor(
         }
     }
 
-    fun setOption(selectedArticleIndex: Int,selectedQuestion: Int,option: QreadUiState.Option) {
-        _uiState.value.articles[selectedArticleIndex].questions[selectedQuestion].choice.value = option.option
-        _uiState.value.articles.forEach {article ->
-            article.questions.forEach {question ->
-                Log.d("",question.choice.value)
-            }
-        }
+    fun setOption(selectedArticleIndex: Int, selectedQuestion: Int, option: String) {
+        _uiState.value.articles[selectedArticleIndex].questions[selectedQuestion].choice.value = option
     }
 
     private fun getOptions(text: String): MutableList<QreadUiState.Option> {
@@ -102,7 +95,7 @@ class QreadViewModel @Inject constructor(
                 QreadUiState.Question(
                     index = "${index + 1}",
                     question = it.secondQuestion,
-                    choice = remember { mutableStateOf("") },
+                    choice = rememberSaveable { mutableStateOf("") },
                     refAnswer = it.refAnswer,
                     description = it.discription
                 )
@@ -126,8 +119,5 @@ class QreadViewModel @Inject constructor(
         }
         return ""
     }
-
-
-
 
 }

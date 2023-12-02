@@ -1,6 +1,5 @@
 package app.xlei.vipexam.data.network
 
-import android.util.Log
 import app.xlei.vipexam.data.Exam
 import app.xlei.vipexam.data.ExamList
 import app.xlei.vipexam.data.LoginResponse
@@ -48,7 +47,6 @@ object Repository {
         return when (loginResponse.code){
             "1" -> {
                 token = loginResponse.token
-                Log.d("", token)
                 loginResponse
             }
             else -> null

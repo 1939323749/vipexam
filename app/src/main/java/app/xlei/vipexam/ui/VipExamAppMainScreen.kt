@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -89,21 +88,21 @@ fun VipExamAppBar(
             ){
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            text = "show answer",
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                        )
-                    },
-                    leadingIcon = {
-                                  Checkbox(
-                                      checked = showAnswer.value,
-                                      onCheckedChange = {
-                                          onShowAnswerClick(it)
-                                      }
-                                  )
+                        Row {
+                            Checkbox(
+                                checked = showAnswer.value,
+                                onCheckedChange = null,
+                            )
+                            Text(
+                                text = "show answer",
+                                modifier = Modifier
+                                    .padding(start = 24.dp)
+                            )
+                        }
+
                     },
                     onClick = {
+                        showAnswer.value = !showAnswer.value
                         showMenu = false
                     }
                 )
@@ -177,7 +176,6 @@ fun HomeRoute(
             composable(
                 route = HomeScreen.Login.name,
             ){
-                Log.d("", uiState.loginUiState.account)
                 connectivity.value = isInternetAvailable(LocalContext.current)
                 loginView(
                     account = uiState.loginUiState.account,
@@ -308,10 +306,7 @@ fun questionListWithQuestionView(
     onQuestionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    DisposableEffect(Unit) {
-        Log.d("qqqqqq", questionListUiState.questions.size.toString())
-        onDispose { }
-    }
+
     Row(
         modifier = modifier
     ) {

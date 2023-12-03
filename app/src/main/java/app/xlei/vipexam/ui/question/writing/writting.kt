@@ -65,11 +65,11 @@ private fun writing(
                 text = name,
                 fontSize = 24.sp,
                 modifier = Modifier
-                    .padding(start = 12.dp)
+                    .padding(start = 16.dp)
             )
             HorizontalDivider(
                 modifier = Modifier
-                    .padding(start = 12.dp, end = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp),
                 thickness = 1.dp,
                 color = Color.Gray,
             )
@@ -77,8 +77,8 @@ private fun writing(
         items(writings.size){
             Column(
                 modifier = Modifier
-                    .padding(top = 12.dp,start = 12.dp, end = 12.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                    .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(

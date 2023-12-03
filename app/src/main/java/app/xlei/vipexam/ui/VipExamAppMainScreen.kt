@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -42,6 +43,9 @@ import app.xlei.vipexam.ui.question.questionListView
 import app.xlei.vipexam.ui.question.translate.translateView
 import app.xlei.vipexam.ui.question.writing.writingView
 import app.xlei.vipexam.ui.question.zread.zreadView
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.Maximize
+import compose.icons.feathericons.Minimize
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -297,6 +301,7 @@ fun examListWithQuestionsView(
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun questionListWithQuestionView(
     questionListUiState: ExamUiState.QuestionListUiState,
@@ -304,138 +309,180 @@ fun questionListWithQuestionView(
     showAnswer: MutableState<Boolean>,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
+    var isMaximize by rememberSaveable { mutableStateOf(false) }
 
     Row(
         modifier = modifier
     ) {
-        ElevatedCard(
-            modifier = Modifier
-                .width(360.dp)
-        ) {
-            questionListView(
-                questionListUiState = questionListUiState,
-                onQuestionClick = {
-                    navController.navigate(it) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-            )
-        }
-        Spacer(modifier = Modifier.width(24.dp))
-        ElevatedCard(
-            modifier = Modifier
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = questionListUiState.question ?: questionListUiState.questions[0].first,
+        if (!isMaximize) {
+            ElevatedCard(
                 modifier = Modifier
+                    .width(360.dp)
             ) {
-                val mubanList = questionListUiState.exam.muban
-                for ((index, q) in questionListUiState.questions.withIndex()) {
-                    composable(route = q.first) {
-                        when (q.first) {
-                            "ecswriting" -> writingView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                questionListView(
+                    questionListUiState = questionListUiState,
+                    onQuestionClick = {
+                        navController.navigate(it) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                )
+            }
+            Spacer(Modifier.width(24.dp).fillMaxHeight())
+        }
 
-                            "ecscloze" -> clozeView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+        ElevatedCard(
+            modifier = if (isMaximize)
+                Modifier.fillMaxWidth().weight(1f)
+            else
+                Modifier
+        ) {
+            Scaffold(
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { isMaximize = !isMaximize },
+                    ) {
+                        Icon(
+                            imageVector = if (isMaximize) FeatherIcons.Minimize
+                            else
+                                FeatherIcons.Maximize,
+                            contentDescription = null,
+                        )
+                    }
+                }
+            ) {
+                NavHost(
+                    navController = navController,
+                    startDestination = questionListUiState.question ?: questionListUiState.questions[0].first,
+                ) {
+                    val mubanList = questionListUiState.exam.muban
+                    for ((index, q) in questionListUiState.questions.withIndex()) {
+                        composable(route = q.first) {
+                            when (q.first) {
+                                "ecswriting" -> writingView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "ecsqread" -> qreadView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecscloze" -> clozeView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "ecszread" -> zreadView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecsqread" -> qreadView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "ecstranslate" -> translateView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecszread" -> zreadView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "ecfwriting" -> writingView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecstranslate" -> translateView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "ecfcloze" -> clozeView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecfwriting" -> writingView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "ecfqread" -> qreadView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecfcloze" -> clozeView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "ecfzread" -> zreadView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecfqread" -> qreadView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "ecftranslate" -> translateView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecfzread" -> zreadView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "eylhlisteninga" -> listeningView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "ecftranslate" -> translateView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "eylhlisteningb" -> listeningView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "eylhlisteninga" -> listeningView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
 
-                            "eylhlisteningc" -> listeningView(
-                                muban = mubanList[index],
-                                onFirstItemHidden = {},
-                                onFirstItemAppear = {},
-                                showAnswer = showAnswer,
-                            )
+                                "eylhlisteningb" -> listeningView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
+
+                                "eylhlisteningc" -> listeningView(
+                                    muban = mubanList[index],
+                                    onFirstItemHidden = {},
+                                    onFirstItemAppear = {},
+                                    showAnswer = showAnswer,
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+
+        if (isMaximize) {
+            Spacer(Modifier.width(24.dp).fillMaxHeight())
+            ElevatedCard(
+                modifier = Modifier
+                    .width(360.dp)
+            ) {
+                questionListView(
+                    questionListUiState = questionListUiState,
+                    onQuestionClick = {
+                        navController.navigate(it) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                )
+            }
+        }
+
     }
 }
-
 
 fun isInternetAvailable(context: Context): Boolean {
     val result: Boolean

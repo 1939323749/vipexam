@@ -64,11 +64,11 @@ private fun translate(
                 name,
                 fontSize = 24.sp,
                 modifier = Modifier
-                    .padding(start = 12.dp)
+                    .padding(start = 16.dp)
             )
             HorizontalDivider(
                 modifier = Modifier
-                    .padding(start = 12.dp, end = 12.dp),
+                    .padding(start = 16.dp, end = 16.dp),
                 thickness = 1.dp,
                 color = Color.Gray
             )
@@ -77,14 +77,14 @@ private fun translate(
 
             Column(
                 modifier = Modifier
-                    .padding(12.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
                     text = translations[it].question,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.padding(16.dp)
                 )
             }
 

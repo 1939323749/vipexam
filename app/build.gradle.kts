@@ -134,4 +134,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.48.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("androidx.datastore:datastore-core:1.1.0-alpha06")
+
+    val feather_icons_version = "1.1.0"
+    implementation("br.com.devsrsouza.compose.icons:feather:${feather_icons_version}")
 }

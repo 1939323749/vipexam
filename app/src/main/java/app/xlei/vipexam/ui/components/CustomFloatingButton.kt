@@ -74,14 +74,15 @@ fun CustomFloatingActionButton(
                                 isExpanded = false
                             }
                     ) {
+                        Spacer(modifier = Modifier.weight(1f))
                         Text(
                             text = it.second,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
                             modifier = Modifier
-                                .padding(12.dp)
                                 .align(Alignment.CenterHorizontally)
                         )
+                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
@@ -97,7 +98,7 @@ fun CustomFloatingActionButton(
             modifier = Modifier
                 .width(expandedFabWidth)
                 .height(expandedFabHeight),
-            shape = RoundedCornerShape(18.dp)
+            shape = RoundedCornerShape(16.dp)
 
         ) {
             Icon(

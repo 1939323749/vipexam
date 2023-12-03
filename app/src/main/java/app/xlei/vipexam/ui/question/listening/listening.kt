@@ -111,11 +111,11 @@ private fun listening(
                     name,
                     fontSize = 24.sp,
                     modifier = Modifier
-                        .padding(start = 12.dp)
+                        .padding(start = 16.dp)
                 )
                 HorizontalDivider(
                     modifier = Modifier
-                        .padding(start = 12.dp, end = 12.dp),
+                        .padding(start = 16.dp, end = 16.dp),
                     thickness = 1.dp,
                     color = Color.Gray
                 )
@@ -147,8 +147,8 @@ private fun listening(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                                .padding(16.dp)
+                                .clip(RoundedCornerShape(16.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .clickable {
                                     selectedListening = it
@@ -158,7 +158,7 @@ private fun listening(
                             Text(question.index)
                             Column (
                                 modifier = Modifier
-                                    .padding(12.dp)
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                             ){
                                 question.options.forEach {option->
                                     Text("${option.index}. "+option.option)

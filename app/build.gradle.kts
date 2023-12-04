@@ -137,4 +137,7 @@ dependencies {
 
     val feather_icons_version = "1.1.0"
     implementation("br.com.devsrsouza.compose.icons:feather:${feather_icons_version}")
+
+    val coil_compose_version = "2.5.0"
+    implementation("io.coil-kt:coil-compose:$coil_compose_version")
 }

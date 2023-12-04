@@ -32,6 +32,7 @@ class WritingViewModel @Inject constructor(
                 WritingUiState.Writing(
                     question = it.primQuestion,
                     refAnswer = it.refAnswer,
+                    image = it.primPic,
                 )
             )
         }

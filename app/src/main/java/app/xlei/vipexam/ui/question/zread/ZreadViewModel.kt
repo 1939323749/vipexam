@@ -99,7 +99,7 @@ class ZreadViewModel @Inject constructor(
         options.add(
             ZreadUiState.Option(
                 index = "D",
-                option = children.third,
+                option = children.fourth,
             )
         )
 

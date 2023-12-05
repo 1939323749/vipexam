@@ -1,7 +1,7 @@
 package app.xlei.vipexam.data
 
-import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.models.room.User
+import app.xlei.vipexam.ui.LoginSetting
 import app.xlei.vipexam.ui.SCREEN_TYPE
 import app.xlei.vipexam.ui.navigation.HomeScreen
 
@@ -19,7 +19,7 @@ data class ExamUiState(
         val password: String,
         val loginResponse: LoginResponse?,
         val users: List<User>,
-        val setting: Setting?,
+        val setting: LoginSetting,
         val connectivity: Boolean,
     )
 

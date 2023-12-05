@@ -1,6 +1,10 @@
 package app.xlei.vipexam.ui.navgraph
 
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +19,7 @@ import app.xlei.vipexam.data.AppContainer
 import app.xlei.vipexam.ui.HomeRoute
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
+import app.xlei.vipexam.ui.page.SettingsScreen
 
 @Composable
 fun VipExamNavHost(
@@ -35,12 +40,19 @@ fun VipExamNavHost(
         composable(
             route = AppDestinations.SECOND_ROUTE.name,
         ) { navBackStackEntry ->
-            Spacer(Modifier)
+            Scaffold(
+                modifier = Modifier.background(MaterialTheme.colorScheme.background)
+            ) { paddingValues ->
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                ) { }
+            }
         }
         composable(
             route = AppDestinations.SETTINGS_ROUTE.name,
         ) { navBackStackEntry ->
-            Spacer(Modifier)
+            SettingsScreen()
         }
     }
 }

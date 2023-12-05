@@ -6,9 +6,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowCompat
+import app.xlei.vipexam.constant.ThemeMode
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -32,28 +36,70 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+const val defaultAccentColor = "0088aa"
+fun String.hexToColor() = Color(android.graphics.Color.parseColor("#$this"))
+
 @Composable
 fun VipexamTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    themeMode: ThemeMode = ThemeMode.AUTO,
+    accentColor: Color? = null,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+    val darkTheme = when (themeMode) {
+        ThemeMode.AUTO -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK, ThemeMode.BLACK -> true
+    }
+
+    var colorScheme = when {
+        accentColor == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else -> {
+            val primary = accentColor ?: defaultAccentColor.hexToColor()
+            val onPrimary = MaterialTheme.colorScheme.contentColorFor(primary)
+            val blendColor =
+                if (darkTheme) android.graphics.Color.WHITE else android.graphics.Color.BLACK
+            val secondary = Color(ColorUtils.blendARGB(primary.toArgb(), blendColor, 0.3f))
+            val onSecondary = MaterialTheme.colorScheme.contentColorFor(secondary)
+            if (darkTheme) {
+                darkColorScheme(
+                    primary,
+                    onPrimary,
+                    secondary = secondary,
+                    onSecondary = onSecondary
+                )
+            } else {
+                lightColorScheme(
+                    primary,
+                    onPrimary,
+                    secondary = secondary,
+                    onSecondary = onSecondary
+                )
+            }
+        }
     }
+    if (themeMode == ThemeMode.BLACK) colorScheme =
+        colorScheme.copy(background = Color.Black, surface = Color.Black)
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-//            window.statusBarColor = colorScheme.secondaryContainer.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            val activity = view.context as Activity
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                activity.window.navigationBarColor = colorScheme.background.toArgb()
+                activity.window.statusBarColor = colorScheme.background.toArgb()
+                WindowCompat.getInsetsController(
+                    activity.window,
+                    view
+                ).isAppearanceLightStatusBars = !darkTheme
+                WindowCompat.getInsetsController(
+                    activity.window,
+                    view
+                ).isAppearanceLightNavigationBars = !darkTheme
+            }
         }
     }
 

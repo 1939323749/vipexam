@@ -12,11 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import app.xlei.vipexam.R
 import app.xlei.vipexam.data.LoginResponse
-import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.models.room.User
+import app.xlei.vipexam.ui.LoginSetting
 import io.ktor.network.selector.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,13 +28,13 @@ fun loginView(
     account: String,
     password: String,
     users: List<User>,
-    setting: Setting,
+    setting: LoginSetting,
     loginResponse: LoginResponse?,
     onAccountChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onSettingChange: (Setting) -> Unit,
+    onSettingChange: (LoginSetting) -> Unit,
     onDeleteUser: (User) -> Unit,
-    onLoginButtonClicked:()->Unit,
+    onLoginButtonClicked: () -> Unit,
 ) {
     var showUsers by remember { mutableStateOf(false) }
 
@@ -49,7 +51,7 @@ fun loginView(
                 TextField(
                     value = account,
                     onValueChange = { onAccountChange(it) },
-                    label = { Text("account") },
+                    label = { Text(stringResource(R.string.account)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = showUsers)
                     },
@@ -85,7 +87,7 @@ fun loginView(
             TextField(
                 value = password,
                 onValueChange = { onPasswordChange(it) },
-                label = { Text("password") },
+                label = { Text(stringResource(R.string.password)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.padding(top = 20.dp)
             )
@@ -97,7 +99,7 @@ fun loginView(
                 onClick = onLoginButtonClicked,
                 modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 20.dp)
             ) {
-                Text("Login")
+                Text(stringResource(R.string.login))
             }
             Row {
                 Row {
@@ -112,7 +114,7 @@ fun loginView(
                         }
                     )
                     Text(
-                        text = "remember",
+                        text = stringResource(R.string.remember_account),
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                     )
@@ -129,7 +131,7 @@ fun loginView(
                         }
                     )
                     Text(
-                        text = "auto login",
+                        text = stringResource(R.string.auto_login),
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                     )

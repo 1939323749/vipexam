@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.constant.Constants
 import app.xlei.vipexam.data.ExamUiState
-import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.data.models.room.User
 import app.xlei.vipexam.data.network.Repository
 import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
+import app.xlei.vipexam.util.Preferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +26,11 @@ enum class SCREEN_TYPE(
     EXPANDED,
 }
 
+data class LoginSetting(
+    val isRememberAccount: Boolean,
+    val isAutoLogin: Boolean,
+)
+
 @HiltViewModel
 class ExamViewModel @Inject constructor(
     examUiState: ExamUiState,
@@ -41,7 +46,6 @@ class ExamViewModel @Inject constructor(
                     it.copy(
                         loginUiState = it.loginUiState.copy(
                             users = DB.repository.getAllUsers(),
-                            setting = DB.repository.getSetting()
                         )
                     )
                 }
@@ -54,15 +58,6 @@ class ExamViewModel @Inject constructor(
                             )
                         )
                     }
-                }
-                if (_uiState.value.loginUiState.setting == null) {
-                    DB.repository.insertSetting(
-                        Setting(
-                            id = 0,
-                            isAutoLogin = false,
-                            isRememberAccount = false,
-                        )
-                    )
                 }
             }
         }
@@ -121,7 +116,7 @@ class ExamViewModel @Inject constructor(
                     navigate(HomeScreen.ExpandedLoggedIn)
                 else
                     navigate(HomeScreen.CompactLoggedIn)
-                if (_uiState.value.loginUiState.setting?.isRememberAccount == true)
+                if (_uiState.value.loginUiState.setting.isRememberAccount == true)
                     withContext(Dispatchers.IO) {
                         DB.repository.insertUser(
                             user = User(
@@ -219,7 +214,7 @@ class ExamViewModel @Inject constructor(
 
     fun setNavigationActions(homeScreenNavigationActions: HomeScreenNavigationActions) {
         this.homeScreenNavigationActions = homeScreenNavigationActions
-        if (_uiState.value.loginUiState.setting?.isAutoLogin == true
+        if (_uiState.value.loginUiState.setting.isAutoLogin == true
             && _uiState.value.loginUiState.loginResponse == null
         )
             login()
@@ -314,7 +309,7 @@ class ExamViewModel @Inject constructor(
         }
     }
 
-    fun setSetting(setting: Setting) {
+    fun setSetting(setting: LoginSetting) {
         _uiState.update {
             it.copy(
                 loginUiState = it.loginUiState.copy(
@@ -322,11 +317,8 @@ class ExamViewModel @Inject constructor(
                 )
             )
         }
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                DB.repository.updateSetting(setting)
-            }
-        }
+        Preferences.put(Preferences.autoLoginKey, setting.isAutoLogin)
+        Preferences.put(Preferences.rememberAccountKey, setting.isRememberAccount)
     }
 
     fun setExamType(type: Int) {

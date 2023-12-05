@@ -17,7 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.xlei.vipexam.R
 
 @Composable
 fun CustomFloatingActionButton(
@@ -110,10 +112,15 @@ fun CustomFloatingActionButton(
             )
 
             Text(
-                text = "Close",
+                text = stringResource(R.string.close_button),
                 softWrap = false,
                 modifier = Modifier
-                    .offset(x = animateDpAsState(if (isExpanded) 10.dp else 50.dp, animationSpec = spring(dampingRatio = 3f)).value)
+                    .offset(
+                        x = animateDpAsState(
+                            if (isExpanded) 10.dp else 50.dp,
+                            animationSpec = spring(dampingRatio = 3f)
+                        ).value
+                    )
                     .alpha(
                         animateFloatAsState(
                             targetValue = if (isExpanded) 1f else 0f,

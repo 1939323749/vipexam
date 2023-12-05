@@ -27,7 +27,6 @@ import app.xlei.vipexam.R
 import app.xlei.vipexam.data.Exam
 import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.data.models.room.Setting
 import app.xlei.vipexam.ui.components.TextIconDialog
 import app.xlei.vipexam.ui.login.loginView
 import app.xlei.vipexam.ui.navgraph.compactHomeGraph
@@ -96,7 +95,7 @@ fun VipExamAppBar(
                                 onCheckedChange = null,
                             )
                             Text(
-                                text = "show answer",
+                                text = stringResource(R.string.show_answer),
                                 modifier = Modifier
                                     .padding(start = 24.dp)
                             )
@@ -164,8 +163,8 @@ fun HomeRoute(
                 TextIconDialog(
                     onDismissRequest = { openDialog.value = false },
                     onConfirmation = { openDialog.value = false },
-                    dialogTitle = "Internet Error",
-                    dialogText = "Connect to Internet to continue.",
+                    dialogTitle = stringResource(R.string.internet_error),
+                    dialogText = stringResource(R.string.connect_to_continue),
                     icon = Icons.Default.Info
                 )
         }
@@ -183,11 +182,7 @@ fun HomeRoute(
                     account = uiState.loginUiState.account,
                     password = uiState.loginUiState.password,
                     users = uiState.loginUiState.users,
-                    setting = uiState.loginUiState.setting ?: Setting(
-                        id = 0,
-                        isRememberAccount = false,
-                        isAutoLogin = false
-                    ),
+                    setting = uiState.loginUiState.setting,
                     loginResponse = uiState.loginUiState.loginResponse,
                     onAccountChange = viewModel::setAccount,
                     onPasswordChange = viewModel::setPassword,
@@ -310,7 +305,6 @@ fun questionListWithQuestionView(
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
     var isMaximize by rememberSaveable { mutableStateOf(false) }
-
     Row(
         modifier = modifier
     ) {

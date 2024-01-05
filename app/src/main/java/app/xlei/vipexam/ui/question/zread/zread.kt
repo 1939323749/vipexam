@@ -13,9 +13,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -24,7 +36,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.ui.components.translateDialog
@@ -32,14 +43,15 @@ import app.xlei.vipexam.ui.login.EmptyTextToolbar
 import app.xlei.vipexam.ui.page.LongPressActions
 import app.xlei.vipexam.util.Preferences
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun zreadView(
     muban: Muban,
     viewModel: ZreadViewModel = hiltViewModel(),
-    showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
     viewModel.setArticles()
+    val showAnswer = Preferences.showAnswerFlow.collectAsState(initial = false)
 
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
@@ -80,10 +92,10 @@ private fun zread(
     showQuestionsSheet: Boolean,
     toggleBottomSheet: () -> Unit,
     toggleQuestionsSheet: () -> Unit,
-    onArticleLongClick:(Int)->Unit,
-    onQuestionClicked: (Int)->Unit,
-    onOptionClicked: (Int,String)->Unit,
-    showAnswer: MutableState<Boolean>,
+    onArticleLongClick: (Int) -> Unit,
+    onQuestionClicked: (Int) -> Unit,
+    onOptionClicked: (Int, String) -> Unit,
+    showAnswer: State<Boolean>,
 ){
     val scrollState = rememberLazyListState()
     var selectedArticle by rememberSaveable { mutableStateOf(0) }

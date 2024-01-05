@@ -1,10 +1,6 @@
 package app.xlei.vipexam
 
-//noinspection UsingMaterialAndMaterial3Libraries
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -12,24 +8,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.navigation.App
-import app.xlei.vipexam.ui.page.Word
 import app.xlei.vipexam.ui.theme.VipexamTheme
 import app.xlei.vipexam.ui.theme.hexToColor
 import app.xlei.vipexam.util.LocaleHelper
 import app.xlei.vipexam.util.Preferences
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    //val viewModel: MainActivityViewModel by viewModels()
     var themeMode by mutableStateOf(Preferences.getThemeMode())
     var accentColor by mutableStateOf(Preferences.getAccentColor())
 

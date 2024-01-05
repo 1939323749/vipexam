@@ -2,8 +2,15 @@ package app.xlei.vipexam.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import app.xlei.vipexam.constant.ThemeMode
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
+val Context.dataStore by preferencesDataStore(
+    name = "preferences",
+)
 object Preferences {
     const val longPressActionKey = "longPressAction"
     const val alwaysShowAnswerKey = "showAnswer"
@@ -12,15 +19,19 @@ object Preferences {
     const val accentColorKey = "accentColor"
     const val rememberAccountKey = "rememberAccount"
     const val autoLoginKey = "autoLogin"
-
+    val SHOW_ANSWER = booleanPreferencesKey("show_answer")
+    lateinit var showAnswerFlow: Flow<Boolean>
     lateinit var prefs: SharedPreferences
+
     fun initialize(context: Context) {
         prefs = context.getSharedPreferences(
             "preferences",
             Context.MODE_PRIVATE
         )
+        showAnswerFlow = context.dataStore.data.map { preferences ->
+            preferences[SHOW_ANSWER] ?: false
+        }
     }
-
     fun <T> put(key: String, value: T) {
         when (value) {
             is Boolean -> prefs.edit().putBoolean(key, value).apply()
@@ -42,7 +53,8 @@ object Preferences {
         }
     }
 
-    fun getThemeMode() = ThemeMode.values()[get(themeModeKey, ThemeMode.AUTO.value.toString()).toInt()]
+    fun getThemeMode() =
+        ThemeMode.entries[get(themeModeKey, ThemeMode.AUTO.value.toString()).toInt()]
 
     fun getAccentColor() = prefs.getString(accentColorKey, null)
 }

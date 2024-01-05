@@ -1,6 +1,8 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -11,7 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -30,25 +34,27 @@ import app.xlei.vipexam.ui.question.translate.translateView
 import app.xlei.vipexam.ui.question.writing.writingView
 import app.xlei.vipexam.ui.question.zread.zreadView
 import app.xlei.vipexam.util.Preferences
+import app.xlei.vipexam.util.dataStore
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ExamPage(
     questionListUiState: ExamUiState.QuestionListUiState,
     setQuestion: (String) -> Unit,
-    showAnswer: MutableState<Boolean>
 ) {
     questions(
         mubanList = questionListUiState.exam.muban,
         setQuestion = { title ->
             setQuestion(title)
         },
-        showAnswer = showAnswer
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun questions(
@@ -57,12 +63,13 @@ fun questions(
     navController: NavHostController = rememberNavController(),
     question: String? = null,
     setQuestion: (String) -> Unit,
-    showAnswer: MutableState<Boolean>
 ) {
     viewModel.setMubanList(mubanList)
     val uiState by viewModel.uiState.collectAsState()
     val questions = getQuestions(uiState.mubanList!!)
     val haptics = LocalHapticFeedback.current
+    val coroutine = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Scaffold(
         floatingActionButton = {
@@ -89,7 +96,11 @@ fun questions(
                         )
                         == ShowAnswerOptions.ONCE.value
                     )
-                        showAnswer.value = false
+                        coroutine.launch {
+                            context.dataStore.edit { preferences ->
+                                preferences[Preferences.SHOW_ANSWER] = false
+                            }
+                        }
                 }
             )
         },
@@ -103,74 +114,23 @@ fun questions(
                 startDestination = question ?: questions[0].first,
                 modifier = Modifier
             ) {
-                for ((index,q) in questions.withIndex()){
-                    composable(route = q.first){
+                for ((index, q) in questions.withIndex()) {
+                    composable(route = q.first) {
                         setQuestion(mubanList[index].cname)
                         when (q.first) {
-                            "ecswriting" -> writingView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecscloze" -> clozeView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecsqread" -> qreadView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecszread" -> zreadView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecstranslate" -> translateView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecfwriting" -> writingView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecfcloze" -> clozeView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecfqread" -> qreadView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecfzread" -> zreadView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "ecftranslate" -> translateView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "eylhlisteninga" -> listeningView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "eylhlisteningb" -> listeningView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
-
-                            "eylhlisteningc" -> listeningView(
-                                muban = mubanList[index],
-                                showAnswer = showAnswer,
-                            )
+                            "ecswriting" -> writingView(muban = mubanList[index])
+                            "ecscloze" -> clozeView(muban = mubanList[index])
+                            "ecsqread" -> qreadView(muban = mubanList[index])
+                            "ecszread" -> zreadView(muban = mubanList[index])
+                            "ecstranslate" -> translateView(muban = mubanList[index])
+                            "ecfwriting" -> writingView(muban = mubanList[index])
+                            "ecfcloze" -> clozeView(muban = mubanList[index])
+                            "ecfqread" -> qreadView(muban = mubanList[index])
+                            "ecfzread" -> zreadView(muban = mubanList[index])
+                            "ecftranslate" -> translateView(muban = mubanList[index])
+                            "eylhlisteninga" -> listeningView(muban = mubanList[index])
+                            "eylhlisteningb" -> listeningView(muban = mubanList[index])
+                            "eylhlisteningc" -> listeningView(muban = mubanList[index])
                         }
                     }
                 }
@@ -178,6 +138,3 @@ fun questions(
         }
     }
 }
-
-
-

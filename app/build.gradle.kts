@@ -155,4 +155,7 @@ dependencies {
 
     // For Wear-Tiles support
     implementation("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
+
+    val datastore_version = "1.0.0"
+    implementation("androidx.datastore:datastore-preferences:$datastore_version")
 }

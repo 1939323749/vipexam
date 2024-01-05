@@ -1,6 +1,5 @@
 package app.xlei.vipexam.ui.navgraph
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavGraphBuilder
@@ -18,7 +17,6 @@ fun NavGraphBuilder.compactHomeGraph(
     onExamClick: (String) -> Unit,
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
-    showAnswer: MutableState<Boolean>,
     setQuestion: (String) -> Unit,
     refresh: () -> Unit,
 ){
@@ -49,7 +47,6 @@ fun NavGraphBuilder.compactHomeGraph(
         ExamPage(
             questionListUiState = uiState.questionListUiState,
             setQuestion = setQuestion,
-            showAnswer = showAnswer,
         )
     }
 }

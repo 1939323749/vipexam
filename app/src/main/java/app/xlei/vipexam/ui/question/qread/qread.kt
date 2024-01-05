@@ -1,18 +1,40 @@
 package app.xlei.vipexam.ui.question.qread
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -26,14 +48,15 @@ import app.xlei.vipexam.ui.login.EmptyTextToolbar
 import app.xlei.vipexam.ui.page.LongPressActions
 import app.xlei.vipexam.util.Preferences
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun qreadView(
     viewModel: QreadViewModel = hiltViewModel(),
     muban: Muban,
-    showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
     viewModel.setArticles()
+    val showAnswer = Preferences.showAnswerFlow.collectAsState(initial = false)
 
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
@@ -61,7 +84,12 @@ fun qreadView(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
+@RequiresApi(Build.VERSION_CODES.P)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 private fun qread(
     showBottomSheet: Boolean,
@@ -72,7 +100,7 @@ private fun qread(
     onArticleLongClicked: () -> Unit,
     onQuestionClicked: (Int) -> Unit,
     onOptionClicked: (Int, String) -> Unit,
-    showAnswer: MutableState<Boolean>,
+    showAnswer: State<Boolean>,
 ){
     val scrollState = rememberLazyListState()
     var selectedArticle by rememberSaveable { mutableStateOf(0) }

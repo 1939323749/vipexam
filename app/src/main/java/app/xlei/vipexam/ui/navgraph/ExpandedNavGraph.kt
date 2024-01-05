@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.navgraph
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -17,7 +16,6 @@ import app.xlei.vipexam.ui.questionListWithQuestionView
 
 fun NavGraphBuilder.expandedHomeGraph(
     viewModel: ExamViewModel,
-    showAnswer: MutableState<Boolean>,
     onExamTypeClick: (Int) -> Unit,
     onExamClick: (String) -> Unit,
     onPreviousPageClicked: () -> Unit,
@@ -63,7 +61,6 @@ fun NavGraphBuilder.expandedHomeGraph(
             val uiState by viewModel.uiState.collectAsState()
             questionListWithQuestionView(
                 questionListUiState = uiState.questionListUiState,
-                showAnswer = showAnswer,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
         }

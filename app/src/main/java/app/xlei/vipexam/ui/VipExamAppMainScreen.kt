@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -17,6 +19,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -45,10 +48,13 @@ import app.xlei.vipexam.ui.question.translate.translateView
 import app.xlei.vipexam.ui.question.writing.writingView
 import app.xlei.vipexam.ui.question.zread.zreadView
 import app.xlei.vipexam.util.Preferences
+import app.xlei.vipexam.util.dataStore
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Maximize
 import compose.icons.feathericons.Menu
 import compose.icons.feathericons.Minimize
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,11 +64,15 @@ fun VipExamAppBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    showAnswer: MutableState<Boolean>,
     openDrawer: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
-){
+) {
     var showMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val coroutine = rememberCoroutineScope()
+    val showAnswer = context.dataStore.data.map {
+        it[Preferences.SHOW_ANSWER] ?: false
+    }.collectAsState(initial = false)
     LargeTopAppBar(
         title = {
             Text(appBarText)
@@ -77,8 +87,13 @@ fun VipExamAppBar(
                                     Preferences.alwaysShowAnswerKey,
                                     ShowAnswerOptions.ONCE.value
                                 ) == ShowAnswerOptions.ONCE.value
-                        )
-                            showAnswer.value = false
+                        ) {
+                            coroutine.launch {
+                                context.dataStore.edit {
+                                    it[Preferences.SHOW_ANSWER] = false
+                                }
+                            }
+                        }
                     }
                 ) {
                     Icon(
@@ -104,7 +119,7 @@ fun VipExamAppBar(
             DropdownMenu(
                 expanded = showMenu,
                 onDismissRequest = { showMenu = false }
-            ){
+            ) {
                 DropdownMenuItem(
                     text = {
                         Row {
@@ -115,13 +130,17 @@ fun VipExamAppBar(
                             Text(
                                 text = stringResource(R.string.show_answer),
                                 modifier = Modifier
-                                    .padding(start = 24.dp)
+                                    .padding(horizontal = 24.dp)
                             )
                         }
 
                     },
                     onClick = {
-                        showAnswer.value = !showAnswer.value
+                        coroutine.launch {
+                            context.dataStore.edit {
+                                it[Preferences.SHOW_ANSWER] = showAnswer.value.not()
+                            }
+                        }
                         showMenu = false
                     }
                 )
@@ -129,74 +148,6 @@ fun VipExamAppBar(
         },
         scrollBehavior = scrollBehavior
     )
-//    TopAppBar(
-//        title = {
-//
-//        },
-////        colors = TopAppBarDefaults.mediumTopAppBarColors(
-////            containerColor = MaterialTheme.colorScheme.primaryContainer
-////        ),
-//        modifier = modifier,
-//        navigationIcon = {
-//            if(canNavigateBack){
-//                IconButton(
-//                    onClick = {
-//                        navigateUp()
-//                        if (Preferences
-//                            .get(
-//                                Preferences.alwaysShowAnswerKey,
-//                                ShowAnswerOptions.ONCE.value
-//                            )==ShowAnswerOptions.ONCE.value)
-//                            showAnswer.value = false
-//                    }
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                        contentDescription = stringResource(R.string.back_button)
-//                    )
-//                }
-//            }else{
-//                IconButton(onClick = openDrawer){
-//                    Icon(
-//                        imageVector = FeatherIcons.Menu,
-//                        contentDescription = null,
-//                    )
-//                }
-//            }
-//        },
-//        actions = {
-//            IconButton(
-//                onClick = { showMenu = !showMenu }
-//            ) {
-//                Icon(Icons.Default.MoreVert, "")
-//            }
-//            DropdownMenu(
-//                expanded = showMenu,
-//                onDismissRequest = { showMenu = false }
-//            ){
-//                DropdownMenuItem(
-//                    text = {
-//                        Row {
-//                            Checkbox(
-//                                checked = showAnswer.value,
-//                                onCheckedChange = null,
-//                            )
-//                            Text(
-//                                text = stringResource(R.string.show_answer),
-//                                modifier = Modifier
-//                                    .padding(start = 24.dp)
-//                            )
-//                        }
-//
-//                    },
-//                    onClick = {
-//                        showAnswer.value = !showAnswer.value
-//                        showMenu = false
-//                    }
-//                )
-//            }
-//        }
-//    )
 }
 
 
@@ -218,7 +169,11 @@ fun HomeRoute(
             false -> SCREEN_TYPE.COMPACT
         }
     )
-    viewModel.setNavigationActions(remember(navController) { HomeScreenNavigationActions(navController) })
+    viewModel.setNavigationActions(remember(navController) {
+        HomeScreenNavigationActions(
+            navController
+        )
+    })
     val uiState by viewModel.uiState.collectAsState()
 
     val openDialog = remember { mutableStateOf(false) }
@@ -249,12 +204,11 @@ fun HomeRoute(
                     },
                     canNavigateBack = navController.previousBackStackEntry != null,
                     navigateUp = { navController.navigateUp() },
-                    showAnswer = showAnswer,
                     openDrawer = openDrawer,
                     scrollBehavior = scrollBehavior,
                 )
         }
-    ){ padding ->
+    ) { padding ->
         when {
             openDialog.value ->
                 TextIconDialog(
@@ -270,10 +224,10 @@ fun HomeRoute(
             navController = navController,
             startDestination = HomeScreen.Login.name,
             modifier = Modifier.padding(padding)
-        ){
+        ) {
             composable(
                 route = HomeScreen.Login.name,
-            ){
+            ) {
                 connectivity.value = isInternetAvailable(LocalContext.current)
                 loginView(
                     account = uiState.loginUiState.account,
@@ -291,7 +245,6 @@ fun HomeRoute(
             compactHomeGraph(
                 viewModel = viewModel,
                 setQuestion = viewModel::setTitle,
-                showAnswer = showAnswer,
                 onNextPageClicked = viewModel::nextPage,
                 onExamTypeClicked = viewModel::setExamType,
                 onExamClick = viewModel::setExam,
@@ -300,7 +253,6 @@ fun HomeRoute(
             )
             expandedHomeGraph(
                 viewModel = viewModel,
-                showAnswer = showAnswer,
                 onExamTypeClick = viewModel::setExamType,
                 onExamClick = viewModel::setExam,
                 onPreviousPageClicked = viewModel::previousPage,
@@ -313,7 +265,6 @@ fun HomeRoute(
 }
 
 
-
 @Composable
 fun examTypeListWithExamListView(
     examTypeListUiState: ExamUiState.ExamTypeListUiState,
@@ -323,10 +274,10 @@ fun examTypeListWithExamListView(
     onNextPageClick: () -> Unit,
     refresh: () -> Unit,
     modifier: Modifier = Modifier
-){
-    Row (
+) {
+    Row(
         modifier = modifier
-    ){
+    ) {
         ElevatedCard(
             modifier = Modifier
                 .width(360.dp)
@@ -362,14 +313,14 @@ fun examListWithQuestionsView(
     onExamClick: (String) -> Unit,
     onQuestionClick: (String) -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     Row(
         modifier = modifier
     ) {
-        ElevatedCard (
+        ElevatedCard(
             modifier = Modifier
                 .width(360.dp)
-        ){
+        ) {
             examListView(
                 examListUiState = examListUiState,
                 onPreviousPageClicked = onPreviousPageClicked,
@@ -392,12 +343,12 @@ fun examListWithQuestionsView(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun questionListWithQuestionView(
     questionListUiState: ExamUiState.QuestionListUiState,
     navController: NavHostController = rememberNavController(),
-    showAnswer: MutableState<Boolean>,
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
     var isMaximize by rememberSaveable { mutableStateOf(false) }
@@ -419,12 +370,12 @@ fun questionListWithQuestionView(
                             launchSingleTop = true
                             restoreState = true
                         }
-                        if (Preferences.get(
-                                key = Preferences.alwaysShowAnswerKey,
-                                ShowAnswerOptions.ONCE.value
-                            ) == ShowAnswerOptions.ONCE.value
-                        )
-                            showAnswer.value = false
+//                        if (Preferences.get(
+//                                key = Preferences.alwaysShowAnswerKey,
+//                                ShowAnswerOptions.ONCE.value
+//                            ) == ShowAnswerOptions.ONCE.value
+//                        )
+//                            showAnswer.value = false
                     },
                 )
             }
@@ -459,7 +410,8 @@ fun questionListWithQuestionView(
             ) {
                 NavHost(
                     navController = navController,
-                    startDestination = questionListUiState.question ?: questionListUiState.questions[0].first,
+                    startDestination = questionListUiState.question
+                        ?: questionListUiState.questions[0].first,
                 ) {
                     val mubanList = questionListUiState.exam.muban
                     for ((index, q) in questionListUiState.questions.withIndex()) {
@@ -467,67 +419,55 @@ fun questionListWithQuestionView(
                             when (q.first) {
                                 "ecswriting" -> writingView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "ecscloze" -> clozeView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "ecsqread" -> qreadView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
-                                )
+
+                                    )
 
                                 "ecszread" -> zreadView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "ecstranslate" -> translateView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "ecfwriting" -> writingView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "ecfcloze" -> clozeView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "ecfqread" -> qreadView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "ecfzread" -> zreadView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "ecftranslate" -> translateView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "eylhlisteninga" -> listeningView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "eylhlisteningb" -> listeningView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
 
                                 "eylhlisteningc" -> listeningView(
                                     muban = mubanList[index],
-                                    showAnswer = showAnswer,
                                 )
                             }
                         }
@@ -566,7 +506,8 @@ fun questionListWithQuestionView(
 
 fun isInternetAvailable(context: Context): Boolean {
     val result: Boolean
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val networkCapabilities = connectivityManager.activeNetwork ?: return false
     val actNw = connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
     result = when {

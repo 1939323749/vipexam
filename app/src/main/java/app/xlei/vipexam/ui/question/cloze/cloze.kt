@@ -1,56 +1,55 @@
 package app.xlei.vipexam.ui.question.cloze
 
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
-import android.widget.Toast
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalTextToolbar
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.R
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.data.TranslationResponse
-import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.components.translateDialog
 import app.xlei.vipexam.ui.login.EmptyTextToolbar
-import app.xlei.vipexam.ui.page.SelectableItem
-import app.xlei.vipexam.ui.page.Word
 import app.xlei.vipexam.util.Preferences
-import compose.icons.FeatherIcons
-import compose.icons.feathericons.Loader
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun clozeView(
     viewModel: ClozeViewModel = hiltViewModel(),
     muban: Muban,
-    showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
     viewModel.setClozes()
+    val showAnswer = Preferences.showAnswerFlow.collectAsState(initial = false)
 
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
@@ -74,7 +73,12 @@ fun clozeView(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
+@RequiresApi(Build.VERSION_CODES.P)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 private fun cloze(
     clozes: List<ClozeUiState.Cloze>,
@@ -82,7 +86,7 @@ private fun cloze(
     onBlankClick: (Int)->Unit,
     onOptionClicked: (Int,ClozeUiState.Option)->Unit,
     toggleBottomSheet: () -> Unit,
-    showAnswer: MutableState<Boolean>
+    showAnswer: State<Boolean>
 ){
     val scrollState = rememberLazyListState()
     var selectedClozeIndex by rememberSaveable { mutableStateOf(0) }

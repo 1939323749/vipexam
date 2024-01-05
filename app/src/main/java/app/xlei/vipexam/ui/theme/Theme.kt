@@ -36,7 +36,7 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
-const val defaultAccentColor = "0088aa"
+const val defaultAccentColor = "1e131d"
 fun String.hexToColor() = Color(android.graphics.Color.parseColor("#$this"))
 
 @Composable

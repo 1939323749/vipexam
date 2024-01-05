@@ -9,13 +9,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.Shiti
+import app.xlei.vipexam.logic.DB
+import app.xlei.vipexam.ui.page.Word
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,6 +56,21 @@ class ClozeViewModel @Inject constructor(
             it.copy(
                 clozes = clozes
             )
+        }
+        addToWordList()
+    }
+
+    private fun addToWordList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value.clozes.forEach { cloze ->
+                cloze.options.forEach { option ->
+                    DB.repository.addWord(
+                        Word(
+                            word = option.word
+                        )
+                    )
+                }
+            }
         }
     }
 

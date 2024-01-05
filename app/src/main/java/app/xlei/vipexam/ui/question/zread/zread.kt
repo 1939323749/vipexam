@@ -1,5 +1,7 @@
 package app.xlei.vipexam.ui.question.zread
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,18 +21,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.ui.components.translateDialog
+import app.xlei.vipexam.ui.login.EmptyTextToolbar
+import app.xlei.vipexam.ui.page.LongPressActions
+import app.xlei.vipexam.util.Preferences
 
 @Composable
 fun zreadView(
     muban: Muban,
     viewModel: ZreadViewModel = hiltViewModel(),
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
@@ -40,7 +46,6 @@ fun zreadView(
     var selectedQuestionIndex by rememberSaveable { mutableStateOf(0) }
 
     zread(
-        name = uiState.muban!!.cname,
         articles = uiState.articles,
         showBottomSheet = uiState.showBottomSheet,
         showQuestionsSheet = uiState.showQuestionsSheet,
@@ -61,17 +66,15 @@ fun zreadView(
             viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
-        onFirstItemHidden = onFirstItemHidden,
-        onFirstItemAppear = onFirstItemAppear,
         showAnswer = showAnswer
     )
 }
 
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun zread(
-    name: String,
     articles: List<ZreadUiState.Article>,
     showBottomSheet: Boolean,
     showQuestionsSheet: Boolean,
@@ -80,66 +83,44 @@ private fun zread(
     onArticleLongClick:(Int)->Unit,
     onQuestionClicked: (Int)->Unit,
     onOptionClicked: (Int,String)->Unit,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
-    val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
     var selectedArticle by rememberSaveable { mutableStateOf(0) }
 
-
-
+    val expanded = remember { mutableStateOf(false) }
     Column {
         LazyColumn(
             state = scrollState,
         ) {
-            if (firstVisibleItemIndex > 0)
-                stickyHeader {
-                    LinearProgressIndicator(
-                        progress = { scrollState.firstVisibleItemIndex / scrollState.layoutInfo.totalItemsCount.toFloat() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-                }
-            item {
-                Column{
-                    Text(
-                        text = name,
-                        fontSize = 24.sp,
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                    )
-                }
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp),
-                    thickness = 1.dp,
-                    color = Color.Gray
-                )
-            }
             articles.forEachIndexed {articleIndex,ti->
-                item{
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .combinedClickable(
-                                onClick = {},
-                                onLongClick = {
-                                    selectedArticle = articleIndex
-                                    onArticleLongClick(articleIndex)
-                                }
-                            )
+                item {
+                    CompositionLocalProvider(
+                        LocalTextToolbar provides EmptyTextToolbar(expended = expanded)
                     ) {
-                        Text(ti.index)
-                        Text(
-                            text = ti.content,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier
-                                .padding(16.dp)
-                        )
+                        SelectionContainer {
+                            Column(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .combinedClickable(
+                                        onClick = {},
+                                        onLongClick = {
+                                            selectedArticle = articleIndex
+                                            onArticleLongClick(articleIndex)
+                                        }
+                                    )
+                            ) {
+                                Text(ti.index)
+                                Text(
+                                    text = ti.content,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                )
+                            }
+                        }
                     }
 
                     HorizontalDivider(
@@ -192,21 +173,37 @@ private fun zread(
                     }
                     if (showAnswer.value)
                         articles[articleIndex].questions[index].let {
-                            Text("${it.index}." + it.refAnswer)
-                            Text(it.description)
+                            Text(
+                                text = "${it.index}." + it.refAnswer,
+                                modifier = Modifier
+                                    .padding(horizontal = 24.dp)
+                            )
+                            Text(
+                                text = it.description,
+                                modifier = Modifier
+                                    .padding(horizontal = 24.dp)
+                            )
                         }
                 }
             }
         }
 
-        if(showBottomSheet){
+        if (expanded.value &&
+            Preferences.get(
+                Preferences.longPressActionKey,
+                LongPressActions.SHOW_QUESTION.value
+            )
+            == LongPressActions.TRANSLATE.value
+        )
+            translateDialog(expanded)
+        if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = toggleBottomSheet,
-            ){
-                articles[selectedArticle].options.forEach{
+            ) {
+                articles[selectedArticle].options.forEach {
                     SuggestionChip(
                         onClick = {
-                            onOptionClicked(selectedArticle , it)
+                            onOptionClicked(selectedArticle, it)
                         },
                         label = {
                             Text(it)
@@ -216,10 +213,16 @@ private fun zread(
             }
         }
 
-        if(showQuestionsSheet){
+        if (showQuestionsSheet &&
+            Preferences.get(
+                Preferences.longPressActionKey,
+                LongPressActions.SHOW_QUESTION.value
+            )
+            == LongPressActions.SHOW_QUESTION.value
+        ) {
             ModalBottomSheet(
                 onDismissRequest = toggleQuestionsSheet,
-            ){
+            ) {
                 articles[selectedArticle].questions.forEach {
                     Column(
                         modifier = Modifier
@@ -243,10 +246,5 @@ private fun zread(
                 }
             }
         }
-
-        if ( firstVisibleItemIndex > 0 )
-            onFirstItemHidden(name)
-        else
-            onFirstItemAppear()
     }
 }

@@ -25,57 +25,30 @@ import coil.compose.AsyncImage
 fun writingView(
     viewModel: WritingViewModel = hiltViewModel(),
     muban: Muban,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
     viewModel.setWritings()
     val uiState by viewModel.uiState.collectAsState()
     writing(
-        name = uiState.muban!!.cname,
         writings = uiState.writings,
-        onFirstItemHidden = {
-            onFirstItemHidden(it)
-        },
-        onFirstItemAppear = {
-            onFirstItemAppear()
-        },
         showAnswer = showAnswer
     )
 }
 
 @Composable
 private fun writing(
-    name: String,
     writings: List<WritingUiState.Writing>,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
-){
+) {
     val scrollState = rememberLazyListState()
-    val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
 
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth(),
         state = scrollState
     ) {
-        item {
-            Text(
-                text = name,
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(start = 16.dp)
-            )
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp),
-                thickness = 1.dp,
-                color = Color.Gray,
-            )
-        }
-        items(writings.size){
+        items(writings.size) {
             Column(
                 modifier = Modifier
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
@@ -106,19 +79,24 @@ private fun writing(
                 }
 
             }
-            if (showAnswer.value)
-                Text(
-                    text = writings[it].refAnswer
-                )
+            if (showAnswer.value) {
+                Column {
+                    Text(
+                        text = writings[it].refAnswer,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp),
+                    )
+                    Text(
+                        text = writings[it].description,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp),
+                    )
+                }
+            }
+
         }
 
     }
-
-    if (firstVisibleItemIndex > 0)
-        onFirstItemHidden(name)
-    else
-        onFirstItemAppear()
-
 }
 
 private fun shouldShowImage(text: String): Boolean {

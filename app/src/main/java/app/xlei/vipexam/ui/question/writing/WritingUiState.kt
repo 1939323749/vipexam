@@ -10,5 +10,6 @@ data class WritingUiState(
         val question: String,
         val refAnswer: String,
         val image: String,
+        val description: String,
     )
 }

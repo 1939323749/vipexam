@@ -22,8 +22,6 @@ import app.xlei.vipexam.data.Muban
 fun translateView(
     viewModel: TranslateViewModel = hiltViewModel(),
     muban: Muban,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
@@ -32,14 +30,7 @@ fun translateView(
     val uiState by viewModel.uiState.collectAsState()
 
     translate(
-        name = uiState.muban!!.cname,
         translations = uiState.translations,
-        onFirstItemHidden = {
-            onFirstItemHidden(it)
-        },
-        onFirstItemAppear = {
-            onFirstItemAppear()
-        },
         showAnswer = showAnswer,
     )
 }
@@ -47,32 +38,14 @@ fun translateView(
 
 @Composable
 private fun translate(
-    name: String,
     translations: List<TranslateUiState.Translation>,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
-    val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
 
     LazyColumn(
         state = scrollState
     ){
-        item{
-            Text(
-                name,
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(start = 16.dp)
-            )
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp),
-                thickness = 1.dp,
-                color = Color.Gray
-            )
-        }
         items(translations.size){
 
             Column(
@@ -89,17 +62,21 @@ private fun translate(
             }
 
             if(showAnswer.value){
-                Text(translations[it].refAnswer)
+                Column {
+                    Text(
+                        text = translations[it].refAnswer,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                    )
+                    Text(
+                        text = translations[it].description,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                    )
+                }
             }
 
         }
 
     }
-
-    if ( firstVisibleItemIndex > 0 )
-        onFirstItemHidden(name)
-    else
-        onFirstItemAppear()
-
-
 }

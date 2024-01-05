@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.xlei.vipexam.R
@@ -30,7 +31,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class)
+@OptIn(
+    ExperimentalMaterialApi::class, ExperimentalLayoutApi::class,
+    ExperimentalMaterial3Api::class
+)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun examListView(
@@ -43,8 +47,13 @@ fun examListView(
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
+    val bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior(
+        rememberBottomAppBarState()
+    )
 
     Scaffold(
+        modifier = Modifier
+            .nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
         bottomBar = {
             BottomAppBar {
                 Row(
@@ -183,7 +192,6 @@ fun examListView(
 
                 }
             }
-
             PullRefreshIndicator(refreshing, state, Modifier.align(Alignment.TopCenter))
         }
     }

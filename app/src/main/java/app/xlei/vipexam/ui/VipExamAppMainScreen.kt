@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import app.xlei.vipexam.ui.navgraph.compactHomeGraph
 import app.xlei.vipexam.ui.navgraph.expandedHomeGraph
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
+import app.xlei.vipexam.ui.page.ShowAnswerOptions
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.examTypeListView
 import app.xlei.vipexam.ui.question.cloze.clozeView
@@ -42,37 +44,53 @@ import app.xlei.vipexam.ui.question.questionListView
 import app.xlei.vipexam.ui.question.translate.translateView
 import app.xlei.vipexam.ui.question.writing.writingView
 import app.xlei.vipexam.ui.question.zread.zreadView
+import app.xlei.vipexam.util.Preferences
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Maximize
+import compose.icons.feathericons.Menu
 import compose.icons.feathericons.Minimize
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VipExamAppBar(
-    question: String,
+    appBarText: String,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     showAnswer: MutableState<Boolean>,
-    onShowAnswerClick: (Boolean) -> Unit,
+    openDrawer: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior
 ){
     var showMenu by remember { mutableStateOf(false) }
-
-    TopAppBar(
+    LargeTopAppBar(
         title = {
-            Text(question)
+            Text(appBarText)
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        modifier = modifier,
         navigationIcon = {
-            if(canNavigateBack){
-                IconButton(onClick = navigateUp){
+            if (canNavigateBack) {
+                IconButton(
+                    onClick = {
+                        navigateUp()
+                        if (Preferences
+                                .get(
+                                    Preferences.alwaysShowAnswerKey,
+                                    ShowAnswerOptions.ONCE.value
+                                ) == ShowAnswerOptions.ONCE.value
+                        )
+                            showAnswer.value = false
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button)
+                    )
+                }
+            } else {
+                IconButton(onClick = openDrawer) {
+                    Icon(
+                        imageVector = FeatherIcons.Menu,
+                        contentDescription = null,
                     )
                 }
             }
@@ -108,11 +126,81 @@ fun VipExamAppBar(
                     }
                 )
             }
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
+//    TopAppBar(
+//        title = {
+//
+//        },
+////        colors = TopAppBarDefaults.mediumTopAppBarColors(
+////            containerColor = MaterialTheme.colorScheme.primaryContainer
+////        ),
+//        modifier = modifier,
+//        navigationIcon = {
+//            if(canNavigateBack){
+//                IconButton(
+//                    onClick = {
+//                        navigateUp()
+//                        if (Preferences
+//                            .get(
+//                                Preferences.alwaysShowAnswerKey,
+//                                ShowAnswerOptions.ONCE.value
+//                            )==ShowAnswerOptions.ONCE.value)
+//                            showAnswer.value = false
+//                    }
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                        contentDescription = stringResource(R.string.back_button)
+//                    )
+//                }
+//            }else{
+//                IconButton(onClick = openDrawer){
+//                    Icon(
+//                        imageVector = FeatherIcons.Menu,
+//                        contentDescription = null,
+//                    )
+//                }
+//            }
+//        },
+//        actions = {
+//            IconButton(
+//                onClick = { showMenu = !showMenu }
+//            ) {
+//                Icon(Icons.Default.MoreVert, "")
+//            }
+//            DropdownMenu(
+//                expanded = showMenu,
+//                onDismissRequest = { showMenu = false }
+//            ){
+//                DropdownMenuItem(
+//                    text = {
+//                        Row {
+//                            Checkbox(
+//                                checked = showAnswer.value,
+//                                onCheckedChange = null,
+//                            )
+//                            Text(
+//                                text = stringResource(R.string.show_answer),
+//                                modifier = Modifier
+//                                    .padding(start = 24.dp)
+//                            )
+//                        }
+//
+//                    },
+//                    onClick = {
+//                        showAnswer.value = !showAnswer.value
+//                        showMenu = false
+//                    }
+//                )
+//            }
+//        }
+//    )
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @Composable
 fun HomeRoute(
@@ -122,6 +210,7 @@ fun HomeRoute(
     viewModel: ExamViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController(),
     showBottomBar: MutableState<Boolean>,
+    openDrawer: () -> Unit,
 ) {
     viewModel.setScreenType(
         when (isExpandedScreen) {
@@ -137,24 +226,32 @@ fun HomeRoute(
     val isInternetAvailable = isInternetAvailable(LocalContext.current)
     val connectivity = remember { mutableStateOf(isInternetAvailable) }
 
-    if (navController.previousBackStackEntry == null){
+    if (navController.previousBackStackEntry == null) {
         showBottomBar.value = true
     }
 
-    Scaffold (
-        topBar={
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        rememberTopAppBarState()
+    )
+
+    Scaffold(
+        modifier = Modifier
+            .statusBarsPadding()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
             if (!isExpandedScreen)
                 VipExamAppBar(
-                    question = when (navController.currentBackStackEntryAsState().value?.destination?.route) {
+                    appBarText = when (navController.currentBackStackEntryAsState().value?.destination?.route) {
                         HomeScreen.Exam.name -> uiState.title
+                        HomeScreen.ExamTypeList.name -> stringResource(id = R.string.examtype)
+                        HomeScreen.ExamList.name -> stringResource(id = R.string.examlist)
                         else -> ""
                     },
                     canNavigateBack = navController.previousBackStackEntry != null,
                     navigateUp = { navController.navigateUp() },
                     showAnswer = showAnswer,
-                    onShowAnswerClick = {
-                        showAnswer.value = it
-                    }
+                    openDrawer = openDrawer,
+                    scrollBehavior = scrollBehavior,
                 )
         }
     ){ padding ->
@@ -193,8 +290,7 @@ fun HomeRoute(
             }
             compactHomeGraph(
                 viewModel = viewModel,
-                onFirstItemHidden = viewModel::toggleTitle,
-                onFirstItemAppear = viewModel::toggleTitle,
+                setQuestion = viewModel::setTitle,
                 showAnswer = showAnswer,
                 onNextPageClicked = viewModel::nextPage,
                 onExamTypeClicked = viewModel::setExamType,
@@ -323,15 +419,27 @@ fun questionListWithQuestionView(
                             launchSingleTop = true
                             restoreState = true
                         }
+                        if (Preferences.get(
+                                key = Preferences.alwaysShowAnswerKey,
+                                ShowAnswerOptions.ONCE.value
+                            ) == ShowAnswerOptions.ONCE.value
+                        )
+                            showAnswer.value = false
                     },
                 )
             }
-            Spacer(Modifier.width(24.dp).fillMaxHeight())
+            Spacer(
+                Modifier
+                    .width(24.dp)
+                    .fillMaxHeight()
+            )
         }
 
         ElevatedCard(
             modifier = if (isMaximize)
-                Modifier.fillMaxWidth().weight(1f)
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             else
                 Modifier
         ) {
@@ -359,92 +467,66 @@ fun questionListWithQuestionView(
                             when (q.first) {
                                 "ecswriting" -> writingView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecscloze" -> clozeView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecsqread" -> qreadView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecszread" -> zreadView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecstranslate" -> translateView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecfwriting" -> writingView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecfcloze" -> clozeView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecfqread" -> qreadView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecfzread" -> zreadView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "ecftranslate" -> translateView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "eylhlisteninga" -> listeningView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "eylhlisteningb" -> listeningView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
 
                                 "eylhlisteningc" -> listeningView(
                                     muban = mubanList[index],
-                                    onFirstItemHidden = {},
-                                    onFirstItemAppear = {},
                                     showAnswer = showAnswer,
                                 )
                             }
@@ -455,7 +537,11 @@ fun questionListWithQuestionView(
         }
 
         if (isMaximize) {
-            Spacer(Modifier.width(24.dp).fillMaxHeight())
+            Spacer(
+                Modifier
+                    .width(24.dp)
+                    .fillMaxHeight()
+            )
             ElevatedCard(
                 modifier = Modifier
                     .width(360.dp)

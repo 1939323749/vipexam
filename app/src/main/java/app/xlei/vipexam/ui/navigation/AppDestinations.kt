@@ -30,7 +30,7 @@ fun App(
     widthSizeClass: WindowSizeClass,
     appState: VipExamState = rememberVipExamAppState(
         windowSizeClass = widthSizeClass,
-    )
+    ),
 ) {
     val homeNavController = rememberNavController()
 
@@ -73,7 +73,6 @@ fun App(
                     homeNavController = homeNavController,
                     currentRoute = currentRoute,
                     navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
-                    openDrawer = { coroutine.launch { sizeAwareDrawerState.open() } },
                 )
             }
             VipExamNavHost(
@@ -83,6 +82,7 @@ fun App(
                 homeNavController = homeNavController,
                 appContainer = appContainer,
                 isExpandedScreen = appState.shouldShowNavRail,
+                openDrawer = { coroutine.launch { sizeAwareDrawerState.open() } },
             )
         }
     }

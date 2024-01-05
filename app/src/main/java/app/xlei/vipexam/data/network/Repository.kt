@@ -1,22 +1,27 @@
 package app.xlei.vipexam.data.network
 
-import app.xlei.vipexam.data.Exam
-import app.xlei.vipexam.data.ExamList
-import app.xlei.vipexam.data.LoginResponse
-import app.xlei.vipexam.data.Muban
+import android.util.Log
+import app.xlei.vipexam.data.*
 import com.google.gson.Gson
 import io.ktor.client.*
+import io.ktor.client.engine.cio.*
 import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.gson.*
+import io.ktor.serialization.jackson.*
+import kotlinx.coroutines.time.withTimeout
+import kotlinx.coroutines.withTimeout
+import org.apache.http.Header
 
 object Repository {
     lateinit var account: String
     lateinit var password: String
     private lateinit var token: String
 
-    suspend fun getToken(account: String, password: String): LoginResponse? {
+    suspend fun getToken(account: String, password: String): LoginResponse {
         this.account = account
         this.password = password
         val client = HttpClient()
@@ -25,7 +30,10 @@ object Repository {
             headers {
                 append(HttpHeaders.Host, "vipexam.cn")
                 append(HttpHeaders.Connection, "keep-alive")
-                append("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"")
+                append(
+                    "sec-ch-ua",
+                    "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\""
+                )
                 append(HttpHeaders.Accept, "application/json, text/javascript, */*; q=0.01")
                 append("sec-ch-ua-mobile", "?0")
                 append(
@@ -44,12 +52,13 @@ object Repository {
         val gson = Gson()
         val loginResponse = gson.fromJson(response.bodyAsText(), LoginResponse::class.java)
 
-        return when (loginResponse.code){
+        return when (loginResponse.code) {
             "1" -> {
                 token = loginResponse.token
                 loginResponse
             }
-            else -> null
+
+            else -> loginResponse
         }
     }
 
@@ -71,7 +80,10 @@ object Repository {
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
             )
             header("X-Requested-With", "XMLHttpRequest")
-            header("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"")
+            header(
+                "sec-ch-ua",
+                "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\""
+            )
             header("sec-ch-ua-mobile", "?0")
             header("sec-ch-ua-platform", "\"macOS\"")
             setBody("examID=$examId&account=$account&token=$token")
@@ -81,15 +93,16 @@ object Repository {
         return gson.fromJson(response.bodyAsText(), Exam::class.java)
     }
 
-    fun getQuestions(mubanList: List<Muban>): List<Pair<String, String> >{
-        val questions = mutableListOf<Pair<String,String>>()
+    fun getQuestions(mubanList: List<Muban>): List<Pair<String, String>> {
+        val questions = mutableListOf<Pair<String, String>>()
 
-        for (muban in mubanList){
+        for (muban in mubanList) {
             questions.add(muban.ename to muban.cname)
         }
 
         return questions
     }
+
     suspend fun getExamList(page: String, type: String): ExamList? {
         val client = HttpClient(OkHttp) {
             engine {
@@ -123,5 +136,32 @@ object Repository {
         client.close()
         val gson = Gson()
         return gson.fromJson(response.bodyAsText(), ExamList::class.java)
+    }
+
+    suspend fun translateToZH(text: String): TranslationResponse? {
+        val client = HttpClient(CIO) {
+            engine {
+                requestTimeout = 0
+            }
+            install(ContentNegotiation) {
+                gson()
+            }
+        }
+
+        val response = client.post("https://api.deeplx.org/translate") {
+            header("Accept", "application/json, text/javascript, */*; q=0.01")
+            contentType(ContentType.Application.Json)
+            setBody(
+                mapOf(
+                    "text" to text,
+                    "source_lang" to "EN",
+                    "target_lang" to "ZH"
+                )
+            )
+        }
+
+        client.close()
+        val gson = Gson()
+        return gson.fromJson(response.bodyAsText(), TranslationResponse::class.java)
     }
 }

@@ -1,22 +1,28 @@
 package app.xlei.vipexam.ui.components
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import io.ktor.http.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppNavRail(
     logo: MutableState<HomeScreen>,
@@ -24,21 +30,46 @@ fun AppNavRail(
     homeNavController: NavHostController,
     currentRoute: String,
     navigationToTopLevelDestination: (AppDestinations) -> Unit,
-    openDrawer: () -> Unit = {},
     @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
+    var startTimer by remember { mutableStateOf(true) }
+    var resetTimer by remember { mutableStateOf(false) }
+    val coroutine = rememberCoroutineScope()
     NavigationRail(
         header = {
-            Icon(logo.value.icon,"",Modifier.padding(vertical = 24.dp))
+            if (homeNavController.currentBackStackEntryAsState().value?.destination?.route == HomeScreen.QuestionListWithQuestion.name)
+                Timer(
+                    isTimerStart = startTimer,
+                    isResetTimer = resetTimer,
+                    modifier = Modifier
+                        .padding(vertical = 24.dp)
+                        .combinedClickable(
+                            onClick = {
+                                startTimer = !startTimer
+                            },
+                            onLongClick = {
+                                coroutine.launch {
+                                    resetTimer = true
+                                    delay(50)
+                                    resetTimer = false
+                                }
+                            }
+                        )
+                )
+            else
+                Icon(logo.value.icon, "", Modifier.padding(vertical = 24.dp))
             CustomFloatingActionButton(
                 expandable = true,
                 onFabClick = {},
                 iconUnExpanded = Icons.Default.Edit,
                 iconExpanded = Icons.Default.Edit,
-                items = listOf("SHOW_ANSWER" to "show answer"),
+                items = listOf("SHOW_ANSWER" to stringResource(app.xlei.vipexam.R.string.show_answer)),
                 onItemClick = {
                     when (it) {
-                        "SHOW_ANSWER" -> { showAnswer.value = !showAnswer.value }
+                        "SHOW_ANSWER" -> {
+                            showAnswer.value = !showAnswer.value
+                        }
+
                         else -> {}
                     }
                 }

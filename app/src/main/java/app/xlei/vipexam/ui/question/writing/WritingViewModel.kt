@@ -33,6 +33,7 @@ class WritingViewModel @Inject constructor(
                     question = it.primQuestion,
                     refAnswer = it.refAnswer,
                     image = it.primPic,
+                    description = it.discription
                 )
             )
         }

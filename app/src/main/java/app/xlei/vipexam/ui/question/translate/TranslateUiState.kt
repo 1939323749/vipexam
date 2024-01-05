@@ -9,5 +9,6 @@ data class TranslateUiState(
     data class Translation(
         val question: String,
         val refAnswer: String,
+        val description: String,
     )
 }

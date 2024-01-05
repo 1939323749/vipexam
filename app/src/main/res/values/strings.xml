@@ -36,4 +36,17 @@
     <string name="internet_error">Internet error</string>
     <string name="connect_to_continue">Connect to Internet to continue.</string>
     <string name="close_button">Close</string>
+    <string name="empty_wordlist_tips">words in cloze will shown here.</string>
+    <string name="words">words</string>
+    <string name="clipToClipboardSuccess">clipped to clipboard success!</string>
+    <string name="okay">OK</string>
+    <string name="accent_color">accent color</string>
+    <string name="dynamic_colors">dynamic colors</string>
+    <string name="show_answer_summary">choose show answer times</string>
+    <string name="always">always</string>
+    <string name="once">once</string>
+    <string name="long_press_action">long press action</string>
+    <string name="show_question">show question</string>
+    <string name="show_translation">show translation</string>
+    <string name="add_to_word_list">Add to word list</string>
 </resources>

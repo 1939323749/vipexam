@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -14,18 +15,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.ui.components.translateDialog
+import app.xlei.vipexam.ui.login.EmptyTextToolbar
+import app.xlei.vipexam.ui.page.LongPressActions
+import app.xlei.vipexam.util.Preferences
 
 @Composable
 fun qreadView(
     viewModel: QreadViewModel = hiltViewModel(),
     muban: Muban,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
@@ -36,7 +40,6 @@ fun qreadView(
     var selectedQuestionIndex by rememberSaveable { mutableStateOf(0) }
 
     qread(
-        name = uiState.muban!!.cname,
         showBottomSheet = uiState.showBottomSheet,
         showOptionsSheet = uiState.showOptionsSheet,
         articles = uiState.articles,
@@ -54,8 +57,6 @@ fun qreadView(
             viewModel.setOption(selectedArticleIndex, selectedQuestionIndex, option)
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        onFirstItemHidden = onFirstItemHidden,
-        onFirstItemAppear = onFirstItemAppear,
         showAnswer = showAnswer,
     )
 }
@@ -63,7 +64,6 @@ fun qreadView(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun qread(
-    name: String,
     showBottomSheet: Boolean,
     showOptionsSheet: Boolean,
     articles: List<QreadUiState.Article>,
@@ -72,64 +72,53 @@ private fun qread(
     onArticleLongClicked: () -> Unit,
     onQuestionClicked: (Int) -> Unit,
     onOptionClicked: (Int, String) -> Unit,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     val scrollState = rememberLazyListState()
     var selectedArticle by rememberSaveable { mutableStateOf(0) }
-    val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
-
+    val expanded = remember { mutableStateOf(false) }
     Column {
         LazyColumn(
             state = scrollState
         ) {
-            item {
-                Column {
-                    Text(
-                        name,
-                        fontSize = 24.sp,
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                    )
-                }
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp),
-                    thickness = 1.dp,
-                    color = Color.Gray
-                )
-            }
             articles.forEachIndexed { articleIndex, article ->
                 item {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .combinedClickable(
-                                onClick = {},
-                                onLongClick = {
-                                    selectedArticle = articleIndex
-                                    onArticleLongClicked()
-                                }
-                            )
+                    CompositionLocalProvider(
+                        LocalTextToolbar provides EmptyTextToolbar(expended = expanded)
                     ) {
-                        Text(
-                            text = articles[articleIndex].title,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontSize = 24.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                        )
-                        Text(
-                            text = articles[articleIndex].content,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier
-                                .padding(16.dp)
-                        )
+                        SelectionContainer {
+                            Column(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .combinedClickable(
+                                        onClick = {},
+                                        onLongClick = {
+                                            selectedArticle = articleIndex
+                                            onArticleLongClicked()
+                                        }
+                                    )
+                            ) {
+                                Text(
+                                    text = articles[articleIndex].title,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    fontSize = 24.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                )
+                                Text(
+                                    text = articles[articleIndex].content,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                )
+                            }
+                        }
                     }
+
+
                 }
                 items(article.questions.size) { it ->
                     Column(
@@ -162,16 +151,36 @@ private fun qread(
 
                     if (showAnswer.value)
                         articles[articleIndex].questions[it].let { question ->
-                            Text(question.index + question.refAnswer)
-                            Text(question.description)
+                            Text(
+                                text = question.index + question.refAnswer,
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
+                            Text(
+                                text = question.description,
+                                modifier = Modifier
+                                    .padding(horizontal = 24.dp)
+                            )
                         }
                 }
             }
 
         }
-
+        if (expanded.value &&
+            Preferences.get(
+                Preferences.longPressActionKey,
+                LongPressActions.SHOW_QUESTION.value
+            )
+            == LongPressActions.TRANSLATE.value
+        )
+            translateDialog(expanded)
         // questions
-        if (showBottomSheet) {
+        if (showBottomSheet &&
+            Preferences.get(
+                Preferences.longPressActionKey,
+                LongPressActions.SHOW_QUESTION.value
+            )
+            == LongPressActions.SHOW_QUESTION.value
+        ) {
             ModalBottomSheet(
                 onDismissRequest = toggleBottomSheet,
             ) {
@@ -243,11 +252,6 @@ private fun qread(
                 }
             }
         }
-
-        if ( firstVisibleItemIndex > 0 )
-            onFirstItemHidden(name)
-        else
-            onFirstItemAppear()
     }
 }
 

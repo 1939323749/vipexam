@@ -16,17 +16,68 @@
             android:theme="@style/Theme.Vipexam"
             tools:targetApi="31">
         <activity
-                android:name=".MainActivity"
-                android:exported="true"
-                android:windowSoftInputMode="adjustResize"
-                android:resizeableActivity="true"
-                android:theme="@style/Theme.Vipexam">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+            android:name=".MainActivity"
+            android:exported="true"
+            android:resizeableActivity="true"
+            android:theme="@style/Theme.Vipexam"
+            android:windowSoftInputMode="adjustResize">
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+
+        </activity>
+        <activity
+            android:name=".glance.WordActivity"
+            android:exported="true"
+            android:resizeableActivity="true"
+            android:theme="@style/Theme.Vipexam"
+            android:windowSoftInputMode="adjustResize">
+
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.TRANSLATE" />
+            </intent-filter>
+
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.SEND" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".glance.VipExamReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/vipexam_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".tile.VipExamQSTileService"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/words"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

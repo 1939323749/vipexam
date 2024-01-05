@@ -109,7 +109,8 @@ class ListeningViewModel @Inject constructor(
                 ),
                 choice = rememberSaveable { mutableStateOf("") },
                 refAnswer = shiti.refAnswer,
-                tooltipState = rememberTooltipState(isPersistent = true)
+                tooltipState = rememberTooltipState(isPersistent = true),
+                description = shiti.discription,
             )
         )
         shiti.children.forEachIndexed {index,it->
@@ -119,7 +120,8 @@ class ListeningViewModel @Inject constructor(
                     options = getOptions(it),
                     choice = rememberSaveable { mutableStateOf("") },
                     refAnswer = it.refAnswer,
-                    tooltipState = rememberTooltipState(isPersistent = true)
+                    tooltipState = rememberTooltipState(isPersistent = true),
+                    description = it.discription,
                 )
             )
         }

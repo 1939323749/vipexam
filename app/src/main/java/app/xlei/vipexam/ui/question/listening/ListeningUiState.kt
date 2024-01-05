@@ -25,6 +25,7 @@ data class ListeningUiState(
         val options: List<Option>,
         var choice: MutableState<String>,
         val refAnswer: String,
+        val description: String,
         val tooltipState: TooltipState,
     )
 

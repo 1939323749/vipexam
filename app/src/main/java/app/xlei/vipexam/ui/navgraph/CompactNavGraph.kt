@@ -19,8 +19,7 @@ fun NavGraphBuilder.compactHomeGraph(
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
     showAnswer: MutableState<Boolean>,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit,
+    setQuestion: (String) -> Unit,
     refresh: () -> Unit,
 ){
     navigation(
@@ -49,8 +48,7 @@ fun NavGraphBuilder.compactHomeGraph(
         val uiState by viewModel.uiState.collectAsState()
         ExamPage(
             questionListUiState = uiState.questionListUiState,
-            onFirstItemHidden = onFirstItemHidden,
-            onFirstItemAppear = onFirstItemAppear,
+            setQuestion = setQuestion,
             showAnswer = showAnswer,
         )
     }

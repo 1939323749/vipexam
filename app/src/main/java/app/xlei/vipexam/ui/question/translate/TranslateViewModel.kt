@@ -32,6 +32,7 @@ class TranslateViewModel @Inject constructor(
                 TranslateUiState.Translation(
                     question = it.primQuestion,
                     refAnswer = it.refAnswer,
+                    description = it.discription,
                 )
             )
         }

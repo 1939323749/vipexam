@@ -1,37 +1,68 @@
 package app.xlei.vipexam.ui.page
 
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import app.xlei.vipexam.MainActivity
 import app.xlei.vipexam.R
 import app.xlei.vipexam.constant.ThemeMode
+import app.xlei.vipexam.ui.theme.defaultAccentColor
+import app.xlei.vipexam.ui.theme.hexToColor
 import app.xlei.vipexam.util.LocaleHelper
 import app.xlei.vipexam.util.Preferences
+import compose.icons.FeatherIcons
+import compose.icons.TablerIcons
+import compose.icons.feathericons.Menu
+import compose.icons.tablericons.Palette
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-
+    openDrawer: () -> Unit,
 ) {
     val context = LocalContext.current
 
     var showThemeOptions by remember {
+        mutableStateOf(false)
+    }
+
+    var showAccentColorDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showShowAnswerOptions by remember {
+        mutableStateOf(false)
+    }
+
+    var showLongPressActions by remember {
         mutableStateOf(false)
     }
 
@@ -50,8 +81,22 @@ fun SettingsScreen(
                         stringResource(R.string.settings)
                     )
                 },
+                navigationIcon = {
+                    IconButton(
+                        onClick = openDrawer
+                    ) {
+                        Icon(
+                            imageVector = FeatherIcons.Menu,
+                            contentDescription = null,
+                        )
+                    }
+                },
                 actions = {
-
+                    StyledIconButton(
+                        imageVector = TablerIcons.Palette
+                    ) {
+                        showAccentColorDialog = true
+                    }
                 },
                 scrollBehavior = scrollBehavior
             )
@@ -61,6 +106,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .padding(horizontal = 24.dp)
         ) {
             item {
                 SettingsCategory(stringResource(R.string.general))
@@ -82,7 +128,8 @@ fun SettingsScreen(
 
             item {
                 PreferenceItem(
-                    modifier = Modifier.padding(top = 10.dp),
+                    modifier = Modifier
+                        .padding(top = 10.dp),
                     title = stringResource(R.string.app_theme),
                     summary = stringResource(R.string.app_theme_summary)
                 ) {
@@ -90,11 +137,119 @@ fun SettingsScreen(
                 }
             }
 
+            item {
+                PreferenceItem(
+                    modifier = Modifier
+                        .padding(top = 10.dp),
+                    title = stringResource(R.string.show_answer),
+                    summary = stringResource(R.string.show_answer_summary)
+                ) {
+                    showShowAnswerOptions = true
+                }
+            }
+
+            item {
+                PreferenceItem(
+                    modifier = Modifier
+                        .padding(top = 10.dp),
+                    title = stringResource(R.string.long_press_action),
+                    summary = stringResource(R.string.long_press_action)
+                ) {
+                    showLongPressActions = true
+                }
+            }
+
         }
 
         if (showThemeOptions)
             ThemeModeDialog { showThemeOptions = false }
+
+        if (showAccentColorDialog) {
+            AccentColorPrefDialog {
+                showAccentColorDialog = false
+            }
+        }
+
+        if (showShowAnswerOptions) {
+            ShowAnswerDialog {
+                showShowAnswerOptions = false
+            }
+        }
+
+        if (showLongPressActions)
+            longPressActionDialog {
+                showLongPressActions = false
+            }
     }
+}
+
+enum class LongPressActions(
+    val value: Int
+) {
+    SHOW_QUESTION(0), TRANSLATE(1)
+}
+
+@Composable
+fun longPressActionDialog(
+    onDismiss: () -> Unit
+) {
+    val longPressAction =
+        Preferences.get(Preferences.longPressActionKey, LongPressActions.SHOW_QUESTION.value)
+    ListPreferenceDialog(
+        title = stringResource(R.string.long_press_action),
+        preferenceKey = Preferences.longPressActionKey,
+        onDismissRequest = {
+            onDismiss.invoke()
+        },
+        options = listOf(
+            ListPreferenceOption(
+                name = stringResource(R.string.show_question),
+                value = LongPressActions.SHOW_QUESTION.value,
+                isSelected = longPressAction == LongPressActions.SHOW_QUESTION.value
+            ),
+            ListPreferenceOption(
+                name = stringResource(R.string.show_translation),
+                value = LongPressActions.TRANSLATE.value,
+                isSelected = longPressAction == LongPressActions.TRANSLATE.value
+            ),
+        ),
+        onOptionSelected = {
+            Preferences.put(Preferences.longPressActionKey, it.value)
+        }
+    )
+}
+
+enum class ShowAnswerOptions(val value: Int) {
+    ALWAYS(0), ONCE(1)
+}
+
+@Composable
+fun ShowAnswerDialog(
+    onDismiss: () -> Unit
+) {
+    val showAnswer = Preferences.get(Preferences.alwaysShowAnswerKey, ShowAnswerOptions.ONCE.value)
+    ListPreferenceDialog(
+        title = stringResource(R.string.show_answer),
+        preferenceKey = Preferences.alwaysShowAnswerKey,
+        onDismissRequest = {
+            onDismiss.invoke()
+        },
+        options = listOf(
+            ListPreferenceOption(
+                name = stringResource(R.string.always),
+                value = ShowAnswerOptions.ALWAYS.value,
+                isSelected = showAnswer == ShowAnswerOptions.ALWAYS.value
+            ),
+            ListPreferenceOption(
+                name = stringResource(R.string.once),
+                value = ShowAnswerOptions.ONCE.value,
+                isSelected = showAnswer == ShowAnswerOptions.ONCE.value
+            ),
+        ),
+        onOptionSelected = {
+            Preferences.put(Preferences.alwaysShowAnswerKey, it.value)
+        }
+    )
 }
 
 @Composable
@@ -318,3 +473,195 @@ fun PreferenceItem(
         }
     }
 }
+
+@OptIn(ExperimentalStdlibApi::class)
+@Composable
+fun AccentColorPrefDialog(
+    onDismissRequest: () -> Unit
+) {
+    val context = LocalContext.current
+    val supportsDynamicColors = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+    var color by remember {
+        mutableStateOf(
+            Preferences.getAccentColor() ?: run {
+                if (supportsDynamicColors) null else defaultAccentColor
+            }
+        )
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            DialogButton(text = stringResource(R.string.okay)) {
+                Preferences.prefs.edit(true) { putString(Preferences.accentColorKey, color) }
+                (context as MainActivity).accentColor = color
+                onDismissRequest.invoke()
+            }
+        },
+        dismissButton = {
+            DialogButton(text = stringResource(R.string.cancel)) {
+                onDismissRequest.invoke()
+            }
+        },
+        title = {
+            Text(stringResource(R.string.accent_color))
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (supportsDynamicColors) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(R.string.dynamic_colors)
+                        )
+                        Switch(
+                            checked = color == null,
+                            onCheckedChange = { newValue ->
+                                color = defaultAccentColor.takeIf { !newValue }
+                            }
+                        )
+                    }
+                }
+
+                val isColorPickerEnabled = color != null
+                val imageAlpha: Float by animateFloatAsState(
+                    targetValue = if (isColorPickerEnabled) 1f else .5f,
+                    animationSpec = tween(
+                        durationMillis = 250,
+                        easing = LinearEasing,
+                    ), label = ""
+                )
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .height(250.dp)
+                        .alpha(imageAlpha)
+                        .let {
+                            if (isColorPickerEnabled) {
+                                it
+                            } else {
+                                // disable input
+                                it.pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        while (true) {
+                                            awaitPointerEvent(pass = PointerEventPass.Initial)
+                                                .changes
+                                                .forEach(PointerInputChange::consume)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                ) {
+                    listOf("R", "G", "B").forEachIndexed { index, c ->
+                        val startIndex = index * 2
+                        ColorSlider(
+                            label = c,
+                            value = color?.substring(startIndex, startIndex + 2)?.toInt(16) ?: 0,
+                            onChange = { colorInt ->
+                                var newHex = colorInt.toHexString()
+                                if (newHex.length == 1) newHex = "0$newHex"
+                                color = StringBuilder(color).apply {
+                                    setCharAt(startIndex, newHex[0])
+                                    setCharAt(startIndex + 1, newHex[1])
+                                }.toString()
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            Modifier
+                                .size(50.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.primary,
+                                    CircleShape
+                                )
+                        )
+                        Text(text = "   =>   ", fontSize = 27.sp)
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .background(
+                                    color?.hexToColor() ?: Color.Black,
+                                    CircleShape
+                                )
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+fun Int.toHexString(): String = Integer.toHexString(this)
+
+@Composable
+fun ColorSlider(
+    label: String,
+    value: Int,
+    onChange: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label)
+        Slider(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .weight(1f),
+            value = value.toFloat(),
+            valueRange = 0f..255f,
+            steps = 256,
+            onValueChange = {
+                onChange(it.toInt())
+            }
+        )
+        Text(value.toString())
+    }
+}
+
+@Composable
+fun DialogButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit
+) {
+    TextButton(
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        Text(text)
+    }
+}
+
+@Composable
+fun StyledIconButton(
+    modifier: Modifier = Modifier,
+    imageVector: ImageVector,
+    contentDescription: String? = null,
+    onClick: () -> Unit = {}
+) {
+    IconButton(
+        onClick = {
+            onClick.invoke()
+        }
+    ) {
+        Icon(
+            modifier = modifier,
+            imageVector = imageVector,
+            contentDescription = contentDescription
+        )
+    }
+}
+

@@ -84,6 +84,9 @@ class ExamViewModel @Inject constructor(
                 )
             }
             _uiState.value.loginUiState.loginResponse?.let {
+                if (it.code != "1") {
+                    return@launch
+                }
                 if (_uiState.value.examTypeListUiState.examTypeList.isEmpty()) {
                     val examList = Repository.getExamList(
                         page = "1",
@@ -116,7 +119,7 @@ class ExamViewModel @Inject constructor(
                     navigate(HomeScreen.ExpandedLoggedIn)
                 else
                     navigate(HomeScreen.CompactLoggedIn)
-                if (_uiState.value.loginUiState.setting.isRememberAccount == true)
+                if (_uiState.value.loginUiState.setting.isRememberAccount)
                     withContext(Dispatchers.IO) {
                         DB.repository.insertUser(
                             user = User(
@@ -347,7 +350,7 @@ class ExamViewModel @Inject constructor(
         }
     }
 
-    fun toggleTitle(title: String? = null) {
+    fun setTitle(title: String? = null) {
         _uiState.update {
             it.copy(
                 title = title ?: ""

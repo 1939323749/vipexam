@@ -6,7 +6,7 @@
     <string name="exam">试卷</string>
     <string name="setting">设置</string>
     <string name="main">主页面</string>
-    <string name="second">次页面</string>
+    <string name="second">单词</string>
     <string name="examtype">试卷类型</string>
     <string name="practice_exam">模拟试题</string>
     <string name="real_exam">真题试卷</string>
@@ -21,7 +21,7 @@
     <string name="cancel">取消</string>
     <string name="app_language">应用语言</string>
     <string name="system">系统</string>
-    <string name="theme_auto">动态取色</string>
+    <string name="theme_auto">自动</string>
     <string name="theme_light">亮色</string>
     <string name="theme_dark">黑暗</string>
     <string name="theme_black">纯黑</string>
@@ -36,4 +36,17 @@
     <string name="internet_error">网络错误</string>
     <string name="connect_to_continue">请连接网络后继续</string>
     <string name="close_button">关闭</string>
+    <string name="empty_wordlist_tips">词汇理解里出现的单词会出现在这里</string>
+    <string name="words">单词</string>
+    <string name="clipToClipboardSuccess">复制成功!</string>
+    <string name="okay">好的</string>
+    <string name="accent_color">强调色</string>
+    <string name="dynamic_colors">动态取色</string>
+    <string name="show_answer_summary">选择显示答案的次数</string>
+    <string name="always">总是</string>
+    <string name="once">一次</string>
+    <string name="long_press_action">长按动作</string>
+    <string name="show_question">显示问题</string>
+    <string name="show_translation">显示翻译</string>
+    <string name="add_to_word_list">Add to word list</string>
 </resources>

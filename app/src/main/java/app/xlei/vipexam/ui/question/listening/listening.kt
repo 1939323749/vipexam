@@ -4,9 +4,7 @@ import android.media.MediaPlayer
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,8 +29,6 @@ import kotlinx.coroutines.withContext
 fun listeningView(
     muban: Muban,
     viewModel: ListeningViewModel = hiltViewModel(),
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: () -> Unit,
     showAnswer: MutableState<Boolean>,
 ){
     viewModel.setMuban(muban)
@@ -43,23 +39,18 @@ fun listeningView(
     val haptics = LocalHapticFeedback.current
 
     listening(
-        name = uiState.muban!!.cname,
         listenings = uiState.listenings,
         showOptionsSheet = uiState.showOptionsSheet,
         toggleOptionsSheet = { viewModel.toggleOptionsSheet() },
         onQuestionClick = {
             selectedQuestionIndex = it
             viewModel.toggleOptionsSheet()
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         onOptionClick = {selectedListeningIndex,option->
             viewModel.setOption(selectedListeningIndex,selectedQuestionIndex,option)
             viewModel.toggleOptionsSheet()
-        },
-        onFirstItemHidden = {
-            onFirstItemHidden(it)
-        },
-        onFirstItemAppear = {
-            onFirstItemAppear()
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         showAnswer = showAnswer,
     )
@@ -68,21 +59,15 @@ fun listeningView(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun listening(
-    name: String,
     listenings: List<ListeningUiState.Listening>,
     showOptionsSheet: Boolean,
     toggleOptionsSheet: () -> Unit,
     onQuestionClick: (Int) -> Unit,
     onOptionClick: (Int,String) -> Unit,
-    onFirstItemHidden: (String) -> Unit,
-    onFirstItemAppear: ()->Unit,
     showAnswer: MutableState<Boolean>,
 ){
     var selectedListening by rememberSaveable { mutableStateOf(0) }
-
-
     val scrollState = rememberLazyListState()
-    val firstVisibleItemIndex by remember { derivedStateOf { scrollState.firstVisibleItemIndex } }
     val coroutine = rememberCoroutineScope()
 
 
@@ -106,21 +91,6 @@ private fun listening(
         LazyColumn(
             state = scrollState
         ) {
-            item{
-                Text(
-                    name,
-                    fontSize = 24.sp,
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                )
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp),
-                    thickness = 1.dp,
-                    color = Color.Gray
-                )
-            }
-
             items(listenings.size) {
                 Text("${it + 1}")
                 AudioPlayer(
@@ -160,8 +130,19 @@ private fun listening(
                                 modifier = Modifier
                                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                             ){
-                                question.options.forEach {option->
-                                    Text("${option.index}. "+option.option)
+                                question.options.forEach { option ->
+                                    Text("${option.index}. " + option.option)
+                                }
+                                if (showAnswer.value) {
+                                    Spacer(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .height(24.dp))
+                                    Text(
+                                        text = question.description,
+                                        modifier = Modifier
+                                            .padding(horizontal = 24.dp)
+                                    )
                                 }
                             }
                             if (question.choice.value!="")
@@ -193,12 +174,6 @@ private fun listening(
                 }
             }
         }
-
-        if (firstVisibleItemIndex > 0)
-            onFirstItemHidden(name)
-        else
-            onFirstItemAppear()
-
     }
 }
 

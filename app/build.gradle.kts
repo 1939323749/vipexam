@@ -12,8 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "app.xlei.vipexam"
-        minSdk = 24
-        targetSdk = 33
+        minSdk = 26
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -66,17 +66,20 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.activity:activity-compose:1.8.1")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material:material:1.5.4")
     implementation("androidx.compose.material3:material3")
-    implementation("io.ktor:ktor-client-apache:2.3.6")
+    implementation("io.ktor:ktor-client-apache:2.3.7")
     implementation("io.ktor:ktor-client-okhttp-jvm:2.3.6")
+    implementation("androidx.palette:palette-ktx:1.0.0")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.6")
+    implementation("io.ktor:ktor-serialization-jackson:2.3.6")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -84,25 +87,26 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha11")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha12")
     implementation("androidx.navigation:navigation-compose:2.6.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${rootProject.extra["lifecycle_version"]}")
 
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     val activity_version = "1.8.1"
     implementation("androidx.activity:activity-ktx:$activity_version")
 
-    val ktor_version="2.3.6"
+    val ktor_version = "2.3.7"
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-serialization-gson:$ktor_version")
 
-    val gson_version="2.9.0"
+    val gson_version = "2.10.1"
     implementation("com.google.code.gson:gson:$gson_version")
 
-    val room_version = "2.5.0"
+    val room_version = "2.5.1"
 
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
@@ -112,7 +116,7 @@ dependencies {
 
     implementation("androidx.collection:collection-ktx:1.3.0")
 
-    val lifecycle_version = "2.5.1"
+    val lifecycle_version = "2.6.2"
 
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
@@ -133,11 +137,22 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.48.1")
     kapt("com.google.dagger:hilt-android-compiler:2.48.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-    implementation("androidx.datastore:datastore-core:1.1.0-alpha06")
+    implementation("androidx.datastore:datastore-core:1.1.0-alpha07")
 
-    val feather_icons_version = "1.1.0"
-    implementation("br.com.devsrsouza.compose.icons:feather:${feather_icons_version}")
+    val icons_version = "1.1.0"
+    implementation("br.com.devsrsouza.compose.icons:feather:${icons_version}")
+    implementation("br.com.devsrsouza.compose.icons:tabler-icons:${icons_version}")
 
     val coil_compose_version = "2.5.0"
     implementation("io.coil-kt:coil-compose:$coil_compose_version")
+
+    val glance_version = "1.0.0"
+    implementation("androidx.glance:glance:$glance_version")
+    implementation("androidx.glance:glance-material3:$glance_version")
+
+    // For AppWidgets support
+    implementation("androidx.glance:glance-appwidget:$glance_version")
+
+    // For Wear-Tiles support
+    implementation("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
 }

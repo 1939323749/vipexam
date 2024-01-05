@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import app.xlei.vipexam.constant.ThemeMode
 
 object Preferences {
+    const val longPressActionKey = "longPressAction"
+    const val alwaysShowAnswerKey = "showAnswer"
     const val appLanguageKey = "appLanguage"
     const val themeModeKey = "themeModeKey"
     const val accentColorKey = "accentColor"

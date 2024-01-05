@@ -1,5 +1,6 @@
 package app.xlei.vipexam.ui.components
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,7 +52,11 @@ fun CustomFloatingActionButton(
                 .offset(y = (16).dp)
                 .size(
                     width = expandedFabWidth,
-                    height = (animateDpAsState(if (isExpanded) 225.dp else 0.dp, animationSpec = spring(dampingRatio = 4f))).value)
+                    height = (animateDpAsState(
+                        if (isExpanded) 225.dp else 0.dp,
+                        animationSpec = spring(dampingRatio = 4f)
+                    )).value
+                )
                 .background(
                     MaterialTheme.colorScheme.surfaceContainer,
                     shape = RoundedCornerShape(16.dp)
@@ -108,7 +113,12 @@ fun CustomFloatingActionButton(
                 contentDescription = null,
                 modifier = Modifier
                     .size(24.dp)
-                    .offset(x = animateDpAsState(if (isExpanded) -70.dp else 0.dp, animationSpec = spring(dampingRatio = 3f)).value)
+                    .offset(
+                        x = animateDpAsState(
+                            if (isExpanded) -70.dp else 0.dp,
+                            animationSpec = spring(dampingRatio = 3f)
+                        ).value
+                    )
             )
 
             Text(
@@ -129,7 +139,8 @@ fun CustomFloatingActionButton(
                                 delayMillis = if (isExpanded) 100 else 0,
                                 easing = EaseIn
                             )
-                        ).value)
+                        ).value
+                    )
             )
         }
     }

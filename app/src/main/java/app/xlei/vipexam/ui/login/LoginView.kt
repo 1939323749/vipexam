@@ -1,25 +1,38 @@
 package app.xlei.vipexam.ui.login
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.view.ActionMode
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getSystemService
 import app.xlei.vipexam.R
 import app.xlei.vipexam.data.LoginResponse
 import app.xlei.vipexam.data.models.room.User
+import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.LoginSetting
+import app.xlei.vipexam.ui.page.Word
 import io.ktor.network.selector.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -42,7 +55,9 @@ fun loginView(
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.weight(3f).align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .weight(3f)
+                .align(Alignment.CenterHorizontally)
         ) {
             ExposedDropdownMenuBox(
                 expanded = showUsers,
@@ -83,21 +98,43 @@ fun loginView(
                     }
                 }
             }
+            val expanded = remember { mutableStateOf(false) }
+            val emptyTextToolbar = remember { EmptyTextToolbar(expanded) }
 
-            TextField(
-                value = password,
-                onValueChange = { onPasswordChange(it) },
-                label = { Text(stringResource(R.string.password)) },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.padding(top = 20.dp)
-            )
-            if(loginResponse!=null){
+            CompositionLocalProvider(
+                LocalTextToolbar provides emptyTextToolbar
+            ) {
+                Box {
+                    DropdownMenu(
+                        expanded = expanded.value,
+                        onDismissRequest = { expanded.value = false },
+                    ) {
+                        DropdownMenuItem(onClick = { expanded.value = false }) {
+                            Text("Delete")
+                        }
+                        DropdownMenuItem(onClick = { expanded.value = false }) {
+                            Text("Save")
+                        }
+                    }
+                    TextField(
+                        value = password,
+                        onValueChange = { onPasswordChange(it) },
+                        label = { Text(stringResource(R.string.password)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.padding(top = 20.dp)
+                    )
+                }
+            }
+
+            if (loginResponse != null) {
                 Text(loginResponse.msg)
             }
 
             Button(
                 onClick = onLoginButtonClicked,
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 20.dp)
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 20.dp)
             ) {
                 Text(stringResource(R.string.login))
             }
@@ -141,3 +178,22 @@ fun loginView(
     }
 }
 
+class EmptyTextToolbar(private val expended: MutableState<Boolean>) : TextToolbar {
+    override val status: TextToolbarStatus = TextToolbarStatus.Hidden
+
+    override fun hide() {
+        //expended.value=false
+    }
+
+    override fun showMenu(
+        rect: Rect,
+        onCopyRequested: (() -> Unit)?,
+        onPasteRequested: (() -> Unit)?,
+        onCutRequested: (() -> Unit)?,
+        onSelectAllRequested: (() -> Unit)?,
+    ) {
+        expended.value = true
+        onCopyRequested?.invoke()
+    }
+
+}

@@ -158,4 +158,7 @@ dependencies {
 
     val datastore_version = "1.0.0"
     implementation("androidx.datastore:datastore-preferences:$datastore_version")
+
+    val commons_csv_version = "1.10.0"
+    implementation("org.apache.commons:commons-csv:$commons_csv_version")
 }

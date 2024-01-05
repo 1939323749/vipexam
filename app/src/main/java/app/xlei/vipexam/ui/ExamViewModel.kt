@@ -217,8 +217,7 @@ class ExamViewModel @Inject constructor(
 
     fun setNavigationActions(homeScreenNavigationActions: HomeScreenNavigationActions) {
         this.homeScreenNavigationActions = homeScreenNavigationActions
-        if (_uiState.value.loginUiState.setting.isAutoLogin == true
-            && _uiState.value.loginUiState.loginResponse == null
+        if (_uiState.value.loginUiState.setting.isAutoLogin && _uiState.value.loginUiState.loginResponse == null
         )
             login()
     }

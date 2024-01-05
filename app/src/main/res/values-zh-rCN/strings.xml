@@ -49,4 +49,10 @@
     <string name="show_question">显示问题</string>
     <string name="show_translation">显示翻译</string>
     <string name="add_to_word_list">Add to word list</string>
+    <string name="sort_by_old_to_new">旧-新</string>
+    <string name="sort_by_new_to_old">新-旧</string>
+    <string name="sort_by_a_z">A-Z</string>
+    <string name="sort_by_z_a">Z-A</string>
+    <string name="sort_by_random">随机</string>
+    <string name="sort">排序</string>
 </resources>

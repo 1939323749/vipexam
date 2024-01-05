@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -11,6 +12,10 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,6 +41,11 @@ import compose.icons.feathericons.Menu
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVPrinter
+import java.io.File
+import java.io.PrintWriter
 import java.util.*
 
 @Entity(
@@ -116,9 +127,69 @@ class WordListViewModel : ViewModel() {
         }
     }
 
+    fun sort(sortMethod: SortMethod) {
+        viewModelScope.launch {
+            DB.repository.getAllWords()
+                .flowOn(Dispatchers.IO)
+                .map { words ->
+                    when (sortMethod) {
+                        SortMethod.OLD_TO_NEW -> words.sortedBy { it.created }
+                        SortMethod.NEW_TO_OLD -> words.sortedByDescending { it.created }
+                        SortMethod.A_TO_Z -> words.sortedBy { it.word }
+                        SortMethod.Z_TO_A -> words.sortedByDescending { it.word }
+                        SortMethod.RANDOM -> words.sortedBy { Random().nextBoolean() }
+                    }
+                }
+                .collect { sortedWordList: List<Word> ->
+                    _wordList.update {
+                        sortedWordList
+                    }
+                }
+        }
+    }
+
+    fun exportWordsToCSV(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val words = DB.repository.getAllWords().first()
+            val csvFile = File(context.cacheDir, "words-${System.currentTimeMillis()}.csv")
+            CSVPrinter(
+                PrintWriter(csvFile),
+                CSVFormat.DEFAULT.withHeader("id", "word", "created")
+            ).use { printer ->
+                words.forEach { word ->
+                    printer.printRecord(word.id, word.word, word.created)
+                }
+            }
+            withContext(Dispatchers.Main) {
+                shareCSVFile(context, csvFile) // 分享文件，让用户选择保存位置
+            }
+        }
+    }
+
+    private fun shareCSVFile(context: Context, file: File) {
+        val contentUri =
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, contentUri)
+            type = "text/csv"
+        }
+        context.startActivity(Intent.createChooser(shareIntent, "Save file..."))
+    }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+enum class SortMethod(val method: Int) {
+    OLD_TO_NEW(R.string.sort_by_old_to_new),
+    NEW_TO_OLD(R.string.sort_by_new_to_old),
+    A_TO_Z(R.string.sort_by_a_z),
+    Z_TO_A(R.string.sort_by_z_a),
+    RANDOM(R.string.sort_by_random),
+}
+
+@OptIn(
+    ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 fun WordListPage(
     viewModel: WordListViewModel = viewModel(),
@@ -130,9 +201,21 @@ fun WordListPage(
     )
     var textToTranslate by remember { mutableStateOf("") }
     var showTranslationSheet by remember { mutableStateOf(false) }
+    var sortMethod by remember {
+        mutableStateOf(SortMethod.OLD_TO_NEW)
+    }
+    var showSortMethods by remember {
+        mutableStateOf(false)
+    }
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             LargeTopAppBar(
+                actions = {
+                    IconButton(onClick = { viewModel.exportWordsToCSV(context) }) {
+                        Icon(imageVector = Icons.Default.Share, contentDescription = null)
+                    }
+                },
                 title = {
                     Text(
                         stringResource(R.string.words)
@@ -160,8 +243,52 @@ fun WordListPage(
             modifier = Modifier
                 .padding(paddingValues)
         ) {
-
             LazyColumn {
+                stickyHeader {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.background)
+                    ) {
+                        LazyRow {
+                            item {
+                                AssistChip(
+                                    onClick = { showSortMethods = !showSortMethods },
+                                    label = { Text(text = stringResource(id = R.string.sort)) },
+                                    trailingIcon = {
+                                        Icon(
+                                            imageVector = if (showSortMethods) {
+                                                Icons.Default.KeyboardArrowUp
+                                            } else {
+                                                Icons.Default.KeyboardArrowDown
+                                            },
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .padding(horizontal = 8.dp)
+                                )
+                            }
+                        }
+                        LazyRow {
+                            if (showSortMethods)
+                                SortMethod.entries.forEach {
+                                    item {
+                                        FilterChip(
+                                            onClick = {
+                                                viewModel.sort(it)
+                                                sortMethod = it
+                                            },
+                                            label = { Text(text = stringResource(id = it.method)) },
+                                            selected = it == sortMethod,
+                                            modifier = Modifier
+                                                .padding(horizontal = 8.dp)
+                                        )
+                                    }
+                                }
+                        }
+                    }
+                }
                 items(wordListState.size) { index ->
                     ListItem(
                         headlineContent = { Text(wordListState[index].word) },

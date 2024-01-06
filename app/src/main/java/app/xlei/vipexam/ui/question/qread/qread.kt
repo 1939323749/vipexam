@@ -105,48 +105,56 @@ private fun qread(
     val scrollState = rememberLazyListState()
     var selectedArticle by rememberSaveable { mutableStateOf(0) }
     val expanded = remember { mutableStateOf(false) }
+    val content: @Composable (Int) -> Unit = { articleIndex ->
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        selectedArticle = articleIndex
+                        onArticleLongClicked()
+                    }
+                )
+        ) {
+            Text(
+                text = articles[articleIndex].title,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = articles[articleIndex].content,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .padding(16.dp)
+            )
+        }
+    }
+
     Column {
         LazyColumn(
             state = scrollState
         ) {
             articles.forEachIndexed { articleIndex, article ->
                 item {
-                    CompositionLocalProvider(
+                    if (Preferences.get(
+                            Preferences.longPressActionKey,
+                            LongPressActions.SHOW_QUESTION.value
+                        )
+                        == LongPressActions.SHOW_QUESTION.value
+                    ) CompositionLocalProvider(
                         LocalTextToolbar provides EmptyTextToolbar(expended = expanded)
                     ) {
                         SelectionContainer {
-                            Column(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
-                                    .combinedClickable(
-                                        onClick = {},
-                                        onLongClick = {
-                                            selectedArticle = articleIndex
-                                            onArticleLongClicked()
-                                        }
-                                    )
-                            ) {
-                                Text(
-                                    text = articles[articleIndex].title,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    fontSize = 24.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                )
-                                Text(
-                                    text = articles[articleIndex].content,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                )
-                            }
+                            content(articleIndex)
                         }
                     }
-
-
+                    else content(articleIndex)
                 }
                 items(article.questions.size) { it ->
                     Column(

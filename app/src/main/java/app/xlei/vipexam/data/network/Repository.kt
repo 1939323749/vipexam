@@ -1,20 +1,27 @@
 package app.xlei.vipexam.data.network
 
-import android.util.Log
-import app.xlei.vipexam.data.*
+import app.xlei.vipexam.data.Exam
+import app.xlei.vipexam.data.ExamList
+import app.xlei.vipexam.data.LoginResponse
+import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.data.TranslationResponse
 import com.google.gson.Gson
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.serialization.gson.*
-import io.ktor.serialization.jackson.*
-import kotlinx.coroutines.time.withTimeout
-import kotlinx.coroutines.withTimeout
-import org.apache.http.Header
+import com.google.gson.JsonSyntaxException
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.header
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
+import io.ktor.serialization.gson.gson
+import io.ktor.utils.io.errors.IOException
 
 object Repository {
     lateinit var account: String
@@ -148,20 +155,36 @@ object Repository {
             }
         }
 
-        val response = client.post("https://api.deeplx.org/translate") {
-            header("Accept", "application/json, text/javascript, */*; q=0.01")
-            contentType(ContentType.Application.Json)
-            setBody(
-                mapOf(
-                    "text" to text,
-                    "source_lang" to "EN",
-                    "target_lang" to "ZH"
+        var response: HttpResponse? = null
+        try {
+            response = client.post("https://api.deeplx.org/translate") {
+                header("Accept", "application/json, text/javascript, */*; q=0.01")
+                contentType(ContentType.Application.Json)
+                setBody(
+                    mapOf(
+                        "text" to text,
+                        "source_lang" to "EN",
+                        "target_lang" to "ZH"
+                    )
                 )
-            )
+            }
+        } catch (e: IOException) {
+            println("Network error occurred: ${e.message}")
         }
 
         client.close()
-        val gson = Gson()
-        return gson.fromJson(response.bodyAsText(), TranslationResponse::class.java)
+
+        var translationResponse: TranslationResponse? = null
+        if (response != null) {
+            val gson = Gson()
+            try {
+                translationResponse =
+                    gson.fromJson(response.bodyAsText(), TranslationResponse::class.java)
+            } catch (e: JsonSyntaxException) {
+                println("Error parsing JSON: ${e.message}")
+            }
+        }
+
+        return translationResponse
     }
 }

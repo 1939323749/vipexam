@@ -44,14 +44,61 @@ import kotlinx.coroutines.launch
 @Composable
 fun ExamPage(
     questionListUiState: ExamUiState.QuestionListUiState,
+    viewModel: QuestionsViewModel = hiltViewModel(),
     setQuestion: (String) -> Unit,
+    navController: NavHostController = rememberNavController(),
 ) {
+    viewModel.setMubanList(mubanList = questionListUiState.exam.muban)
+    val uiState by viewModel.uiState.collectAsState()
+    val questions = getQuestions(uiState.mubanList!!)
+    val haptics = LocalHapticFeedback.current
+    val coroutine = rememberCoroutineScope()
+    val context = LocalContext.current
     questions(
         mubanList = questionListUiState.exam.muban,
+        question = if (questions.toMap().containsKey(questionListUiState.question)) {
+            questionListUiState.question!!
+        } else {
+            questions.first().first
+        },
+        questions = questions,
+        navController = navController,
         setQuestion = { title ->
             setQuestion(title)
         },
-    )
+    ) {
+        CustomFloatingActionButton(
+            expandable = true,
+            onFabClick = {
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            },
+            iconExpanded = Icons.Filled.KeyboardArrowDown,
+            iconUnExpanded = Icons.Filled.KeyboardArrowUp,
+            items = questions,
+            onItemClick = {
+                navController.navigate(it) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                if (Preferences.get(
+                        Preferences.alwaysShowAnswerKey,
+                        ShowAnswerOptions.ONCE.value
+                    )
+                    == ShowAnswerOptions.ONCE.value
+                ) {
+                    coroutine.launch {
+                        context.dataStore.edit { preferences ->
+                            preferences[Preferences.SHOW_ANSWER] = false
+                        }
+                    }
+                }
+            }
+        )
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -59,52 +106,14 @@ fun ExamPage(
 @Composable
 fun questions(
     mubanList: List<Muban>,
-    viewModel: QuestionsViewModel = hiltViewModel(),
-    navController: NavHostController = rememberNavController(),
-    question: String? = null,
+    question: String,
+    questions: List<Pair<String, String>>,
+    navController: NavHostController,
     setQuestion: (String) -> Unit,
+    FAB: @Composable () -> Unit,
 ) {
-    viewModel.setMubanList(mubanList)
-    val uiState by viewModel.uiState.collectAsState()
-    val questions = getQuestions(uiState.mubanList!!)
-    val haptics = LocalHapticFeedback.current
-    val coroutine = rememberCoroutineScope()
-    val context = LocalContext.current
-
     Scaffold(
-        floatingActionButton = {
-            CustomFloatingActionButton(
-                expandable = true,
-                onFabClick = {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                },
-                iconExpanded = Icons.Filled.KeyboardArrowDown,
-                iconUnExpanded = Icons.Filled.KeyboardArrowUp,
-                items = questions,
-                onItemClick = {
-                    navController.navigate(it) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    if (Preferences.get(
-                            Preferences.alwaysShowAnswerKey,
-                            ShowAnswerOptions.ONCE.value
-                        )
-                        == ShowAnswerOptions.ONCE.value
-                    ) {
-                        coroutine.launch {
-                            context.dataStore.edit { preferences ->
-                                preferences[Preferences.SHOW_ANSWER] = false
-                            }
-                        }
-                    }
-                }
-            )
-        },
+        floatingActionButton = FAB,
     ) {
         Column(
             modifier = Modifier
@@ -112,7 +121,7 @@ fun questions(
         ) {
             NavHost(
                 navController = navController,
-                startDestination = question ?: questions[0].first,
+                startDestination = question,
                 modifier = Modifier
             ) {
                 for ((index, q) in questions.withIndex()) {

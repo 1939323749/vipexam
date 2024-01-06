@@ -11,13 +11,16 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.R
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.edit
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
+import app.xlei.vipexam.util.Preferences
+import app.xlei.vipexam.util.dataStore
 import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -26,7 +29,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppNavRail(
     logo: MutableState<HomeScreen>,
-    showAnswer: MutableState<Boolean>,
     homeNavController: NavHostController,
     currentRoute: String,
     navigationToTopLevelDestination: (AppDestinations) -> Unit,
@@ -35,6 +37,8 @@ fun AppNavRail(
     var startTimer by remember { mutableStateOf(true) }
     var resetTimer by remember { mutableStateOf(false) }
     val coroutine = rememberCoroutineScope()
+    val context = LocalContext.current
+
     NavigationRail(
         header = {
             if (homeNavController.currentBackStackEntryAsState().value?.destination?.route == HomeScreen.QuestionListWithQuestion.name)
@@ -67,7 +71,12 @@ fun AppNavRail(
                 onItemClick = {
                     when (it) {
                         "SHOW_ANSWER" -> {
-                            showAnswer.value = !showAnswer.value
+                            coroutine.launch {
+                                context.dataStore.edit { preferences ->
+                                    val showAnswer = preferences[Preferences.SHOW_ANSWER]
+                                    preferences[Preferences.SHOW_ANSWER] = showAnswer?.not() ?: true
+                                }
+                            }
                         }
 
                         else -> {}
@@ -106,11 +115,12 @@ fun AppNavRail(
             alwaysShowLabel = false
         )
         if (currentRoute == AppDestinations.HOME_ROUTE.name &&
-            homeNavController.currentBackStack.value.size > 2)
+            homeNavController.previousBackStackEntry != null
+        )
             IconButton(
                 onClick = { homeNavController.navigateUp() },
-            ){
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft,null)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, null)
             }
         Spacer(Modifier.weight(1f))
     }

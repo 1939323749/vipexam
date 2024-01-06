@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui.navigation
+package app.xlei.vipexam.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
@@ -8,26 +8,28 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.data.AppContainer
-import app.xlei.vipexam.ui.AppDrawer
-import app.xlei.vipexam.ui.VipExamState
 import app.xlei.vipexam.ui.components.AppNavRail
 import app.xlei.vipexam.ui.navgraph.VipExamNavHost
-import app.xlei.vipexam.ui.rememberVipExamAppState
+import app.xlei.vipexam.ui.navigation.AppDestinations
+import app.xlei.vipexam.ui.navigation.HomeScreen
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @Composable
 fun App(
     appContainer: AppContainer,
-    widthSizeClass: WindowSizeClass,
+    widthSizeClass: WindowWidthSizeClass,
     appState: VipExamState = rememberVipExamAppState(
         windowSizeClass = widthSizeClass,
     ),
@@ -38,7 +40,7 @@ fun App(
     val currentRoute =
         navBackStackEntry?.destination?.route ?: AppDestinations.HOME_ROUTE.name
 
-    val sizeAwareDrawerState = rememberSizeAwareDrawerState(appState.shouldShowBottomBar)
+    val sizeAwareDrawerState = rememberSizeAwareDrawerState(appState.shouldShowTopBar)
 
     val currentHomeScreenRoute = homeNavController.currentBackStackEntryAsState()
         .value?.destination?.route ?: HomeScreen.Login.name
@@ -46,8 +48,6 @@ fun App(
     val logoText = remember { mutableStateOf(
         HomeScreen.valueOf(currentHomeScreenRoute)
     ) }
-
-    val showAnswer = rememberSaveable() { mutableStateOf(false) }
 
     val coroutine = rememberCoroutineScope()
 
@@ -63,13 +63,12 @@ fun App(
             )
         },
         drawerState = sizeAwareDrawerState,
-        gesturesEnabled = appState.shouldShowBottomBar,
+        gesturesEnabled = appState.shouldShowTopBar,
     ){
         Row {
             if (appState.shouldShowNavRail) {
                 AppNavRail(
                     logo = logoText,
-                    showAnswer = showAnswer,
                     homeNavController = homeNavController,
                     currentRoute = currentRoute,
                     navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
@@ -77,11 +76,10 @@ fun App(
             }
             VipExamNavHost(
                 logoText = logoText,
-                showAnswer = showAnswer,
                 navHostController = appState.navController,
                 homeNavController = homeNavController,
                 appContainer = appContainer,
-                isExpandedScreen = appState.shouldShowNavRail,
+                widthSizeClass = widthSizeClass,
                 openDrawer = { coroutine.launch { sizeAwareDrawerState.open() } },
             )
         }

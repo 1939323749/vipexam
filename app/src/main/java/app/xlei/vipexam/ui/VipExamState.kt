@@ -1,6 +1,5 @@
 package app.xlei.vipexam.ui
 
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -16,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun rememberVipExamAppState(
-    windowSizeClass: WindowSizeClass,
+    windowSizeClass: WindowWidthSizeClass,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
 ): VipExamState {
@@ -28,7 +27,7 @@ fun rememberVipExamAppState(
         VipExamState(
             vipExamNavigationActions = VipExamNavigationActions(navController),
             coroutineScope = coroutineScope,
-            windowSizeClass = windowSizeClass,
+            widthSizeClass = windowSizeClass,
             navController = navController,
         )
     }
@@ -38,7 +37,7 @@ fun rememberVipExamAppState(
 class VipExamState(
     val vipExamNavigationActions: VipExamNavigationActions,
     val coroutineScope: CoroutineScope,
-    val windowSizeClass: WindowSizeClass,
+    val widthSizeClass: WindowWidthSizeClass,
     val navController: NavHostController,
 ) {
     val currentDestination: NavDestination?
@@ -53,11 +52,11 @@ class VipExamState(
             else -> null
         }
 
-    val shouldShowBottomBar: Boolean
-        get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
+    val shouldShowTopBar: Boolean
+        get() = widthSizeClass == WindowWidthSizeClass.Compact
 
     val shouldShowNavRail: Boolean
-        get() = !shouldShowBottomBar
+        get() = !shouldShowTopBar
 
     val appDestinations: List<AppDestinations> = AppDestinations.entries
 

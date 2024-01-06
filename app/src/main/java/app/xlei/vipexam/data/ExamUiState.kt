@@ -1,8 +1,8 @@
 package app.xlei.vipexam.data
 
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import app.xlei.vipexam.data.models.room.User
 import app.xlei.vipexam.ui.LoginSetting
-import app.xlei.vipexam.ui.SCREEN_TYPE
 import app.xlei.vipexam.ui.navigation.HomeScreen
 
 data class ExamUiState(
@@ -11,7 +11,7 @@ data class ExamUiState(
     val examListUiState: ExamListUiState,
     val questionListUiState: QuestionListUiState,
     val title: String,
-    val screenType: SCREEN_TYPE = SCREEN_TYPE.COMPACT,
+    val screenType: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
     val currentRoute: HomeScreen = HomeScreen.Login,
 ) {
     data class LoginUiState(

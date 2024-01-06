@@ -1,5 +1,6 @@
 package app.xlei.vipexam.ui
 
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.constant.Constants
@@ -20,11 +21,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-enum class SCREEN_TYPE(
-) {
-    COMPACT,
-    EXPANDED,
-}
 
 data class LoginSetting(
     val isRememberAccount: Boolean,
@@ -63,10 +59,10 @@ class ExamViewModel @Inject constructor(
         }
     }
 
-    fun setScreenType(screenType: SCREEN_TYPE) {
+    fun setScreenType(widthSizeClass: WindowWidthSizeClass) {
         _uiState.update {
             it.copy(
-                screenType = screenType
+                screenType = widthSizeClass
             )
         }
     }
@@ -115,10 +111,10 @@ class ExamViewModel @Inject constructor(
                     }
 
                 }
-                if (_uiState.value.screenType == SCREEN_TYPE.EXPANDED)
-                    navigate(HomeScreen.ExpandedLoggedIn)
-                else
-                    navigate(HomeScreen.CompactLoggedIn)
+                //if (_uiState.value.screenType == SCREEN_TYPE.EXPANDED)
+                navigate(HomeScreen.LoggedIn)
+                //else
+                //    navigate(HomeScreen.CompactLoggedIn)
                 if (_uiState.value.loginUiState.setting.isRememberAccount)
                     withContext(Dispatchers.IO) {
                         DB.repository.insertUser(
@@ -134,76 +130,16 @@ class ExamViewModel @Inject constructor(
 
     fun navigate(destination: HomeScreen) {
         when (destination) {
-            HomeScreen.Exam -> {
-                homeScreenNavigationActions.navigateToExam()
-                _uiState.update {
-                    it.copy(
-                        currentRoute = HomeScreen.Exam
-                    )
-                }
-            }
-
-            HomeScreen.ExamList -> {
-                homeScreenNavigationActions.navigateToExamList()
-                _uiState.update {
-                    it.copy(
-                        currentRoute = HomeScreen.ExamList
-                    )
-                }
-            }
-
-            HomeScreen.CompactLoggedIn -> {
-                homeScreenNavigationActions.navigateToCompactLoggedIn()
-                _uiState.update {
-                    it.copy(
-                        currentRoute = HomeScreen.CompactLoggedIn
-                    )
-                }
-            }
-
             HomeScreen.ExamListWithQuestions -> {
                 homeScreenNavigationActions.navigateToExamListWithQuestions()
-                _uiState.update {
-                    it.copy(
-                        currentRoute = HomeScreen.ExamListWithQuestions
-                    )
-                }
             }
 
-            HomeScreen.ExamTypeList -> {
-                homeScreenNavigationActions.navigateToExamList()
-                _uiState.update {
-                    it.copy(
-                        currentRoute = HomeScreen.ExamTypeList
-                    )
-                }
-            }
-
-            HomeScreen.ExamTypeWithExamList -> {
-                homeScreenNavigationActions.navigateToExamList()
-                _uiState.update {
-                    it.copy(
-                        currentRoute = HomeScreen.ExamTypeWithExamList
-                    )
-                }
-            }
-
-            HomeScreen.ExpandedLoggedIn -> {
-                homeScreenNavigationActions.navigateToExpandedLoggedIn()
-                _uiState.update {
-                    it.copy(
-                        currentRoute = HomeScreen.ExpandedLoggedIn
-                    )
-                }
+            HomeScreen.LoggedIn -> {
+                homeScreenNavigationActions.navigateToLoggedIn()
             }
 
             HomeScreen.QuestionListWithQuestion -> {
                 homeScreenNavigationActions.navigateToQuestionsWithQuestion()
-                _uiState.update {
-                    it.copy(
-                        currentRoute = HomeScreen.QuestionListWithQuestion
-                    )
-                }
             }
 
             else -> return
@@ -344,8 +280,7 @@ class ExamViewModel @Inject constructor(
                     )
                 )
             }
-            if (_uiState.value.screenType == SCREEN_TYPE.COMPACT)
-                navigate(HomeScreen.ExamList)
+            navigate(HomeScreen.ExamListWithQuestions)
         }
     }
 
@@ -362,7 +297,8 @@ class ExamViewModel @Inject constructor(
             it.copy(
                 questionListUiState = it.questionListUiState.copy(
                     question = question,
-                )
+                ),
+                title = question
             )
         }
         navigate(HomeScreen.QuestionListWithQuestion)
@@ -394,10 +330,17 @@ class ExamViewModel @Inject constructor(
                     ),
                 )
             }
-            if (_uiState.value.screenType == SCREEN_TYPE.COMPACT)
-                navigate(HomeScreen.Exam)
-            else
+            if (_uiState.value.currentRoute == HomeScreen.ExamTypeWithExamList)
                 navigate(HomeScreen.ExamListWithQuestions)
+            else navigate(HomeScreen.QuestionListWithQuestion)
+        }
+    }
+
+    fun setCurrentRoute(homeScreen: HomeScreen) {
+        _uiState.update {
+            it.copy(
+                currentRoute = homeScreen
+            )
         }
     }
 }

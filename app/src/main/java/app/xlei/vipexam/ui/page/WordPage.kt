@@ -161,7 +161,7 @@ class WordListViewModel : ViewModel() {
                 }
             }
             withContext(Dispatchers.Main) {
-                shareCSVFile(context, csvFile) // 分享文件，让用户选择保存位置
+                shareCSVFile(context, csvFile)
             }
         }
     }

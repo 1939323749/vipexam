@@ -101,40 +101,50 @@ private fun zread(
     var selectedArticle by rememberSaveable { mutableStateOf(0) }
 
     val expanded = remember { mutableStateOf(false) }
+    val content: @Composable (Int, ZreadUiState.Article) -> Unit = { articleIndex, ti ->
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        selectedArticle = articleIndex
+                        onArticleLongClick(articleIndex)
+                    }
+                )
+        ) {
+            Text(ti.index)
+            Text(
+                text = ti.content,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .padding(16.dp)
+            )
+        }
+    }
+
     Column {
         LazyColumn(
             state = scrollState,
         ) {
-            articles.forEachIndexed {articleIndex,ti->
+            articles.forEachIndexed { articleIndex, ti ->
                 item {
-                    CompositionLocalProvider(
-                        LocalTextToolbar provides EmptyTextToolbar(expended = expanded)
-                    ) {
-                        SelectionContainer {
-                            Column(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
-                                    .combinedClickable(
-                                        onClick = {},
-                                        onLongClick = {
-                                            selectedArticle = articleIndex
-                                            onArticleLongClick(articleIndex)
-                                        }
-                                    )
-                            ) {
-                                Text(ti.index)
-                                Text(
-                                    text = ti.content,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                )
+                    if (Preferences.get(
+                            Preferences.longPressActionKey,
+                            LongPressActions.SHOW_QUESTION.value
+                        )
+                        == LongPressActions.TRANSLATE.value
+                    )
+                        CompositionLocalProvider(
+                            LocalTextToolbar provides EmptyTextToolbar(expended = expanded)
+                        ) {
+                            SelectionContainer {
+                                content(articleIndex, ti)
                             }
                         }
-                    }
-
+                    else content(articleIndex, ti)
                     HorizontalDivider(
                         modifier = Modifier
                             .padding(start = 16.dp, end = 16.dp),

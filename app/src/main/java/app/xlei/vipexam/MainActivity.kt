@@ -14,7 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import app.xlei.vipexam.logic.DB
-import app.xlei.vipexam.ui.navigation.App
+import app.xlei.vipexam.ui.App
 import app.xlei.vipexam.ui.theme.VipexamTheme
 import app.xlei.vipexam.ui.theme.hexToColor
 import app.xlei.vipexam.util.LocaleHelper
@@ -40,15 +40,18 @@ class MainActivity : ComponentActivity() {
                 themeMode = themeMode,
                 accentColor = accentColor?.hexToColor()
             ) {
-                val widthSizeClass = calculateWindowSizeClass(this)
+                val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
                 enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.auto(lightScrim = lightScrim(), darkScrim = darkScrim()),
-                    navigationBarStyle = SystemBarStyle.auto(lightScrim = lightScrim(), darkScrim = darkScrim()),
+                    statusBarStyle = SystemBarStyle.auto(
+                        lightScrim = lightScrim(),
+                        darkScrim = darkScrim()
+                    ),
+                    navigationBarStyle = SystemBarStyle.auto(
+                        lightScrim = lightScrim(),
+                        darkScrim = darkScrim()
+                    ),
                 )
-                App(
-                    appContainer,
-                    widthSizeClass,
-                )
+                App(appContainer = appContainer, widthSizeClass = widthSizeClass)
             }
         }
     }

@@ -2,7 +2,6 @@ package app.xlei.vipexam.ui.question.cloze
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.ui.components.translateDialog
 import app.xlei.vipexam.ui.login.EmptyTextToolbar
+import app.xlei.vipexam.ui.page.LongPressActions
 import app.xlei.vipexam.util.Preferences
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -76,7 +76,6 @@ fun clozeView(
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class,
     ExperimentalLayoutApi::class
 )
 @Composable
@@ -87,50 +86,59 @@ private fun cloze(
     onOptionClicked: (Int,ClozeUiState.Option)->Unit,
     toggleBottomSheet: () -> Unit,
     showAnswer: State<Boolean>
-){
+) {
     val scrollState = rememberLazyListState()
     var selectedClozeIndex by rememberSaveable { mutableStateOf(0) }
     val expanded = remember { mutableStateOf(false) }
+    val content: @Composable (Int) -> Unit = { clozeIndex ->
+        ClickableText(
+            text = clozes[clozeIndex].article.article,
+            style = LocalTextStyle.current.copy(
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+            onClick = {
+                clozes[clozeIndex].article.tags.forEachIndexed { index, tag ->
+                    clozes[clozeIndex].article.article.getStringAnnotations(
+                        tag = tag,
+                        start = it,
+                        end = it
+                    ).firstOrNull()?.let {
+                        selectedClozeIndex = clozeIndex
+                        onBlankClick(index)
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 4.dp, end = 4.dp)
+        )
+    }
 
-    Column{
+    Column {
         LazyColumn(
-            state =  scrollState,
+            state = scrollState,
             modifier = Modifier
         ) {
-            items(clozes.size){ clozeIndex ->
+            items(clozes.size) { clozeIndex ->
                 Column(
                     modifier = Modifier
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer)
                 ) {
-
-                    CompositionLocalProvider(
-                        LocalTextToolbar provides EmptyTextToolbar(expended = expanded)
-                    ) {
-                        SelectionContainer {
-                            ClickableText(
-                                text = clozes[clozeIndex].article.article,
-                                style = LocalTextStyle.current.copy(
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                ),
-                                onClick = {
-                                    clozes[clozeIndex].article.tags.forEachIndexed { index, tag ->
-                                        clozes[clozeIndex].article.article.getStringAnnotations(
-                                            tag = tag,
-                                            start = it,
-                                            end = it
-                                        ).firstOrNull()?.let {
-                                            selectedClozeIndex = clozeIndex
-                                            onBlankClick(index)
-                                        }
-                                    }
-                                },
-                                modifier = Modifier
-                                    .padding(start = 4.dp, end = 4.dp)
-                            )
+                    if (Preferences.get(
+                            Preferences.longPressActionKey,
+                            LongPressActions.SHOW_QUESTION.value
+                        )
+                        == LongPressActions.TRANSLATE.value
+                    )
+                        CompositionLocalProvider(
+                            LocalTextToolbar provides EmptyTextToolbar(expended = expanded)
+                        ) {
+                            SelectionContainer {
+                                content(clozeIndex)
+                            }
                         }
-                    }
+                    else content(clozeIndex)
                 }
                 FlowRow(
                     horizontalArrangement = Arrangement.Start,
@@ -172,7 +180,12 @@ private fun cloze(
             }
         }
 
-        if (expanded.value)
+        if (expanded.value && Preferences.get(
+                Preferences.longPressActionKey,
+                LongPressActions.SHOW_QUESTION
+            )
+            == LongPressActions.TRANSLATE
+        )
             translateDialog(expanded)
         if (showBottomSheet) {
             ModalBottomSheet(

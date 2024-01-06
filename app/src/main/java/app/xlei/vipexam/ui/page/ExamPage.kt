@@ -95,12 +95,13 @@ fun questions(
                             ShowAnswerOptions.ONCE.value
                         )
                         == ShowAnswerOptions.ONCE.value
-                    )
+                    ) {
                         coroutine.launch {
                             context.dataStore.edit { preferences ->
                                 preferences[Preferences.SHOW_ANSWER] = false
                             }
                         }
+                    }
                 }
             )
         },

@@ -32,7 +32,7 @@ import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
 
 @OptIn(
-    ExperimentalMaterialApi::class, ExperimentalLayoutApi::class,
+    ExperimentalMaterialApi::class,
     ExperimentalMaterial3Api::class
 )
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -55,73 +55,80 @@ fun examListView(
         modifier = Modifier
             .nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
         bottomBar = {
-            BottomAppBar {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .weight(1f)
-                    ) {
-                        FilledIconButton(
-                            onClick = {
-                                onPreviousPageClicked()
-                                coroutineScope.launch {
-                                    scrollState.animateScrollToItem(0)
-                                } },
-                            enabled = examListUiState.currentPage.toInt() > 1
-                        ){
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                contentDescription = "previous page",
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.Bottom)
-                    ) {
-                        Text(
-                            text = "${(examListUiState.currentPage.toInt() - 1) * 20 + 1}-" +
-                                    "${(examListUiState.currentPage.toInt() - 1) * 20 + 20}/" +
-                                    "${examListUiState.examList.count}",
-                            fontSize = 12.sp
-                        )
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        FilledIconButton(
-                            onClick = {
-                                onNextPageClicked()
-                                coroutineScope.launch {
-                                    scrollState.animateScrollToItem(0)
-                                } },
-                        ){
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = "next page",
-                            )
+            BoxWithConstraints {
+                if (maxHeight > 360.dp) {
+                    BottomAppBar {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier
+                                    .weight(1f)
+                            ) {
+                                FilledIconButton(
+                                    onClick = {
+                                        onPreviousPageClicked()
+                                        coroutineScope.launch {
+                                            scrollState.animateScrollToItem(0)
+                                        }
+                                    },
+                                    enabled = examListUiState.currentPage.toInt() > 1
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                        contentDescription = "previous page",
+                                    )
+                                }
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .align(Alignment.Bottom)
+                            ) {
+                                Text(
+                                    text = "${(examListUiState.currentPage.toInt() - 1) * 20 + 1}-" +
+                                            "${(examListUiState.currentPage.toInt() - 1) * 20 + 20}/" +
+                                            "${examListUiState.examList.count}",
+                                    fontSize = 12.sp
+                                )
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .align(Alignment.CenterVertically)
+                            ) {
+                                FilledIconButton(
+                                    onClick = {
+                                        onNextPageClicked()
+                                        coroutineScope.launch {
+                                            scrollState.animateScrollToItem(0)
+                                        }
+                                    },
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                        contentDescription = "next page",
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         },
         floatingActionButton = {
-            if(firstVisibleItemIndex >0) FloatingActionButton(
+            if (firstVisibleItemIndex > 0) FloatingActionButton(
                 onClick = {
                     coroutineScope.launch {
                         scrollState.animateScrollToItem(0)
                     }
                 }
-            ){
-                Icon(Icons.Default.KeyboardArrowUp,"back to top")
+            ) {
+                Icon(Icons.Default.KeyboardArrowUp, "back to top")
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.End
     ) {padding ->
         val refreshing by remember{ mutableStateOf(false) }
 

@@ -9,12 +9,13 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -269,14 +270,51 @@ fun examTypeListWithExamListView(
             Row(
                 modifier = modifier
             ) {
-                ElevatedCard(
-                    modifier = Modifier
-                        .width(360.dp)
-                ) {
-                    examTypeListView(
-                        examTypeListUiState = examTypeListUiState,
-                        onExamTypeClicked = onExamTypeClick,
-                    )
+                BoxWithConstraints {
+                    if (maxHeight > 360.dp) {
+                        ElevatedCard(
+                            modifier = Modifier
+                                .width(360.dp)
+                        ) {
+                            examTypeListView(
+                                examTypeListUiState = examTypeListUiState,
+                                onExamTypeClicked = onExamTypeClick,
+                            )
+                        }
+                    } else {
+                        ElevatedCard(
+                            modifier = Modifier
+                                .width(180.dp)
+                        ) {
+                            examTypeListView(
+                                examTypeListUiState = examTypeListUiState,
+                                onExamTypeClicked = onExamTypeClick,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .height(40.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                IconButton(
+                                    onClick = onPreviousPageClick, Modifier.weight(1f),
+                                    enabled = (examTypeListUiState.examListUiState?.currentPage?.toInt()
+                                        ?: 1) > 1
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                        contentDescription = null
+                                    )
+                                }
+                                IconButton(onClick = onNextPageClick, Modifier.weight(1f)) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.width(24.dp))
                 ElevatedCard(
@@ -318,7 +356,6 @@ fun examListWithQuestionsView(
                 refresh = refresh
             )
         }
-
         WindowWidthSizeClass.Medium -> {
             Row(
                 modifier = modifier
@@ -353,17 +390,34 @@ fun examListWithQuestionsView(
             Row(
                 modifier = modifier
             ) {
-                ElevatedCard(
-                    modifier = Modifier
-                        .width(360.dp)
-                ) {
-                    examListView(
-                        examListUiState = examListUiState,
-                        onPreviousPageClicked = onPreviousPageClicked,
-                        onNextPageClicked = onNextPageClicked,
-                        onExamClick = onExamClick,
-                        refresh = refresh
-                    )
+                BoxWithConstraints {
+                    if (maxHeight < 360.dp) {
+                        ElevatedCard(
+                            modifier = Modifier
+                                .width(180.dp)
+                        ) {
+                            examListView(
+                                examListUiState = examListUiState,
+                                onPreviousPageClicked = onPreviousPageClicked,
+                                onNextPageClicked = onNextPageClicked,
+                                onExamClick = onExamClick,
+                                refresh = refresh
+                            )
+                        }
+                    } else {
+                        ElevatedCard(
+                            modifier = Modifier
+                                .width(360.dp)
+                        ) {
+                            examListView(
+                                examListUiState = examListUiState,
+                                onPreviousPageClicked = onPreviousPageClicked,
+                                onNextPageClicked = onNextPageClicked,
+                                onExamClick = onExamClick,
+                                refresh = refresh
+                            )
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.width(24.dp))
                 ElevatedCard(
@@ -393,7 +447,7 @@ fun questionListWithQuestionView(
 ) {
     val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
-    var isMaximize by rememberSaveable { mutableStateOf(false) }
+
     when (widthSizeClass) {
         WindowWidthSizeClass.Compact -> {
             ExamPage(
@@ -415,48 +469,74 @@ fun questionListWithQuestionView(
             Row(
                 modifier = modifier
             ) {
-                if (!isMaximize) {
-                    ElevatedCard(
-                        modifier = Modifier
-                            .width(360.dp)
-                    ) {
-                        questionListView(
-                            questionListUiState = questionListUiState,
-                            onQuestionClick = {
-                                navController.navigate(it) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                BoxWithConstraints {
+                    if (maxHeight < 360.dp) {
+                        ElevatedCard(
+                            modifier = Modifier
+                                .width(120.dp)
+                        ) {
+                            questionListView(
+                                questionListUiState = questionListUiState,
+                                onQuestionClick = {
+                                    navController.navigate(it) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                                if (Preferences.get(
-                                        key = Preferences.alwaysShowAnswerKey,
-                                        ShowAnswerOptions.ONCE.value
-                                    ) == ShowAnswerOptions.ONCE.value
-                                ) {
-                                    coroutine.launch {
-                                        context.dataStore.edit { preferences ->
-                                            preferences[Preferences.SHOW_ANSWER] = false
+                                    if (Preferences.get(
+                                            key = Preferences.alwaysShowAnswerKey,
+                                            ShowAnswerOptions.ONCE.value
+                                        ) == ShowAnswerOptions.ONCE.value
+                                    ) {
+                                        coroutine.launch {
+                                            context.dataStore.edit { preferences ->
+                                                preferences[Preferences.SHOW_ANSWER] = false
+                                            }
                                         }
                                     }
-                                }
-                            },
-                        )
+                                },
+                            )
+                        }
+                    } else {
+                        ElevatedCard(
+                            modifier = Modifier
+                                .width(360.dp)
+                        ) {
+                            questionListView(
+                                questionListUiState = questionListUiState,
+                                onQuestionClick = {
+                                    navController.navigate(it) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                    if (Preferences.get(
+                                            key = Preferences.alwaysShowAnswerKey,
+                                            ShowAnswerOptions.ONCE.value
+                                        ) == ShowAnswerOptions.ONCE.value
+                                    ) {
+                                        coroutine.launch {
+                                            context.dataStore.edit { preferences ->
+                                                preferences[Preferences.SHOW_ANSWER] = false
+                                            }
+                                        }
+                                    }
+                                },
+                            )
+                        }
                     }
-                    Spacer(
-                        Modifier
-                            .width(24.dp)
-                            .fillMaxHeight()
-                    )
                 }
+                Spacer(
+                    Modifier
+                        .width(24.dp)
+                        .fillMaxHeight()
+                )
                 ElevatedCard(
-                    modifier = if (isMaximize)
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    else
-                        Modifier
+                    modifier = Modifier
                 ) {
                     ExamPage(
                         questionListUiState = questionListUiState,
@@ -464,32 +544,6 @@ fun questionListWithQuestionView(
                         navController = navController
                     )
                 }
-
-                if (isMaximize) {
-                    Spacer(
-                        Modifier
-                            .width(24.dp)
-                            .fillMaxHeight()
-                    )
-                    ElevatedCard(
-                        modifier = Modifier
-                            .width(360.dp)
-                    ) {
-                        questionListView(
-                            questionListUiState = questionListUiState,
-                            onQuestionClick = {
-                                navController.navigate(it) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                        )
-                    }
-                }
-
             }
         }
     }

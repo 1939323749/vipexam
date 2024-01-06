@@ -31,5 +31,4 @@ fun examTypeListView(
             HorizontalDivider()
         }
     }
-
 }

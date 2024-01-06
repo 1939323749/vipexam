@@ -1,9 +1,9 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
-    kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.android")
+    kotlin("kapt")
 }
 
 android {
@@ -68,100 +68,58 @@ android {
 }
 
 dependencies {
-
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.1")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material:material:1.5.4")
-    implementation("androidx.compose.material3:material3")
-    implementation("io.ktor:ktor-client-apache:2.3.7")
-    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.6")
-    implementation("androidx.palette:palette-ktx:1.0.0")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.6")
-    implementation("io.ktor:ktor-serialization-jackson:2.3.6")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha12")
-    implementation("androidx.navigation:navigation-compose:2.6.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${rootProject.extra["lifecycle_version"]}")
-
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-
-    val activity_version = "1.8.1"
-    implementation("androidx.activity:activity-ktx:$activity_version")
-
-    val ktor_version = "2.3.7"
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
-    implementation("io.ktor:ktor-serialization-gson:$ktor_version")
-
-    val gson_version = "2.10.1"
-    implementation("com.google.code.gson:gson:$gson_version")
-
-    val room_version = "2.5.1"
-
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-
-    implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
-
-    implementation("androidx.collection:collection-ktx:1.3.0")
-
-    val lifecycle_version = "2.6.2"
-
-    // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    // ViewModel utilities for Compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
-    // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-
-    val paging_version = "3.2.1"
-
-    implementation("androidx.paging:paging-runtime:$paging_version")
-
-    val paging_compose_version = "3.3.0-alpha02"
-    implementation("androidx.paging:paging-compose:${paging_compose_version}")
-
-    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
-
-    implementation("com.google.dagger:hilt-android:2.48.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-    implementation("androidx.datastore:datastore-core:1.1.0-alpha07")
-
-    val icons_version = "1.1.0"
-    implementation("br.com.devsrsouza.compose.icons:feather:${icons_version}")
-    implementation("br.com.devsrsouza.compose.icons:tabler-icons:${icons_version}")
-
-    val coil_compose_version = "2.5.0"
-    implementation("io.coil-kt:coil-compose:$coil_compose_version")
-
-    val glance_version = "1.0.0"
-    implementation("androidx.glance:glance:$glance_version")
-    implementation("androidx.glance:glance-material3:$glance_version")
-
-    // For AppWidgets support
-    implementation("androidx.glance:glance-appwidget:$glance_version")
-
-    // For Wear-Tiles support
-    implementation("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
-
-    val datastore_version = "1.0.0"
-    implementation("androidx.datastore:datastore-preferences:$datastore_version")
-
-    val commons_csv_version = "1.10.0"
-    implementation("org.apache.commons:commons-csv:$commons_csv_version")
+    androidTestImplementation(libs.androidx.test.espresso.espresso.core2)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(platform(libs.compose.bom))
+    annotationProcessor(libs.room.compiler)
+    debugImplementation(libs.ui.tooling)
+    implementation(libs.activity.compose)
+    implementation(libs.activity.ktx)
+    implementation(libs.androidx.compose.material.material2)
+    implementation(libs.coil.compose)
+    implementation(libs.collection.ktx)
+    implementation(libs.commons.csv)
+    implementation(libs.core.ktx)
+    implementation(libs.datastore.core)
+    implementation(libs.datastore.preferences)
+    implementation(libs.feather)
+    implementation(libs.glance)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+    implementation(libs.glance.wear.tiles)
+    implementation(libs.gson)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.io.ktor.ktor.client.apache2)
+    implementation(libs.io.ktor.ktor.client.okhttp.jvm4)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.serialization.gson)
+    implementation(libs.ktor.serialization.jackson)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.material3)
+    implementation(libs.material3)
+    implementation(libs.navigation.compose)
+    implementation(libs.paging.compose)
+    implementation(libs.paging.runtime)
+    implementation(libs.palette.ktx)
+    implementation(libs.room.ktx)
+    implementation(libs.room.runtime)
+    implementation(libs.tabler.icons)
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.window.size)
+    implementation(platform(libs.compose.bom))
+    kapt(libs.hilt.android.compiler)
+    ksp(libs.room.compiler)
+    testImplementation(libs.junit)
 }

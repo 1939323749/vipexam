@@ -1,0 +1,96 @@
+[versions]
+activity-compose = "1.8.1"
+activity_version = "1.8.1"
+agp = "8.2.0"
+androidx-compose-material-material2 = "1.5.4"
+androidx-junit = "1.1.5"
+androidx-test-espresso-espressoCore2 = "3.5.1"
+coilCompose = "2.5.0"
+collection = "1.3.0"
+com-google-dagger-hilt-android = "2.48"
+com-google-devtools-ksp = "1.9.20-1.0.14"
+commonsCsv = "1.10.0"
+compose-bom = "2023.10.01"
+core-ktx = "1.12.0"
+datastoreCore = "1.1.0-alpha07"
+datastorePreferences = "1.0.0"
+glance = "1.0.0"
+glanceWearTiles = "1.0.0-alpha05"
+gson = "2.10.1"
+hilt = "2.48.1"
+hiltNavigationCompose = "1.1.0"
+icons = "1.1.0"
+io-ktor-ktorClientApache2 = "2.3.7"
+junit = "4.13.2"
+kotlinxCoroutinesAndroid = "1.7.3"
+kotlinxSerializationJson = "1.6.2"
+ktor_version = "2.3.7"
+ktorClientContentNegotiation = "2.3.6"
+ktorSerializationJackson = "2.3.6"
+lifecycle = "2.6.2"
+lifecycle-runtime-ktx = "2.6.2"
+material3 = "1.2.0-alpha12"
+material3WindowSizeClass = "1.1.2"
+navigationCompose = "2.6.0"
+org-jetbrains-kotlin-android = "1.9.20"
+paging = "3.2.1"
+pagingCompose = "3.3.0-alpha02"
+paletteKtx = "1.0.0"
+room = "2.5.1"
+
+[libraries]
+activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
+activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity_version" }
+androidx-compose-material-material2 = { module = "androidx.compose.material:material", version.ref = "androidx-compose-material-material2" }
+androidx-test-espresso-espresso-core2 = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso-espressoCore2" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
+collection-ktx = { group = "androidx.collection", name = "collection-ktx", version.ref = "collection" }
+commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "commonsCsv" }
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
+datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
+ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
+feather = { group = "br.com.devsrsouza.compose.icons", name = "feather", version.ref = "icons" }
+glance = { group = "androidx.glance", name = "glance", version.ref = "glance" }
+glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
+glance-wear-tiles = { group = "androidx.glance", name = "glance-wear-tiles", version.ref = "glanceWearTiles" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+io-ktor-ktor-client-apache2 = { module = "io.ktor:ktor-client-apache", version.ref = "io-ktor-ktorClientApache2" }
+io-ktor-ktor-client-okhttp-jvm4 = { module = "io.ktor:ktor-client-okhttp-jvm", version.ref = "ktorClientContentNegotiation" }
+junit = { module = "junit:junit", version.ref = "junit" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor_version" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor_version" }
+ktor-serialization-gson = { group = "io.ktor", name = "ktor-serialization-gson", version.ref = "ktor_version" }
+ktor-serialization-jackson = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktorSerializationJackson" }
+lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
+lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
+lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagingCompose" }
+paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+palette-ktx = { module = "androidx.palette:palette-ktx", version.ref = "paletteKtx" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+tabler-icons = { group = "br.com.devsrsouza.compose.icons", name = "tabler-icons", version.ref = "icons" }
+ui = { group = "androidx.compose.ui", name = "ui" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+window-size = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "material3WindowSizeClass" }
+
+[plugins]
+com-android-application = { id = "com.android.application", version.ref = "agp" }
+com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "com-google-dagger-hilt-android" }
+com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }

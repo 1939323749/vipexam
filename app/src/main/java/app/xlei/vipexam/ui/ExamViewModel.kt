@@ -69,52 +69,55 @@ class ExamViewModel @Inject constructor(
 
     fun login() {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    loginUiState = it.loginUiState.copy(
-                        loginResponse = Repository.getToken(
-                            account = it.loginUiState.account,
-                            password = it.loginUiState.password,
-                        )
-                    ),
-                )
+            Repository.getToken(
+                account = _uiState.value.loginUiState.account,
+                password = _uiState.value.loginUiState.password,
+            ).onSuccess { loginResponse ->
+                _uiState.update {
+                    it.copy(
+                        loginUiState = it.loginUiState.copy(
+                            loginResponse = loginResponse
+                        ),
+                    )
+                }
+            }.onFailure {
+                return@launch
             }
             _uiState.value.loginUiState.loginResponse?.let {
                 if (it.code != "1") {
                     return@launch
                 }
                 if (_uiState.value.examTypeListUiState.examTypeList.isEmpty()) {
-                    val examList = Repository.getExamList(
+                    Repository.getExamList(
                         page = "1",
                         type = Constants.EXAMTYPES[0].second,
-                    )!!
-                    _uiState.update {
-                        it.copy(
-                            examTypeListUiState = it.examTypeListUiState.copy(
-                                examTypeList = Constants.EXAMTYPES.toList().map { examType ->
-                                    examType.first
-                                },
+                    ).onSuccess { examList ->
+                        _uiState.update { examUiState ->
+                            examUiState.copy(
+                                examTypeListUiState = examUiState.examTypeListUiState.copy(
+                                    examTypeList = Constants.EXAMTYPES.toList().map { examType ->
+                                        examType.first
+                                    },
+                                    examListUiState = ExamUiState.ExamListUiState(
+                                        examType = Constants.EXAMTYPES[0].first,
+                                        examList = examList,
+                                        currentPage = "1",
+                                        questionListUiState = null,
+                                    )
+                                ),
                                 examListUiState = ExamUiState.ExamListUiState(
                                     examType = Constants.EXAMTYPES[0].first,
                                     examList = examList,
                                     currentPage = "1",
                                     questionListUiState = null,
-                                )
-                            ),
-                            examListUiState = ExamUiState.ExamListUiState(
-                                examType = Constants.EXAMTYPES[0].first,
-                                examList = examList,
-                                currentPage = "1",
-                                questionListUiState = null,
-                            ),
-                        )
+                                ),
+                            )
+                        }
+                    }.onFailure {
+                        return@launch
                     }
-
                 }
-                //if (_uiState.value.screenType == SCREEN_TYPE.EXPANDED)
                 navigate(HomeScreen.LoggedIn)
-                //else
-                //    navigate(HomeScreen.CompactLoggedIn)
                 if (_uiState.value.loginUiState.setting.isRememberAccount)
                     withContext(Dispatchers.IO) {
                         DB.repository.insertUser(
@@ -128,7 +131,7 @@ class ExamViewModel @Inject constructor(
         }
     }
 
-    fun navigate(destination: HomeScreen) {
+    private fun navigate(destination: HomeScreen) {
         when (destination) {
             HomeScreen.ExamListWithQuestions -> {
                 homeScreenNavigationActions.navigateToExamListWithQuestions()
@@ -153,7 +156,8 @@ class ExamViewModel @Inject constructor(
 
     fun setNavigationActions(homeScreenNavigationActions: HomeScreenNavigationActions) {
         this.homeScreenNavigationActions = homeScreenNavigationActions
-        if (_uiState.value.loginUiState.setting.isAutoLogin && _uiState.value.loginUiState.loginResponse == null
+        if (_uiState.value.loginUiState.setting.isAutoLogin
+            && _uiState.value.loginUiState.loginResponse == null
         )
             login()
     }
@@ -161,23 +165,26 @@ class ExamViewModel @Inject constructor(
     fun nextPage() {
         viewModelScope.launch {
             val currentPage = "${_uiState.value.examListUiState.currentPage.toInt() + 1}"
-            val examList = Repository.getExamList(
+            Repository.getExamList(
                 page = currentPage,
                 type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
-            )!!
-            _uiState.update {
-                it.copy(
-                    examTypeListUiState = it.examTypeListUiState.copy(
+            ).onSuccess { examList ->
+                _uiState.update {
+                    it.copy(
+                        examTypeListUiState = it.examTypeListUiState.copy(
+                            examListUiState = it.examListUiState.copy(
+                                examList = examList,
+                                currentPage = currentPage,
+                            )
+                        ),
                         examListUiState = it.examListUiState.copy(
                             examList = examList,
                             currentPage = currentPage,
                         )
-                    ),
-                    examListUiState = it.examListUiState.copy(
-                        examList = examList,
-                        currentPage = currentPage,
                     )
-                )
+                }
+            }.onFailure {
+                return@launch
             }
         }
     }
@@ -185,23 +192,26 @@ class ExamViewModel @Inject constructor(
     fun previousPage() {
         viewModelScope.launch {
             val currentPage = "${_uiState.value.examListUiState.currentPage.toInt() - 1}"
-            val examList = Repository.getExamList(
+            Repository.getExamList(
                 page = currentPage,
                 type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
-            )!!
-            _uiState.update {
-                it.copy(
-                    examTypeListUiState = it.examTypeListUiState.copy(
+            ).onSuccess { examList ->
+                _uiState.update {
+                    it.copy(
+                        examTypeListUiState = it.examTypeListUiState.copy(
+                            examListUiState = it.examListUiState.copy(
+                                examList = examList,
+                                currentPage = currentPage,
+                            )
+                        ),
                         examListUiState = it.examListUiState.copy(
                             examList = examList,
                             currentPage = currentPage,
                         )
-                    ),
-                    examListUiState = it.examListUiState.copy(
-                        examList = examList,
-                        currentPage = currentPage,
                     )
-                )
+                }
+            }.onFailure {
+                return@launch
             }
         }
     }
@@ -228,22 +238,26 @@ class ExamViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            val examList = Repository.getExamList(
+            Repository.getExamList(
                 page = _uiState.value.examListUiState.currentPage,
                 type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
-            )!!
-            _uiState.update {
-                it.copy(
-                    examTypeListUiState = it.examTypeListUiState.copy(
+            ).onSuccess { examList ->
+                _uiState.update {
+                    it.copy(
+                        examTypeListUiState = it.examTypeListUiState.copy(
+                            examListUiState = it.examListUiState.copy(
+                                examList = examList,
+                            )
+                        ),
                         examListUiState = it.examListUiState.copy(
                             examList = examList,
                         )
-                    ),
-                    examListUiState = it.examListUiState.copy(
-                        examList = examList,
                     )
-                )
+                }
+            }.onFailure {
+                return@launch
             }
+
         }
     }
 
@@ -261,26 +275,29 @@ class ExamViewModel @Inject constructor(
 
     fun setExamType(type: Int) {
         viewModelScope.launch {
-            val examList = Repository.getExamList(
+            Repository.getExamList(
                 page = "1",
                 type = Constants.EXAMTYPES.toMap()[type]!!,
-            )!!
-            _uiState.update {
-                it.copy(
-                    examTypeListUiState = it.examTypeListUiState.copy(
+            ).onSuccess { examList ->
+                _uiState.update {
+                    it.copy(
+                        examTypeListUiState = it.examTypeListUiState.copy(
+                            examListUiState = it.examListUiState.copy(
+                                examType = type,
+                                examList = examList,
+                            )
+                        ),
                         examListUiState = it.examListUiState.copy(
                             examType = type,
                             examList = examList,
+                            currentPage = "1",
                         )
-                    ),
-                    examListUiState = it.examListUiState.copy(
-                        examType = type,
-                        examList = examList,
-                        currentPage = "1",
                     )
-                )
+                }
+                navigate(HomeScreen.ExamListWithQuestions)
+            }.onFailure {
+                return@launch
             }
-            navigate(HomeScreen.ExamListWithQuestions)
         }
     }
 
@@ -314,25 +331,29 @@ class ExamViewModel @Inject constructor(
 
     fun setExam(examId: String) {
         viewModelScope.launch {
-            val exam = Repository.getExam(examId)!!
-            _uiState.update {
-                it.copy(
-                    examListUiState = it.examListUiState.copy(
-                        examList = it.examTypeListUiState.examListUiState!!.examList,
-                        questionListUiState = it.questionListUiState.copy(
-                            exam = exam,
-                            questions = Repository.getQuestions(exam.muban)
+            Repository.getExam(examId)
+                .onSuccess { exam ->
+                    _uiState.update {
+                        it.copy(
+                            examListUiState = it.examListUiState.copy(
+                                examList = it.examTypeListUiState.examListUiState!!.examList,
+                                questionListUiState = it.questionListUiState.copy(
+                                    exam = exam,
+                                    questions = Repository.getQuestions(exam.muban)
+                                )
+                            ),
+                            questionListUiState = it.questionListUiState.copy(
+                                exam = exam,
+                                questions = Repository.getQuestions(exam.muban)
+                            ),
                         )
-                    ),
-                    questionListUiState = it.questionListUiState.copy(
-                        exam = exam,
-                        questions = Repository.getQuestions(exam.muban)
-                    ),
-                )
-            }
-            if (_uiState.value.currentRoute == HomeScreen.ExamTypeWithExamList)
-                navigate(HomeScreen.ExamListWithQuestions)
-            else navigate(HomeScreen.QuestionListWithQuestion)
+                    }
+                    if (_uiState.value.currentRoute == HomeScreen.ExamTypeWithExamList)
+                        navigate(HomeScreen.ExamListWithQuestions)
+                    else navigate(HomeScreen.QuestionListWithQuestion)
+                }.onFailure {
+                    return@launch
+                }
         }
     }
 

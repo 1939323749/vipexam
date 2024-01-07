@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun translateDialog(expanded: MutableState<Boolean>) {
+fun TranslateDialog(expanded: MutableState<Boolean>) {
     val coroutine = rememberCoroutineScope()
     val context = LocalContext.current
     val clipBoardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -67,8 +67,12 @@ fun translateDialog(expanded: MutableState<Boolean>) {
                     val res = Repository.translateToZH(
                         text = clipBoardManager.primaryClip?.getItemAt(0)?.text?.toString()!!
                     )
-                    if (res != null) {
-                        translation = res
+                    res.onSuccess {
+                        translation = it
+                    }
+                    res.onFailure {
+                        expanded.value = false
+                        Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
                 onDispose {

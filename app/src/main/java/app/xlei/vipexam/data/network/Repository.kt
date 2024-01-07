@@ -6,7 +6,6 @@ import app.xlei.vipexam.data.LoginResponse
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.TranslationResponse
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.okhttp.OkHttp
@@ -21,83 +20,126 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.gson.gson
-import io.ktor.utils.io.errors.IOException
 
 object Repository {
     lateinit var account: String
     lateinit var password: String
     private lateinit var token: String
 
-    suspend fun getToken(account: String, password: String): LoginResponse {
+    suspend fun getToken(account: String, password: String): Result<LoginResponse> {
         this.account = account
         this.password = password
         val client = HttpClient()
 
-        val response = client.post("https://vipexam.cn/user/login.action") {
-            headers {
-                append(HttpHeaders.Host, "vipexam.cn")
-                append(HttpHeaders.Connection, "keep-alive")
-                append(
-                    "sec-ch-ua",
-                    "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\""
-                )
-                append(HttpHeaders.Accept, "application/json, text/javascript, */*; q=0.01")
-                append("sec-ch-ua-mobile", "?0")
-                append(
-                    HttpHeaders.UserAgent,
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-                )
-                append("sec-ch-ua-platform", "\"macOS\"")
-                append(HttpHeaders.Origin, "https://vipexam.cn")
-                append(HttpHeaders.Referrer, "https://vipexam.cn/login2.html")
-                append(HttpHeaders.AcceptLanguage, "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
-                append(HttpHeaders.ContentType, "application/x-www-form-urlencoded; charset=UTF-8")
+
+        val response: HttpResponse?
+        try {
+            response = client.post("https://vipexam.cn/user/login.action") {
+                headers {
+                    append(HttpHeaders.Host, "vipexam.cn")
+                    append(HttpHeaders.Connection, "keep-alive")
+                    append(
+                        "sec-ch-ua",
+                        "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\""
+                    )
+                    append(HttpHeaders.Accept, "application/json, text/javascript, */*; q=0.01")
+                    append("sec-ch-ua-mobile", "?0")
+                    append(
+                        HttpHeaders.UserAgent,
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
+                    )
+                    append("sec-ch-ua-platform", "\"macOS\"")
+                    append(HttpHeaders.Origin, "https://vipexam.cn")
+                    append(HttpHeaders.Referrer, "https://vipexam.cn/login2.html")
+                    append(
+                        HttpHeaders.AcceptLanguage,
+                        "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6"
+                    )
+                    append(
+                        HttpHeaders.ContentType,
+                        "application/x-www-form-urlencoded; charset=UTF-8"
+                    )
+                }
+                setBody("account=$account&password=$password")
             }
-            setBody("account=$account&password=$password")
+        } catch (e: Exception) {
+            return Result.failure(e)
+        } finally {
+            client.close()
         }
-        client.close()
+
         val gson = Gson()
-        val loginResponse = gson.fromJson(response.bodyAsText(), LoginResponse::class.java)
-
-        return when (loginResponse.code) {
-            "1" -> {
-                token = loginResponse.token
-                loginResponse
+        var loginResponse: LoginResponse? = null
+        try {
+            if (response != null) {
+                loginResponse = gson.fromJson(response.bodyAsText(), LoginResponse::class.java)
             }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
 
-            else -> loginResponse
+        return if (loginResponse != null) {
+            when (loginResponse.code) {
+                "1" -> {
+                    token = loginResponse.token
+                    Result.success(loginResponse)
+                }
+
+                else -> Result.failure(Exception(loginResponse.msg))
+            }
+        } else {
+            Result.failure(Exception("login response is null"))
         }
     }
 
-    suspend fun getExam(examId: String): Exam? {
+    suspend fun getExam(examId: String): Result<Exam> {
         val client = HttpClient()
 
-        val response = client.post("https://vipexam.cn/exam/getExamList.action") {
-            header("Accept", "application/json, text/javascript, */*; q=0.01")
-            header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
-            header("Connection", "keep-alive")
-            header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-            header("Origin", "https://vipexam.cn")
-            header("Referer", "https://vipexam.cn/begin_testing2.html?id=$examId")
-            header("Sec-Fetch-Dest", "empty")
-            header("Sec-Fetch-Mode", "cors")
-            header("Sec-Fetch-Site", "same-origin")
-            header(
-                "User-Agent",
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-            )
-            header("X-Requested-With", "XMLHttpRequest")
-            header(
-                "sec-ch-ua",
-                "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\""
-            )
-            header("sec-ch-ua-mobile", "?0")
-            header("sec-ch-ua-platform", "\"macOS\"")
-            setBody("examID=$examId&account=$account&token=$token")
+        val response: HttpResponse?
+        try {
+            response = client.post("https://vipexam.cn/exam/getExamList.action") {
+                header("Accept", "application/json, text/javascript, */*; q=0.01")
+                header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
+                header("Connection", "keep-alive")
+                header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                header("Origin", "https://vipexam.cn")
+                header("Referer", "https://vipexam.cn/begin_testing2.html?id=$examId")
+                header("Sec-Fetch-Dest", "empty")
+                header("Sec-Fetch-Mode", "cors")
+                header("Sec-Fetch-Site", "same-origin")
+                header(
+                    "User-Agent",
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
+                )
+                header("X-Requested-With", "XMLHttpRequest")
+                header(
+                    "sec-ch-ua",
+                    "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\""
+                )
+                header("sec-ch-ua-mobile", "?0")
+                header("sec-ch-ua-platform", "\"macOS\"")
+                setBody("examID=$examId&account=$account&token=$token")
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        } finally {
+            client.close()
         }
-        client.close()
+
         val gson = Gson()
-        return gson.fromJson(response.bodyAsText(), Exam::class.java)
+        var exam: Exam? = null
+        try {
+            if (response != null) {
+                exam = gson.fromJson(response.bodyAsText(), Exam::class.java)
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+        return if (exam != null) {
+            Result.success(exam)
+        } else {
+            Result.failure(Exception("exam is null"))
+        }
     }
 
     fun getQuestions(mubanList: List<Muban>): List<Pair<String, String>> {
@@ -110,7 +152,7 @@ object Repository {
         return questions
     }
 
-    suspend fun getExamList(page: String, type: String): ExamList? {
+    suspend fun getExamList(page: String, type: String): Result<ExamList> {
         val client = HttpClient(OkHttp) {
             engine {
                 config {
@@ -118,34 +160,53 @@ object Repository {
                 }
             }
         }
-        val response = client.post("https://vipexam.cn/web/moreCourses") {
-            header("Accept", "application/json, text/javascript, */*; q=0.01")
-            header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
-            header("Connection", "keep-alive")
-            header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-            header("Origin", "https://vipexam.cn")
-            header("Referer", "https://vipexam.cn/resources_kinds.html?id=ve01002")
-            header("Sec-Fetch-Dest", "empty")
-            header("Sec-Fetch-Mode", "cors")
-            header("Sec-Fetch-Site", "same-origin")
-            header(
-                "User-Agent",
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-            )
-            header("X-Requested-With", "XMLHttpRequest")
-            header("sec-ch-ua", "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\"")
-            header("sec-ch-ua-mobile", "?0")
-            header("sec-ch-ua-platform", "\"macOS\"")
-            setBody("data={\"account\":\"$account\",\"token\":\"$token\",\"typeCode\":\"ve01002\",\"resourceType\":\"${type}\",\"courriculumType\":\"0\",\"classHourS\":\"0\",\"classHourE\":\"0\",\"yearPublishedS\":\"0\",\"yearPublishedE\":\"0\",\"page\":$page,\"limit\":20,\"collegeName\":\"吉林大学\"}")
+        val response: HttpResponse?
+        try {
+            response = client.post("https://vipexam.cn/web/moreCourses") {
+                header("Accept", "application/json, text/javascript, */*; q=0.01")
+                header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
+                header("Connection", "keep-alive")
+                header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                header("Origin", "https://vipexam.cn")
+                header("Referer", "https://vipexam.cn/resources_kinds.html?id=ve01002")
+                header("Sec-Fetch-Dest", "empty")
+                header("Sec-Fetch-Mode", "cors")
+                header("Sec-Fetch-Site", "same-origin")
+                header(
+                    "User-Agent",
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
+                )
+                header("X-Requested-With", "XMLHttpRequest")
+                header(
+                    "sec-ch-ua",
+                    "\"Microsoft Edge\";v=\"119\", \"Chromium\";v=\"119\", \"Not?A_Brand\";v=\"24\""
+                )
+                header("sec-ch-ua-mobile", "?0")
+                header("sec-ch-ua-platform", "\"macOS\"")
+                setBody("data={\"account\":\"$account\",\"token\":\"$token\",\"typeCode\":\"ve01002\",\"resourceType\":\"${type}\",\"courriculumType\":\"0\",\"classHourS\":\"0\",\"classHourE\":\"0\",\"yearPublishedS\":\"0\",\"yearPublishedE\":\"0\",\"page\":$page,\"limit\":20,\"collegeName\":\"吉林大学\"}")
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        } finally {
+            client.close()
         }
-
-
-        client.close()
+        var examList: ExamList? = null
         val gson = Gson()
-        return gson.fromJson(response.bodyAsText(), ExamList::class.java)
+        try {
+            if (response != null) {
+                examList = gson.fromJson(response.bodyAsText(), ExamList::class.java)
+            }
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+        return if (examList != null) {
+            Result.success(examList)
+        } else {
+            Result.failure(Exception("exam list is null"))
+        }
     }
 
-    suspend fun translateToZH(text: String): TranslationResponse? {
+    suspend fun translateToZH(text: String): Result<TranslationResponse> {
         val client = HttpClient(CIO) {
             engine {
                 requestTimeout = 0
@@ -155,7 +216,7 @@ object Repository {
             }
         }
 
-        var response: HttpResponse? = null
+        val response: HttpResponse?
         try {
             response = client.post("https://api.deeplx.org/translate") {
                 header("Accept", "application/json, text/javascript, */*; q=0.01")
@@ -168,23 +229,28 @@ object Repository {
                     )
                 )
             }
-        } catch (e: IOException) {
-            println("Network error occurred: ${e.message}")
+        } catch (e: Exception) {
+            return Result.failure(e)
+        } finally {
+            client.close()
         }
-
-        client.close()
 
         var translationResponse: TranslationResponse? = null
-        if (response != null) {
-            val gson = Gson()
-            try {
+        val gson = Gson()
+        try {
+            if (response != null) {
                 translationResponse =
                     gson.fromJson(response.bodyAsText(), TranslationResponse::class.java)
-            } catch (e: JsonSyntaxException) {
-                println("Error parsing JSON: ${e.message}")
             }
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
 
-        return translationResponse
+        return if (translationResponse != null) {
+            Result.success(translationResponse)
+        } else {
+            Result.failure(Exception("Translation response was null"))
+        }
     }
 }
+

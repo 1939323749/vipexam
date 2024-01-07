@@ -316,7 +316,7 @@ fun WordListPage(
             }
 
             if (showTranslationSheet)
-                translationSheet(
+                TranslationSheet(
                     textToTranslate
                 ) {
                     showTranslationSheet = !showTranslationSheet
@@ -329,7 +329,7 @@ fun WordListPage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun translationSheet(
+fun TranslationSheet(
     text: String,
     toggleBottomSheet: () -> Unit,
 ) {
@@ -344,12 +344,17 @@ fun translationSheet(
             )
         )
     }
+    val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
     DisposableEffect(Unit) {
         coroutine.launch {
             val res = app.xlei.vipexam.data.network.Repository.translateToZH(text)
-            if (res != null) {
-                translation = res
+            res.onSuccess {
+                translation = it
+            }
+            res.onFailure {
+                toggleBottomSheet()
+                Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
             }
         }
         onDispose { }

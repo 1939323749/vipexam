@@ -38,7 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.ui.components.translateDialog
+import app.xlei.vipexam.ui.components.TranslateDialog
 import app.xlei.vipexam.ui.login.EmptyTextToolbar
 import app.xlei.vipexam.ui.page.LongPressActions
 import app.xlei.vipexam.util.Preferences
@@ -217,7 +217,7 @@ private fun zread(
             )
             == LongPressActions.TRANSLATE.value
         )
-            translateDialog(expanded)
+            TranslateDialog(expanded)
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = toggleBottomSheet,

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -22,10 +23,10 @@ import app.xlei.vipexam.data.models.room.User
 import app.xlei.vipexam.ui.LoginSetting
 import io.ktor.network.selector.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun loginView(
+fun LoginView(
     account: String,
     password: String,
     users: List<User>,
@@ -53,12 +54,13 @@ fun loginView(
             ) {
                 TextField(
                     value = account,
-                    onValueChange = { onAccountChange(it) },
+                    onValueChange = onAccountChange,
                     label = { Text(stringResource(R.string.account)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = showUsers)
                     },
-                    modifier = Modifier.menuAnchor()
+                    modifier = Modifier
+                        .menuAnchor()
                 )
                 ExposedDropdownMenu(
                     expanded = showUsers,
@@ -93,20 +95,9 @@ fun loginView(
                 LocalTextToolbar provides emptyTextToolbar
             ) {
                 Box {
-//                    DropdownMenu(
-//                        expanded = expanded.value,
-//                        onDismissRequest = { expanded.value = false },
-//                    ) {
-//                        DropdownMenuItem(onClick = { expanded.value = false }) {
-//                            Text("Delete")
-//                        }
-//                        DropdownMenuItem(onClick = { expanded.value = false }) {
-//                            Text("Save")
-//                        }
-//                    }
                     TextField(
                         value = password,
-                        onValueChange = { onPasswordChange(it) },
+                        onValueChange = onPasswordChange,
                         label = { Text(stringResource(R.string.password)) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.padding(top = 20.dp)
@@ -126,6 +117,7 @@ fun loginView(
             ) {
                 Text(stringResource(R.string.login))
             }
+
             Row {
                 Row {
                     Checkbox(

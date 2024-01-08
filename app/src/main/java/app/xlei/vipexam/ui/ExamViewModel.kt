@@ -94,6 +94,16 @@ class ExamViewModel @Inject constructor(
                     ).onSuccess { examList ->
                         _uiState.update { examUiState ->
                             examUiState.copy(
+                                loginUiState = examUiState.loginUiState.copy(
+                                    users = examUiState.loginUiState.users.filterNot { user ->
+                                        user.account == _uiState.value.loginUiState.account
+                                    }.plus(
+                                        User(
+                                            account = _uiState.value.loginUiState.account,
+                                            password = _uiState.value.loginUiState.password,
+                                        )
+                                    )
+                                ),
                                 examTypeListUiState = examUiState.examTypeListUiState.copy(
                                     examTypeList = Constants.EXAMTYPES.toList().map { examType ->
                                         examType.first
@@ -325,6 +335,13 @@ class ExamViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 DB.repository.deleteUser(user)
+            }
+            _uiState.update {
+                it.copy(
+                    loginUiState = it.loginUiState.copy(
+                        users = it.loginUiState.users.filter { it != user }
+                    )
+                )
             }
         }
     }

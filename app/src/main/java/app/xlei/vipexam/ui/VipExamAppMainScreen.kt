@@ -32,7 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
 import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.ui.components.TextIconDialog
-import app.xlei.vipexam.ui.login.loginView
+import app.xlei.vipexam.ui.login.LoginView
 import app.xlei.vipexam.ui.navgraph.homeScreenGraph
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
@@ -212,7 +212,7 @@ fun HomeRoute(
                 route = HomeScreen.Login.name,
             ) {
                 connectivity.value = isInternetAvailable(LocalContext.current)
-                loginView(
+                LoginView(
                     account = uiState.loginUiState.account,
                     password = uiState.loginUiState.password,
                     users = uiState.loginUiState.users,

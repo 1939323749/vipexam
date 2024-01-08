@@ -137,7 +137,6 @@ class WordListViewModel : ViewModel() {
                         SortMethod.NEW_TO_OLD -> words.sortedByDescending { it.created }
                         SortMethod.A_TO_Z -> words.sortedBy { it.word }
                         SortMethod.Z_TO_A -> words.sortedByDescending { it.word }
-                        SortMethod.RANDOM -> words.sortedBy { Random().nextBoolean() }
                     }
                 }
                 .collect { sortedWordList: List<Word> ->
@@ -183,12 +182,10 @@ enum class SortMethod(val method: Int) {
     NEW_TO_OLD(R.string.sort_by_new_to_old),
     A_TO_Z(R.string.sort_by_a_z),
     Z_TO_A(R.string.sort_by_z_a),
-    RANDOM(R.string.sort_by_random),
 }
 
 @OptIn(
     ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalLayoutApi::class
 )
 @Composable
 fun WordListPage(

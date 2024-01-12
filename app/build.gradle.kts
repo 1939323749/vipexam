@@ -68,6 +68,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.data)
+
     androidTestImplementation(libs.androidx.test.espresso.espresso.core2)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(platform(libs.compose.bom))

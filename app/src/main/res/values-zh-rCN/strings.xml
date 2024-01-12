@@ -54,4 +54,5 @@
     <string name="sort_by_a_z">A-Z</string>
     <string name="sort_by_z_a">Z-A</string>
     <string name="sort">排序</string>
+    <string name="not_connected">网络未连接</string>
 </resources>

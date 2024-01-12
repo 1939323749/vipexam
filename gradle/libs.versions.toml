@@ -25,8 +25,8 @@ junit = "4.13.2"
 kotlinxCoroutinesAndroid = "1.7.3"
 kotlinxSerializationJson = "1.6.2"
 ktor_version = "2.3.7"
-ktorClientContentNegotiation = "2.3.6"
-ktorSerializationJackson = "2.3.6"
+ktorClientContentNegotiation = "2.3.7"
+ktorSerializationJackson = "2.3.7"
 lifecycle = "2.6.2"
 lifecycle-runtime-ktx = "2.6.2"
 material3 = "1.2.0-alpha12"
@@ -37,6 +37,10 @@ paging = "3.2.1"
 pagingCompose = "3.3.0-alpha02"
 paletteKtx = "1.0.0"
 room = "2.5.1"
+appcompat = "1.6.1"
+material = "1.9.0"
+annotation = "1.6.0"
+org-jetbrains-kotlin-jvm = "1.9.20"
 
 [libraries]
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
@@ -88,9 +92,15 @@ ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 window-size = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "material3WindowSizeClass" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "com-google-dagger-hilt-android" }
 com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "com-google-devtools-ksp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
+androidDynamicFeature = { id = "com.android.dynamic-feature", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin-jvm" }

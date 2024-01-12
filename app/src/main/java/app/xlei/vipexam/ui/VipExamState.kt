@@ -9,13 +9,18 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import app.xlei.vipexam.core.data.util.NetworkMonitor
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.VipExamNavigationActions
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 @Composable
 fun rememberVipExamAppState(
     windowSizeClass: WindowWidthSizeClass,
+    networkMonitor: NetworkMonitor,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
 ): VipExamState {
@@ -29,6 +34,7 @@ fun rememberVipExamAppState(
             coroutineScope = coroutineScope,
             widthSizeClass = windowSizeClass,
             navController = navController,
+            networkMonitor,
         )
     }
 }
@@ -39,6 +45,7 @@ class VipExamState(
     val coroutineScope: CoroutineScope,
     val widthSizeClass: WindowWidthSizeClass,
     val navController: NavHostController,
+    networkMonitor: NetworkMonitor,
 ) {
     val currentDestination: NavDestination?
         @Composable get() = navController
@@ -67,4 +74,12 @@ class VipExamState(
             AppDestinations.SETTINGS_ROUTE -> vipExamNavigationActions.navigateToSettings()
         }
     }
+
+    val isOffline = networkMonitor.isOnline
+        .map(Boolean::not)
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false,
+        )
 }

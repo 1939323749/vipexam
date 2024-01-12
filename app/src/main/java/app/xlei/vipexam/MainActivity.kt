@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
+import app.xlei.vipexam.core.data.util.NetworkMonitor
 import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.App
 import app.xlei.vipexam.ui.theme.VipexamTheme
@@ -20,9 +21,14 @@ import app.xlei.vipexam.ui.theme.hexToColor
 import app.xlei.vipexam.util.LocaleHelper
 import app.xlei.vipexam.util.Preferences
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var networkMonitor: NetworkMonitor
+
     var themeMode by mutableStateOf(Preferences.getThemeMode())
     var accentColor by mutableStateOf(Preferences.getAccentColor())
 
@@ -51,7 +57,11 @@ class MainActivity : ComponentActivity() {
                         darkScrim = darkScrim()
                     ),
                 )
-                App(appContainer = appContainer, widthSizeClass = widthSizeClass)
+                App(
+                    appContainer = appContainer,
+                    widthSizeClass = widthSizeClass,
+                    networkMonitor = networkMonitor,
+                )
             }
         }
     }

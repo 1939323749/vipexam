@@ -54,4 +54,5 @@
     <string name="sort_by_a_z">A-Z</string>
     <string name="sort_by_z_a">Z-A</string>
     <string name="sort">sort</string>
+    <string name="not_connected">Network Not Connected</string>
 </resources>

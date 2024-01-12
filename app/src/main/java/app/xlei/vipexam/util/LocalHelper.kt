@@ -7,7 +7,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import app.xlei.vipexam.R
 import kotlinx.serialization.Serializable
-import java.util.*
+import java.util.Locale
 
 @Entity
 @Serializable

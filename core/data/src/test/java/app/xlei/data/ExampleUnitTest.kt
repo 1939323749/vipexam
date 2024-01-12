@@ -1,4 +1,4 @@
-package app.xlei.vipexam
+package app.xlei.data
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

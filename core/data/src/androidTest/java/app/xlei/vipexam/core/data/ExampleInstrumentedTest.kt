@@ -1,4 +1,4 @@
-package app.xlei.vipexam
+package app.xlei.vipexam.core.data
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("app.xlei.vipexam", appContext.packageName)
+        assertEquals("app.xlei.vipexam.core.data.test", appContext.packageName)
     }
 }

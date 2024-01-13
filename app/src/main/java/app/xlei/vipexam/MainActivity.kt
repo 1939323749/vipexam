@@ -39,8 +39,6 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        val appContainer = (application as VipExamApplication).container
-
         setContent {
             VipexamTheme(
                 themeMode = themeMode,
@@ -58,7 +56,6 @@ class MainActivity : ComponentActivity() {
                     ),
                 )
                 App(
-                    appContainer = appContainer,
                     widthSizeClass = widthSizeClass,
                     networkMonitor = networkMonitor,
                 )

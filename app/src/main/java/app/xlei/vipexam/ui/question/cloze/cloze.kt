@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -53,7 +54,7 @@ fun clozeView(
 
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
-    var selectedQuestionIndex by rememberSaveable { mutableStateOf(0) }
+    var selectedQuestionIndex by rememberSaveable { mutableIntStateOf(0) }
 
     cloze(
         clozes = uiState.clozes,
@@ -63,13 +64,14 @@ fun clozeView(
             viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        onOptionClicked = {selectedClozeIndex,option->
-            viewModel.setOption(selectedClozeIndex,selectedQuestionIndex,option)
+        onOptionClicked = { selectedClozeIndex, option ->
+            viewModel.setOption(selectedClozeIndex, selectedQuestionIndex, option)
             viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        toggleBottomSheet = {viewModel.toggleBottomSheet()},
-        showAnswer = showAnswer
+        toggleBottomSheet = { viewModel.toggleBottomSheet() },
+        showAnswer = showAnswer,
+        addToWordList = viewModel::addToWordList,
     )
 }
 
@@ -82,10 +84,11 @@ fun clozeView(
 private fun cloze(
     clozes: List<ClozeUiState.Cloze>,
     showBottomSheet: Boolean,
-    onBlankClick: (Int)->Unit,
-    onOptionClicked: (Int,ClozeUiState.Option)->Unit,
+    onBlankClick: (Int) -> Unit,
+    onOptionClicked: (Int, ClozeUiState.Option) -> Unit,
     toggleBottomSheet: () -> Unit,
-    showAnswer: State<Boolean>
+    showAnswer: State<Boolean>,
+    addToWordList: (String) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     var selectedClozeIndex by rememberSaveable { mutableStateOf(0) }
@@ -182,11 +185,14 @@ private fun cloze(
 
         if (expanded.value && Preferences.get(
                 Preferences.longPressActionKey,
-                LongPressActions.SHOW_QUESTION
+                LongPressActions.SHOW_QUESTION.value
             )
-            == LongPressActions.TRANSLATE
+            == LongPressActions.TRANSLATE.value
         )
-            TranslateDialog(expanded)
+            TranslateDialog(
+                expanded = expanded,
+                onAddButtonClick = addToWordList
+            )
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = toggleBottomSheet,

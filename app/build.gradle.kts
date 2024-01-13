@@ -69,6 +69,7 @@ android {
 
 dependencies {
     implementation(projects.core.data)
+    implementation(project(":core:database"))
 
     androidTestImplementation(libs.androidx.test.espresso.espresso.core2)
     androidTestImplementation(libs.ext.junit)
@@ -90,7 +91,6 @@ dependencies {
     implementation(libs.glance.material3)
     implementation(libs.glance.wear.tiles)
     implementation(libs.gson)
-    implementation(libs.hilt.android)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.io.ktor.ktor.client.apache2)

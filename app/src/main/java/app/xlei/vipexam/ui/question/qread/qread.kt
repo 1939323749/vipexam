@@ -81,6 +81,7 @@ fun qreadView(
             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         showAnswer = showAnswer,
+        addToWordList = viewModel::addToWordList
     )
 }
 
@@ -101,6 +102,7 @@ private fun qread(
     onQuestionClicked: (Int) -> Unit,
     onOptionClicked: (Int, String) -> Unit,
     showAnswer: State<Boolean>,
+    addToWordList: (String) -> Unit,
 ){
     val scrollState = rememberLazyListState()
     var selectedArticle by rememberSaveable { mutableStateOf(0) }
@@ -208,7 +210,10 @@ private fun qread(
             )
             == LongPressActions.TRANSLATE.value
         )
-            TranslateDialog(expanded)
+            TranslateDialog(
+                expanded = expanded,
+                onAddButtonClick = addToWordList
+            )
         // questions
         if (showBottomSheet &&
             Preferences.get(

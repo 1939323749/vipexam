@@ -4,19 +4,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.xlei.vipexam.core.data.repository.Repository
+import app.xlei.vipexam.core.database.module.Word
 import app.xlei.vipexam.data.Children
 import app.xlei.vipexam.data.Muban
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ZreadViewModel @Inject constructor(
     zreadUiState: ZreadUiState
 ) : ViewModel() {
+    @Inject
+    lateinit var wordRepository: Repository
+
     private val _uiState = MutableStateFlow(zreadUiState)
     val uiState: StateFlow<ZreadUiState> = _uiState.asStateFlow()
 
@@ -126,4 +134,15 @@ class ZreadViewModel @Inject constructor(
         }
     }
 
+    fun addToWordList(string: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            string.let {
+                wordRepository.addWord(
+                    Word(
+                        word = it
+                    )
+                )
+            }
+        }
+    }
 }

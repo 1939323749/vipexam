@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -27,17 +28,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.*
 import app.xlei.vipexam.R
+import app.xlei.vipexam.constant.SortMethod
+import app.xlei.vipexam.core.data.repository.Repository
+import app.xlei.vipexam.core.database.module.Word
 import app.xlei.vipexam.data.TranslationResponse
-import app.xlei.vipexam.logic.DB
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Clipboard
 import compose.icons.feathericons.Loader
 import compose.icons.feathericons.Menu
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -47,56 +51,13 @@ import org.apache.commons.csv.CSVPrinter
 import java.io.File
 import java.io.PrintWriter
 import java.util.*
+import javax.inject.Inject
 
-@Entity(
-    tableName = "words",
-    indices = [Index(value = ["word"], unique = true)]
-)
-data class Word(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    @ColumnInfo(name = "word") val word: String,
-    val created: Long = Calendar.getInstance().timeInMillis,
-)
+@HiltViewModel
+class WordListViewModel @Inject constructor(
+    private val wordRepository: Repository,
+) : ViewModel() {
 
-@Dao
-interface WordDao {
-    @Query("SELECT * FROM words")
-    fun getAllWords(): Flow<List<Word>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(word: Word)
-
-    @Delete
-    suspend fun delete(word: Word)
-
-}
-
-@Database(
-    entities = [Word::class],
-    version = 1
-)
-abstract class WordDatabase : RoomDatabase() {
-    abstract fun wordDao(): WordDao
-
-    companion object {
-        @Volatile
-        var INSTANCE: WordDatabase? = null
-        fun getDatabase(context: Context): WordDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context = context,
-                    WordDatabase::class.java,
-                    "word_db"
-                ).build()
-                INSTANCE = instance
-                return instance
-            }
-        }
-    }
-}
-
-class WordListViewModel : ViewModel() {
     private val _wordList = MutableStateFlow(emptyList<Word>())
 
     val wordList = _wordList.asStateFlow()
@@ -107,7 +68,7 @@ class WordListViewModel : ViewModel() {
 
     fun getWordList() {
         viewModelScope.launch {
-            DB.repository.getAllWords().flowOn(Dispatchers.IO).collect { wordList: List<Word> ->
+            wordRepository.getAllWords().flowOn(Dispatchers.IO).collect { wordList: List<Word> ->
                 _wordList.update {
                     wordList
                 }
@@ -117,19 +78,19 @@ class WordListViewModel : ViewModel() {
 
     fun addWord(word: Word) {
         viewModelScope.launch(Dispatchers.IO) {
-            DB.repository.addWord(word)
+            wordRepository.addWord(word)
         }
     }
 
     fun removeWord(word: Word) {
         viewModelScope.launch(Dispatchers.IO) {
-            DB.repository.removeWord(word)
+            wordRepository.removeWord(word)
         }
     }
 
     fun sort(sortMethod: SortMethod) {
         viewModelScope.launch {
-            DB.repository.getAllWords()
+            wordRepository.getAllWords()
                 .flowOn(Dispatchers.IO)
                 .map { words ->
                     when (sortMethod) {
@@ -149,7 +110,7 @@ class WordListViewModel : ViewModel() {
 
     fun exportWordsToCSV(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            val words = DB.repository.getAllWords().first()
+            val words = wordRepository.getAllWords().first()
             val csvFile = File(context.cacheDir, "words-${System.currentTimeMillis()}.csv")
             CSVPrinter(
                 PrintWriter(csvFile),
@@ -177,19 +138,14 @@ class WordListViewModel : ViewModel() {
     }
 }
 
-enum class SortMethod(val method: Int) {
-    OLD_TO_NEW(R.string.sort_by_old_to_new),
-    NEW_TO_OLD(R.string.sort_by_new_to_old),
-    A_TO_Z(R.string.sort_by_a_z),
-    Z_TO_A(R.string.sort_by_z_a),
-}
+
 
 @OptIn(
     ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
 )
 @Composable
 fun WordListPage(
-    viewModel: WordListViewModel = viewModel(),
+    viewModel: WordListViewModel = hiltViewModel(),
     openDrawer: () -> Unit,
 ) {
     val wordListState by viewModel.wordList.collectAsState()
@@ -198,10 +154,10 @@ fun WordListPage(
     )
     var textToTranslate by remember { mutableStateOf("") }
     var showTranslationSheet by remember { mutableStateOf(false) }
-    var sortMethod by remember {
+    var sortMethod by rememberSaveable {
         mutableStateOf(SortMethod.OLD_TO_NEW)
     }
-    var showSortMethods by remember {
+    var showSortMethods by rememberSaveable {
         mutableStateOf(false)
     }
     val context = LocalContext.current

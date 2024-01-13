@@ -29,17 +29,16 @@ import androidx.compose.ui.unit.sp
 import app.xlei.vipexam.R
 import app.xlei.vipexam.data.TranslationResponse
 import app.xlei.vipexam.data.network.Repository
-import app.xlei.vipexam.logic.DB
-import app.xlei.vipexam.ui.page.Word
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Loader
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun TranslateDialog(expanded: MutableState<Boolean>) {
+fun TranslateDialog(
+    expanded: MutableState<Boolean>,
+    onAddButtonClick: (String) -> Unit,
+) {
     val coroutine = rememberCoroutineScope()
     val context = LocalContext.current
     val clipBoardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -124,23 +123,8 @@ fun TranslateDialog(expanded: MutableState<Boolean>) {
         confirmButton = {
             TextButton(
                 onClick = {
-                    coroutine.launch {
-                        val word = clipBoardManager.primaryClip?.getItemAt(0)?.text?.toString()
-                        withContext(Dispatchers.IO) {
-                            word?.let {
-                                Word(
-                                    word = it
-                                )
-                            }?.let {
-                                DB.repository.addWord(
-                                    it
-                                )
-                            }
-                            expanded.value = false
-
-                        }
-                        Toast.makeText(context, "successful", Toast.LENGTH_SHORT).show()
-                    }
+                    onAddButtonClick(clipBoardManager.primaryClip?.getItemAt(0)?.text?.toString()!!)
+                    expanded.value = false
                 }
             ) {
                 Text(stringResource(id = R.string.add_to_word_list))

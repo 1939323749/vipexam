@@ -18,3 +18,4 @@ rootProject.name = "vipexam"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 include(":app")
 include(":core:data")
+include(":core:database")

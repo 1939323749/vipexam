@@ -10,10 +10,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.xlei.vipexam.core.data.repository.Repository
+import app.xlei.vipexam.core.database.module.Word
 import app.xlei.vipexam.data.Muban
 import app.xlei.vipexam.data.Shiti
-import app.xlei.vipexam.logic.DB
-import app.xlei.vipexam.ui.page.Word
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,10 +25,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ClozeViewModel @Inject constructor(
-    clozeUiState: ClozeUiState
+    clozeUiState: ClozeUiState,
+    private val wordRepository: Repository,
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(clozeUiState)
     val uiState: StateFlow<ClozeUiState> = _uiState.asStateFlow()
+    private var addToWordListState = AddToWordListState.PROCESSING
 
     fun setMuban(muban: Muban) {
         _uiState.update {
@@ -57,19 +60,33 @@ class ClozeViewModel @Inject constructor(
                 clozes = clozes
             )
         }
-        addToWordList()
+        when (addToWordListState) {
+            AddToWordListState.PROCESSING -> addToWordList()
+            AddToWordListState.OK -> return
+        }
     }
 
-    private fun addToWordList() {
+    fun addToWordList(string: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.value.clozes.forEach { cloze ->
-                cloze.options.forEach { option ->
-                    DB.repository.addWord(
-                        Word(
-                            word = option.word
-                        )
+            string?.let {
+                wordRepository.addWord(
+                    Word(
+                        word = it
                     )
+                )
+                return@launch
+            }
+            viewModelScope.launch(Dispatchers.IO) {
+                _uiState.value.clozes.forEach { cloze ->
+                    cloze.options.forEach { option ->
+                        wordRepository.addWord(
+                            Word(
+                                word = option.word
+                            )
+                        )
+                    }
                 }
+                addToWordListState = AddToWordListState.OK
             }
         }
     }
@@ -155,7 +172,17 @@ class ClozeViewModel @Inject constructor(
         }
     }
 
-    fun setOption(selectedClozeIndex: Int, selectedQuestionIndex: Int, option: ClozeUiState.Option) {
-        _uiState.value.clozes[selectedClozeIndex].blanks[selectedQuestionIndex].choice.value = option.word
+    fun setOption(
+        selectedClozeIndex: Int,
+        selectedQuestionIndex: Int,
+        option: ClozeUiState.Option
+    ) {
+        _uiState.value.clozes[selectedClozeIndex].blanks[selectedQuestionIndex].choice.value =
+            option.word
     }
+}
+
+enum class AddToWordListState {
+    OK,
+    PROCESSING
 }

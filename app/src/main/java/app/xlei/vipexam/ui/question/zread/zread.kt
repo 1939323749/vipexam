@@ -78,7 +78,8 @@ fun zreadView(
             viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
-        showAnswer = showAnswer
+        showAnswer = showAnswer,
+        addToWordList = viewModel::addToWordList,
     )
 }
 
@@ -96,6 +97,7 @@ private fun zread(
     onQuestionClicked: (Int) -> Unit,
     onOptionClicked: (Int, String) -> Unit,
     showAnswer: State<Boolean>,
+    addToWordList: (String) -> Unit,
 ){
     val scrollState = rememberLazyListState()
     var selectedArticle by rememberSaveable { mutableStateOf(0) }
@@ -217,7 +219,10 @@ private fun zread(
             )
             == LongPressActions.TRANSLATE.value
         )
-            TranslateDialog(expanded)
+            TranslateDialog(
+                expanded = expanded,
+                onAddButtonClick = addToWordList
+            )
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = toggleBottomSheet,

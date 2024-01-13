@@ -6,7 +6,6 @@ import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import app.xlei.vipexam.data.AppContainer
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.page.SettingsScreen
@@ -18,7 +17,6 @@ fun VipExamNavHost(
     logoText: MutableState<HomeScreen>,
     navHostController: NavHostController,
     homeNavController: NavHostController,
-    appContainer: AppContainer,
     widthSizeClass: WindowWidthSizeClass,
     openDrawer: () -> Unit,
 ) {

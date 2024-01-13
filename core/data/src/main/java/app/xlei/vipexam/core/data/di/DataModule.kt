@@ -16,6 +16,8 @@
 
 package app.xlei.vipexam.core.data.di
 
+import app.xlei.vipexam.core.data.repository.Repository
+import app.xlei.vipexam.core.data.repository.WordRepository
 import app.xlei.vipexam.core.data.util.ConnectivityManagerNetworkMonitor
 import app.xlei.vipexam.core.data.util.NetworkMonitor
 import dagger.Binds
@@ -26,6 +28,11 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 interface DataModule {
+    @Binds
+    fun bindsWordRepository(
+        wordRepository: WordRepository
+    ): Repository
+
     @Binds
     fun bindsNetworkMonitor(
         networkMonitor: ConnectivityManagerNetworkMonitor,

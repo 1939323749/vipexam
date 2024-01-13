@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="words">单词</string>
+    <string name="sort">排序</string>
+    <string name="empty_wordlist_tips">单词表为空</string>
+    <string name="CopyToClipboardSuccess">复制成功</string>
+    <string name="sort_by_old_to_new">旧</string>
+    <string name="sort_by_new_to_old">新</string>
+    <string name="sort_by_a_z">A-Z</string>
+    <string name="sort_by_z_a">Z-A</string>
+</resources>

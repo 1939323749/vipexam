@@ -4,7 +4,7 @@ import android.media.MediaPlayer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TooltipState
 import androidx.compose.runtime.MutableState
-import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.core.network.module.Muban
 
 data class ListeningUiState(
     val muban: Muban?=null,

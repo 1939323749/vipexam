@@ -1,9 +1,13 @@
 package app.xlei.vipexam.data
 
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import app.xlei.vipexam.data.models.room.User
+import app.xlei.vipexam.core.database.module.User
+import app.xlei.vipexam.core.network.module.Exam
+import app.xlei.vipexam.core.network.module.ExamList
+import app.xlei.vipexam.core.network.module.LoginResponse
 import app.xlei.vipexam.ui.LoginSetting
 import app.xlei.vipexam.ui.navigation.HomeScreen
+import kotlinx.coroutines.flow.Flow
 
 data class ExamUiState(
     val loginUiState: LoginUiState,
@@ -18,7 +22,7 @@ data class ExamUiState(
         val account: String,
         val password: String,
         val loginResponse: LoginResponse?,
-        val users: List<User>,
+        val users: Flow<List<User>>,
         val setting: LoginSetting,
         val connectivity: Boolean,
     )

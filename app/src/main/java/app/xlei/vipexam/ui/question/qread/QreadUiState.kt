@@ -1,7 +1,7 @@
 package app.xlei.vipexam.ui.question.qread
 
 import androidx.compose.runtime.MutableState
-import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.core.network.module.Muban
 
 data class QreadUiState(
     val muban: Muban?=null,

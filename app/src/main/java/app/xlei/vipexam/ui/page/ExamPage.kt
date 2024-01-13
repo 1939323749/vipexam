@@ -22,9 +22,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import app.xlei.vipexam.core.network.module.Muban
+import app.xlei.vipexam.core.network.module.NetWorkRepository.getQuestions
 import app.xlei.vipexam.data.ExamUiState
-import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.data.network.Repository.getQuestions
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
 import app.xlei.vipexam.ui.question.cloze.clozeView
@@ -35,9 +35,6 @@ import app.xlei.vipexam.ui.question.writing.writingView
 import app.xlei.vipexam.ui.question.zread.zreadView
 import app.xlei.vipexam.util.Preferences
 import app.xlei.vipexam.util.dataStore
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.P)

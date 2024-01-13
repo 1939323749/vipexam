@@ -27,8 +27,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.xlei.vipexam.R
-import app.xlei.vipexam.data.TranslationResponse
-import app.xlei.vipexam.data.network.Repository
+import app.xlei.vipexam.core.network.module.TranslationResponse
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Loader
 import kotlinx.coroutines.launch
@@ -63,7 +62,7 @@ fun TranslateDialog(
             }
             DisposableEffect(Unit) {
                 coroutine.launch {
-                    val res = Repository.translateToZH(
+                    val res = app.xlei.vipexam.core.network.module.NetWorkRepository.translateToZH(
                         text = clipBoardManager.primaryClip?.getItemAt(0)?.text?.toString()!!
                     )
                     res.onSuccess {

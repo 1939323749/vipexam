@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.util.Preferences
 
 @Composable

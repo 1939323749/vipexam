@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui.login
+package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -18,18 +17,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import app.xlei.vipexam.R
-import app.xlei.vipexam.data.LoginResponse
-import app.xlei.vipexam.data.models.room.User
+import app.xlei.vipexam.core.database.module.User
+import app.xlei.vipexam.core.network.module.LoginResponse
 import app.xlei.vipexam.ui.LoginSetting
-import io.ktor.network.selector.*
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginView(
     account: String,
     password: String,
-    users: List<User>,
+    users: State<List<User>>,
     setting: LoginSetting,
     loginResponse: LoginResponse?,
     onAccountChange: (String) -> Unit,
@@ -66,7 +64,7 @@ fun LoginView(
                     expanded = showUsers,
                     onDismissRequest = { showUsers = false }
                 ) {
-                    users.forEach {
+                    users.value.forEach {
                         DropdownMenuItem(
                             text = { Text(it.account) },
                             trailingIcon = {

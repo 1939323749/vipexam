@@ -1,7 +1,7 @@
 package app.xlei.vipexam.ui.question
 
 import androidx.lifecycle.ViewModel
-import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.core.network.module.Muban
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

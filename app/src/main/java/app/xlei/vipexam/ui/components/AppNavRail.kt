@@ -21,7 +21,6 @@ import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.util.Preferences
 import app.xlei.vipexam.util.dataStore
-import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -83,11 +82,6 @@ fun AppNavRail(
                     }
                 }
             )
-//            FloatingActionButton(
-//                onClick = { showAnswer.value = !showAnswer.value },
-//            ){
-//                Icon(Icons.Default.Edit,"")
-//            }
         },
         containerColor = NavigationRailDefaults.ContainerColor,
         modifier = modifier

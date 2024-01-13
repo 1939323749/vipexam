@@ -14,7 +14,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import app.xlei.vipexam.core.data.util.NetworkMonitor
-import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.App
 import app.xlei.vipexam.ui.theme.VipexamTheme
 import app.xlei.vipexam.ui.theme.hexToColor
@@ -34,7 +33,6 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        DB.provide(this)
         LocaleHelper.updateLanguage(this)
 
         super.onCreate(savedInstanceState)

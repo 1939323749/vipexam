@@ -8,9 +8,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
-import app.xlei.vipexam.data.Children
-import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.data.Shiti
+import app.xlei.vipexam.core.network.module.Children
+import app.xlei.vipexam.core.network.module.Muban
+import app.xlei.vipexam.core.network.module.Shiti
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

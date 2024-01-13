@@ -4,10 +4,10 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.constant.Constants
+import app.xlei.vipexam.core.data.repository.Repository
+import app.xlei.vipexam.core.database.module.User
+import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.data.ExamUiState
-import app.xlei.vipexam.data.models.room.User
-import app.xlei.vipexam.data.network.Repository
-import app.xlei.vipexam.logic.DB
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
 import app.xlei.vipexam.util.Preferences
@@ -30,6 +30,7 @@ data class LoginSetting(
 @HiltViewModel
 class ExamViewModel @Inject constructor(
     examUiState: ExamUiState,
+    private val userRepository: Repository<User>
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(examUiState)
     private lateinit var homeScreenNavigationActions: HomeScreenNavigationActions
@@ -41,18 +42,20 @@ class ExamViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         loginUiState = it.loginUiState.copy(
-                            users = DB.repository.getAllUsers(),
+                            users = userRepository.getAll(),
                         )
                     )
                 }
-                if (_uiState.value.loginUiState.users.isNotEmpty()) {
-                    _uiState.update {
-                        it.copy(
-                            loginUiState = it.loginUiState.copy(
-                                account = it.loginUiState.users[0].account,
-                                password = it.loginUiState.users[0].password,
+                _uiState.value.loginUiState.users.collect { usersList ->
+                    if (usersList.isNotEmpty()) {
+                        _uiState.update {
+                            it.copy(
+                                loginUiState = it.loginUiState.copy(
+                                    account = usersList[0].account,
+                                    password = usersList[0].password,
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -69,7 +72,7 @@ class ExamViewModel @Inject constructor(
 
     fun login() {
         viewModelScope.launch {
-            Repository.getToken(
+            NetWorkRepository.getToken(
                 account = _uiState.value.loginUiState.account,
                 password = _uiState.value.loginUiState.password,
             ).onSuccess { loginResponse ->
@@ -88,22 +91,12 @@ class ExamViewModel @Inject constructor(
                     return@launch
                 }
                 if (_uiState.value.examTypeListUiState.examTypeList.isEmpty()) {
-                    Repository.getExamList(
+                    app.xlei.vipexam.core.network.module.NetWorkRepository.getExamList(
                         page = "1",
                         type = Constants.EXAMTYPES[0].second,
                     ).onSuccess { examList ->
                         _uiState.update { examUiState ->
                             examUiState.copy(
-                                loginUiState = examUiState.loginUiState.copy(
-                                    users = examUiState.loginUiState.users.filterNot { user ->
-                                        user.account == _uiState.value.loginUiState.account
-                                    }.plus(
-                                        User(
-                                            account = _uiState.value.loginUiState.account,
-                                            password = _uiState.value.loginUiState.password,
-                                        )
-                                    )
-                                ),
                                 examTypeListUiState = examUiState.examTypeListUiState.copy(
                                     examTypeList = Constants.EXAMTYPES.toList().map { examType ->
                                         examType.first
@@ -130,8 +123,8 @@ class ExamViewModel @Inject constructor(
                 navigate(HomeScreen.LoggedIn)
                 if (_uiState.value.loginUiState.setting.isRememberAccount)
                     withContext(Dispatchers.IO) {
-                        DB.repository.insertUser(
-                            user = User(
+                        userRepository.add(
+                            item = User(
                                 account = _uiState.value.loginUiState.account,
                                 password = _uiState.value.loginUiState.password,
                             )
@@ -175,7 +168,7 @@ class ExamViewModel @Inject constructor(
     fun nextPage() {
         viewModelScope.launch {
             val currentPage = "${_uiState.value.examListUiState.currentPage.toInt() + 1}"
-            Repository.getExamList(
+            app.xlei.vipexam.core.network.module.NetWorkRepository.getExamList(
                 page = currentPage,
                 type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
             ).onSuccess { examList ->
@@ -202,7 +195,7 @@ class ExamViewModel @Inject constructor(
     fun previousPage() {
         viewModelScope.launch {
             val currentPage = "${_uiState.value.examListUiState.currentPage.toInt() - 1}"
-            Repository.getExamList(
+            NetWorkRepository.getExamList(
                 page = currentPage,
                 type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
             ).onSuccess { examList ->
@@ -248,7 +241,7 @@ class ExamViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            Repository.getExamList(
+            NetWorkRepository.getExamList(
                 page = _uiState.value.examListUiState.currentPage,
                 type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
             ).onSuccess { examList ->
@@ -285,7 +278,7 @@ class ExamViewModel @Inject constructor(
 
     fun setExamType(type: Int) {
         viewModelScope.launch {
-            Repository.getExamList(
+            NetWorkRepository.getExamList(
                 page = "1",
                 type = Constants.EXAMTYPES.toMap()[type]!!,
             ).onSuccess { examList ->
@@ -334,21 +327,14 @@ class ExamViewModel @Inject constructor(
     fun deleteUser(user: User) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                DB.repository.deleteUser(user)
-            }
-            _uiState.update {
-                it.copy(
-                    loginUiState = it.loginUiState.copy(
-                        users = it.loginUiState.users.filter { it != user }
-                    )
-                )
+                userRepository.remove(user)
             }
         }
     }
 
     fun setExam(examId: String) {
         viewModelScope.launch {
-            Repository.getExam(examId)
+            NetWorkRepository.getExam(examId)
                 .onSuccess { exam ->
                     _uiState.update {
                         it.copy(
@@ -356,12 +342,12 @@ class ExamViewModel @Inject constructor(
                                 examList = it.examTypeListUiState.examListUiState!!.examList,
                                 questionListUiState = it.questionListUiState.copy(
                                     exam = exam,
-                                    questions = Repository.getQuestions(exam.muban)
+                                    questions = NetWorkRepository.getQuestions(exam.muban)
                                 )
                             ),
                             questionListUiState = it.questionListUiState.copy(
                                 exam = exam,
-                                questions = Repository.getQuestions(exam.muban)
+                                questions = NetWorkRepository.getQuestions(exam.muban)
                             ),
                         )
                     }

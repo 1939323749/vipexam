@@ -1,7 +1,7 @@
 package app.xlei.vipexam.ui.question
 
-import app.xlei.vipexam.data.Exam
-import app.xlei.vipexam.data.ExamList
+import app.xlei.vipexam.core.network.module.Exam
+import app.xlei.vipexam.core.network.module.ExamList
 import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.ui.LoginSetting
 import app.xlei.vipexam.ui.question.cloze.ClozeUiState
@@ -15,6 +15,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.emptyFlow
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -46,7 +47,7 @@ object QuestionModule {
                 isRememberAccount = Preferences.get(Preferences.rememberAccountKey, false),
                 isAutoLogin = Preferences.get(Preferences.autoLoginKey, false),
             ),
-            users = emptyList(),
+            users = emptyFlow(),
         ),
         questionListUiState = ExamUiState.QuestionListUiState(
             exam = Exam(

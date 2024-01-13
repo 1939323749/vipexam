@@ -1,9 +1,6 @@
 package app.xlei.vipexam.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
@@ -11,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -31,12 +27,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
 import app.xlei.vipexam.data.ExamUiState
-import app.xlei.vipexam.ui.components.TextIconDialog
-import app.xlei.vipexam.ui.login.LoginView
 import app.xlei.vipexam.ui.navgraph.homeScreenGraph
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
 import app.xlei.vipexam.ui.page.ExamPage
+import app.xlei.vipexam.ui.page.LoginView
 import app.xlei.vipexam.ui.page.ShowAnswerOptions
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.examTypeListView
@@ -161,11 +156,6 @@ fun HomeRoute(
     viewModel.setScreenType(widthSizeClass)
     val uiState by viewModel.uiState.collectAsState()
 
-    val openDialog = remember { mutableStateOf(false) }
-
-    val isInternetAvailable = isInternetAvailable(LocalContext.current)
-    val connectivity = remember { mutableStateOf(isInternetAvailable) }
-
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
     )
@@ -192,17 +182,6 @@ fun HomeRoute(
             }
         }
     ) { padding ->
-        when {
-            openDialog.value ->
-                TextIconDialog(
-                    onDismissRequest = { openDialog.value = false },
-                    onConfirmation = { openDialog.value = false },
-                    dialogTitle = stringResource(R.string.internet_error),
-                    dialogText = stringResource(R.string.connect_to_continue),
-                    icon = Icons.Default.Info
-                )
-        }
-
         NavHost(
             navController = navController,
             startDestination = HomeScreen.Login.name,
@@ -211,11 +190,10 @@ fun HomeRoute(
             composable(
                 route = HomeScreen.Login.name,
             ) {
-                connectivity.value = isInternetAvailable(LocalContext.current)
                 LoginView(
                     account = uiState.loginUiState.account,
                     password = uiState.loginUiState.password,
-                    users = uiState.loginUiState.users,
+                    users = uiState.loginUiState.users.collectAsState(initial = emptyList()),
                     setting = uiState.loginUiState.setting,
                     loginResponse = uiState.loginUiState.loginResponse,
                     onAccountChange = viewModel::setAccount,
@@ -547,19 +525,4 @@ fun questionListWithQuestionView(
             }
         }
     }
-}
-
-fun isInternetAvailable(context: Context): Boolean {
-    val result: Boolean
-    val connectivityManager =
-        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val networkCapabilities = connectivityManager.activeNetwork ?: return false
-    val actNw = connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
-    result = when {
-        actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-        actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-        actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-        else -> false
-    }
-    return result
 }

@@ -12,8 +12,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.Word
-import app.xlei.vipexam.data.Muban
-import app.xlei.vipexam.data.Shiti
+import app.xlei.vipexam.core.network.module.Muban
+import app.xlei.vipexam.core.network.module.Shiti
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ClozeViewModel @Inject constructor(
     clozeUiState: ClozeUiState,
-    private val wordRepository: Repository,
+    private val repository: Repository<Word>,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(clozeUiState)
@@ -69,7 +69,7 @@ class ClozeViewModel @Inject constructor(
     fun addToWordList(string: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             string?.let {
-                wordRepository.addWord(
+                repository.add(
                     Word(
                         word = it
                     )
@@ -79,7 +79,7 @@ class ClozeViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 _uiState.value.clozes.forEach { cloze ->
                     cloze.options.forEach { option ->
-                        wordRepository.addWord(
+                        repository.add(
                             Word(
                                 word = option.word
                             )

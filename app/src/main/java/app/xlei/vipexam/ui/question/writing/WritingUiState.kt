@@ -1,6 +1,6 @@
 package app.xlei.vipexam.ui.question.writing
 
-import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.core.network.module.Muban
 
 data class WritingUiState(
     val muban: Muban?=null,

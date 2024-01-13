@@ -48,11 +48,6 @@
     <string name="long_press_action">long press action</string>
     <string name="show_question">show question</string>
     <string name="show_translation">show translation</string>
-    <string name="add_to_word_list">Add to word list</string>
-    <string name="sort_by_old_to_new">Old</string>
-    <string name="sort_by_new_to_old">New</string>
-    <string name="sort_by_a_z">A-Z</string>
-    <string name="sort_by_z_a">Z-A</string>
-    <string name="sort">sort</string>
     <string name="not_connected">Network Not Connected</string>
+    <string name="add_to_word_list">Add to words</string>
 </resources>

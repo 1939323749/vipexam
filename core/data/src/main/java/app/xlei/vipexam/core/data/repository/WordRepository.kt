@@ -9,15 +9,15 @@ private const val TAG = "WORDREPOSITORY"
 
 class WordRepository @Inject constructor(
     private val wordDao: WordDao
-) : Repository {
-    override fun getAllWords() = run {
+) : Repository<Word> {
+    override fun getAll() = run {
         wordDao.getAllWords()
     }
 
-    override suspend fun addWord(word: Word) = run {
-        Log.d(TAG, "add word ${word.word}")
-        wordDao.insert(word)
+    override suspend fun add(item: Word) = run {
+        Log.d(TAG, "add word ${item.word}")
+        wordDao.insert(item)
     }
 
-    override suspend fun removeWord(word: Word) = wordDao.delete(word)
+    override suspend fun remove(item: Word) = wordDao.delete(item)
 }

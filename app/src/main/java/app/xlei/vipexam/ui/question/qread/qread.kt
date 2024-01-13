@@ -42,9 +42,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.ui.components.TranslateDialog
-import app.xlei.vipexam.ui.login.EmptyTextToolbar
+import app.xlei.vipexam.ui.page.EmptyTextToolbar
 import app.xlei.vipexam.ui.page.LongPressActions
 import app.xlei.vipexam.util.Preferences
 

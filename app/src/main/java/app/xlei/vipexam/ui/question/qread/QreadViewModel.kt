@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.Word
-import app.xlei.vipexam.data.Children
-import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.core.network.module.Children
+import app.xlei.vipexam.core.network.module.Muban
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class QreadViewModel @Inject constructor(
     qreadUiState: QreadUiState,
-    private val wordRepository: Repository,
+    private val repository: Repository<Word>,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(qreadUiState)
@@ -130,7 +130,7 @@ class QreadViewModel @Inject constructor(
     fun addToWordList(string: String) {
         viewModelScope.launch(Dispatchers.IO) {
             string.let {
-                wordRepository.addWord(
+                repository.add(
                     Word(
                         word = it
                     )

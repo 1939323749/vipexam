@@ -2,7 +2,7 @@ package app.xlei.vipexam.ui.question.cloze
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.AnnotatedString
-import app.xlei.vipexam.data.Muban
+import app.xlei.vipexam.core.network.module.Muban
 
 data class ClozeUiState(
     val muban: Muban?=null,

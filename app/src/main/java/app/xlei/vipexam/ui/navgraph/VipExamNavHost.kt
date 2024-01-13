@@ -1,17 +1,20 @@
 package app.xlei.vipexam.ui.navgraph
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import app.xlei.vipexam.feature.wordlist.WordListScreen
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.page.SettingsScreen
-import app.xlei.vipexam.ui.page.WordListPage
 
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun VipExamNavHost(
     logoText: MutableState<HomeScreen>,
@@ -33,7 +36,7 @@ fun VipExamNavHost(
         composable(
             route = AppDestinations.SECOND_ROUTE.name,
         ) { navBackStackEntry ->
-            WordListPage(
+            WordListScreen(
                 openDrawer = openDrawer,
             )
         }

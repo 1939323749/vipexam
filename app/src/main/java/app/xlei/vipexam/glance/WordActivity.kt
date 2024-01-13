@@ -12,8 +12,8 @@ import androidx.compose.runtime.setValue
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.Word
 import app.xlei.vipexam.darkScrim
+import app.xlei.vipexam.feature.wordlist.WordListScreen
 import app.xlei.vipexam.lightScrim
-import app.xlei.vipexam.ui.page.WordListPage
 import app.xlei.vipexam.ui.theme.VipexamTheme
 import app.xlei.vipexam.ui.theme.hexToColor
 import app.xlei.vipexam.util.LocaleHelper
@@ -25,9 +25,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class WordActivity : ComponentActivity() {
-    @Inject
-    lateinit var wordRepository: Repository
+class WordActivity @Inject constructor(
+    private val wordRepository: Repository<Word>
+) : ComponentActivity() {
     var themeMode by mutableStateOf(Preferences.getThemeMode())
     var accentColor by mutableStateOf(Preferences.getAccentColor())
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +48,7 @@ class WordActivity : ComponentActivity() {
                         darkScrim = darkScrim()
                     ),
                 )
-                WordListPage(openDrawer = {})
+                WordListScreen(openDrawer = {})
             }
         }
         handleIntentData()
@@ -64,8 +64,8 @@ class WordActivity : ComponentActivity() {
         getIntentText()?.let {
             val coroutineScope = CoroutineScope(Dispatchers.IO)
             coroutineScope.launch {
-                wordRepository.addWord(
-                    word = Word(
+                wordRepository.add(
+                    item = Word(
                         word = it,
                     )
                 )

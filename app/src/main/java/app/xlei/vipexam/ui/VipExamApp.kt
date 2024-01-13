@@ -31,7 +31,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.util.NetworkMonitor
-import app.xlei.vipexam.data.AppContainer
 import app.xlei.vipexam.ui.components.AppNavRail
 import app.xlei.vipexam.ui.navgraph.VipExamNavHost
 import app.xlei.vipexam.ui.navigation.AppDestinations
@@ -41,7 +40,6 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @Composable
 fun App(
-    appContainer: AppContainer,
     widthSizeClass: WindowWidthSizeClass,
     networkMonitor: NetworkMonitor,
     appState: VipExamState = rememberVipExamAppState(
@@ -118,7 +116,6 @@ fun App(
                     logoText = logoText,
                     navHostController = appState.navController,
                     homeNavController = homeNavController,
-                    appContainer = appContainer,
                     widthSizeClass = widthSizeClass,
                     openDrawer = { coroutine.launch { sizeAwareDrawerState.open() } },
                 )

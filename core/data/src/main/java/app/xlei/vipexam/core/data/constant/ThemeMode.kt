@@ -1,4 +1,4 @@
-package app.xlei.vipexam.constant
+package app.xlei.vipexam.core.data.constant
 
 enum class ThemeMode(val value: Int) {
     AUTO(0),

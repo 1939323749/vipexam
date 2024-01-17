@@ -1,15 +1,14 @@
-package app.xlei.vipexam.data
+package app.xlei.vipexam.ui
 
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import app.xlei.vipexam.core.database.module.User
 import app.xlei.vipexam.core.network.module.Exam
 import app.xlei.vipexam.core.network.module.ExamList
 import app.xlei.vipexam.core.network.module.LoginResponse
-import app.xlei.vipexam.ui.LoginSetting
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import kotlinx.coroutines.flow.Flow
 
-data class ExamUiState(
+data class VipexamUiState(
     val loginUiState: LoginUiState,
     val examTypeListUiState: ExamTypeListUiState,
     val examListUiState: ExamListUiState,

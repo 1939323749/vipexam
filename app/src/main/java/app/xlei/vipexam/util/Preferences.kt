@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import app.xlei.vipexam.constant.ThemeMode
+import app.xlei.vipexam.core.data.constant.ThemeMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

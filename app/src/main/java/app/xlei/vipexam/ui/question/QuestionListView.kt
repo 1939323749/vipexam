@@ -8,11 +8,11 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import app.xlei.vipexam.data.ExamUiState
+import app.xlei.vipexam.ui.VipexamUiState
 
 @Composable
 fun questionListView(
-    questionListUiState: ExamUiState.QuestionListUiState,
+    questionListUiState: VipexamUiState.QuestionListUiState,
     onQuestionClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {

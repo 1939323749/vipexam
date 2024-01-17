@@ -2,7 +2,7 @@ package app.xlei.vipexam.ui.question
 
 import app.xlei.vipexam.core.network.module.Exam
 import app.xlei.vipexam.core.network.module.ExamList
-import app.xlei.vipexam.data.ExamUiState
+import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.LoginSetting
 import app.xlei.vipexam.ui.question.cloze.ClozeUiState
 import app.xlei.vipexam.ui.question.listening.ListeningUiState
@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.emptyFlow
 @InstallIn(SingletonComponent::class)
 object QuestionModule {
     @Provides
-    fun provideExamUiState() = ExamUiState(
-        examListUiState = ExamUiState.ExamListUiState(
+    fun provideExamUiState() = VipexamUiState(
+        examListUiState = VipexamUiState.ExamListUiState(
             examType = 0,
             examList = ExamList(
                 msg = "",
@@ -34,11 +34,11 @@ object QuestionModule {
             currentPage = "1",
             questionListUiState = null,
         ),
-        examTypeListUiState = ExamUiState.ExamTypeListUiState(
+        examTypeListUiState = VipexamUiState.ExamTypeListUiState(
             examListUiState = null,
             examTypeList = emptyList(),
         ),
-        loginUiState = ExamUiState.LoginUiState(
+        loginUiState = VipexamUiState.LoginUiState(
             account = "",
             password = "",
             connectivity = false,
@@ -49,7 +49,7 @@ object QuestionModule {
             ),
             users = emptyFlow(),
         ),
-        questionListUiState = ExamUiState.QuestionListUiState(
+        questionListUiState = VipexamUiState.QuestionListUiState(
             exam = Exam(
                 code = 1,
                 count = 1,

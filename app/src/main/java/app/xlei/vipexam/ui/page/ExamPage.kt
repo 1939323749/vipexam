@@ -24,7 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.core.network.module.NetWorkRepository.getQuestions
-import app.xlei.vipexam.data.ExamUiState
+import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
 import app.xlei.vipexam.ui.question.cloze.clozeView
@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ExamPage(
-    questionListUiState: ExamUiState.QuestionListUiState,
+    questionListUiState: VipexamUiState.QuestionListUiState,
     viewModel: QuestionsViewModel = hiltViewModel(),
     setQuestion: (String) -> Unit,
     navController: NavHostController = rememberNavController(),

@@ -8,12 +8,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import app.xlei.vipexam.constant.Constants
-import app.xlei.vipexam.data.ExamUiState
+import app.xlei.vipexam.core.data.constant.Constants
+import app.xlei.vipexam.ui.VipexamUiState
 
 @Composable
 fun examTypeListView(
-    examTypeListUiState: ExamUiState.ExamTypeListUiState,
+    examTypeListUiState: VipexamUiState.ExamTypeListUiState,
     onExamTypeClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {

@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowCompat
-import app.xlei.vipexam.constant.ThemeMode
+import app.xlei.vipexam.core.data.constant.ThemeMode
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,

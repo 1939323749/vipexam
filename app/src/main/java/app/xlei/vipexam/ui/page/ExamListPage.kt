@@ -24,7 +24,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.xlei.vipexam.R
-import app.xlei.vipexam.data.ExamUiState
+import app.xlei.vipexam.ui.VipexamUiState
 import kotlinx.coroutines.launch
 
 @OptIn(
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun examListView(
-    examListUiState: ExamUiState.ExamListUiState,
+    examListUiState: VipexamUiState.ExamListUiState,
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
     onExamClick: (String) -> Unit,

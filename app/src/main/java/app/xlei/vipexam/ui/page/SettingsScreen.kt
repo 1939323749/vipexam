@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
 import app.xlei.vipexam.MainActivity
 import app.xlei.vipexam.R
-import app.xlei.vipexam.constant.ThemeMode
+import app.xlei.vipexam.core.data.constant.ThemeMode
 import app.xlei.vipexam.ui.theme.defaultAccentColor
 import app.xlei.vipexam.ui.theme.hexToColor
 import app.xlei.vipexam.util.LocaleHelper

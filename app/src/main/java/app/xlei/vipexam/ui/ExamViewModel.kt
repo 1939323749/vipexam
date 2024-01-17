@@ -3,11 +3,10 @@ package app.xlei.vipexam.ui
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.xlei.vipexam.constant.Constants
+import app.xlei.vipexam.core.data.constant.Constants
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.User
 import app.xlei.vipexam.core.network.module.NetWorkRepository
-import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
 import app.xlei.vipexam.util.Preferences
@@ -29,12 +28,12 @@ data class LoginSetting(
 
 @HiltViewModel
 class ExamViewModel @Inject constructor(
-    examUiState: ExamUiState,
+    vipexamUiState: VipexamUiState,
     private val userRepository: Repository<User>
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(examUiState)
+    private val _uiState = MutableStateFlow(vipexamUiState)
     private lateinit var homeScreenNavigationActions: HomeScreenNavigationActions
-    val uiState: StateFlow<ExamUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<VipexamUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -101,14 +100,14 @@ class ExamViewModel @Inject constructor(
                                     examTypeList = Constants.EXAMTYPES.toList().map { examType ->
                                         examType.first
                                     },
-                                    examListUiState = ExamUiState.ExamListUiState(
+                                    examListUiState = VipexamUiState.ExamListUiState(
                                         examType = Constants.EXAMTYPES[0].first,
                                         examList = examList,
                                         currentPage = "1",
                                         questionListUiState = null,
                                     )
                                 ),
-                                examListUiState = ExamUiState.ExamListUiState(
+                                examListUiState = VipexamUiState.ExamListUiState(
                                     examType = Constants.EXAMTYPES[0].first,
                                     examList = examList,
                                     currentPage = "1",

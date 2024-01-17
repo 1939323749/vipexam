@@ -2,16 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="Documents.vipexam.app">
-        <State />
-      </entry>
       <entry key="app">
-        <State />
-      </entry>
-      <entry key="core.database">
-        <State />
-      </entry>
-      <entry key="vipexam">
         <State />
       </entry>
     </value>

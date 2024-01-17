@@ -26,7 +26,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
-import app.xlei.vipexam.data.ExamUiState
 import app.xlei.vipexam.ui.navgraph.homeScreenGraph
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
@@ -220,7 +219,7 @@ fun HomeRoute(
 
 @Composable
 fun examTypeListWithExamListView(
-    examTypeListUiState: ExamUiState.ExamTypeListUiState,
+    examTypeListUiState: VipexamUiState.ExamTypeListUiState,
     onExamTypeClick: (Int) -> Unit,
     onExamClick: (String) -> Unit,
     onPreviousPageClick: () -> Unit,
@@ -315,7 +314,7 @@ fun examTypeListWithExamListView(
 
 @Composable
 fun examListWithQuestionsView(
-    examListUiState: ExamUiState.ExamListUiState,
+    examListUiState: VipexamUiState.ExamListUiState,
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
     refresh: () -> Unit,
@@ -417,7 +416,7 @@ fun examListWithQuestionsView(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun questionListWithQuestionView(
-    questionListUiState: ExamUiState.QuestionListUiState,
+    questionListUiState: VipexamUiState.QuestionListUiState,
     setQuestion: (String) -> Unit,
     navController: NavHostController = rememberNavController(),
     widthSizeClass: WindowWidthSizeClass,

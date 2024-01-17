@@ -35,7 +35,8 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.datastore.core)
+    implementation(libs.datastore.preferences)
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)

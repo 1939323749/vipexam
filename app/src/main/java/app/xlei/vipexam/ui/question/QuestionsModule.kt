@@ -10,7 +10,7 @@ import app.xlei.vipexam.ui.question.qread.QreadUiState
 import app.xlei.vipexam.ui.question.translate.TranslateUiState
 import app.xlei.vipexam.ui.question.writing.WritingUiState
 import app.xlei.vipexam.ui.question.zread.ZreadUiState
-import app.xlei.vipexam.util.Preferences
+import app.xlei.vipexam.core.data.util.Preferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

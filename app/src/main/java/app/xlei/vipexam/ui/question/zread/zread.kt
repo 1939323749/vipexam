@@ -41,7 +41,7 @@ import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.ui.components.TranslateDialog
 import app.xlei.vipexam.ui.page.EmptyTextToolbar
 import app.xlei.vipexam.ui.page.LongPressActions
-import app.xlei.vipexam.util.Preferences
+import app.xlei.vipexam.core.data.util.Preferences
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable

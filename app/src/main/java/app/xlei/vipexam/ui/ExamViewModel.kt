@@ -9,7 +9,7 @@ import app.xlei.vipexam.core.database.module.User
 import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
-import app.xlei.vipexam.util.Preferences
+import app.xlei.vipexam.core.data.util.Preferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,23 +92,23 @@ class ExamViewModel @Inject constructor(
                 if (_uiState.value.examTypeListUiState.examTypeList.isEmpty()) {
                     app.xlei.vipexam.core.network.module.NetWorkRepository.getExamList(
                         page = "1",
-                        type = Constants.EXAMTYPES[0].second,
+                        type = Constants.EXAM_TYPES[0].second,
                     ).onSuccess { examList ->
                         _uiState.update { examUiState ->
                             examUiState.copy(
                                 examTypeListUiState = examUiState.examTypeListUiState.copy(
-                                    examTypeList = Constants.EXAMTYPES.toList().map { examType ->
+                                    examTypeList = Constants.EXAM_TYPES.toList().map { examType ->
                                         examType.first
                                     },
                                     examListUiState = VipexamUiState.ExamListUiState(
-                                        examType = Constants.EXAMTYPES[0].first,
+                                        examType = Constants.EXAM_TYPES[0].first,
                                         examList = examList,
                                         currentPage = "1",
                                         questionListUiState = null,
                                     )
                                 ),
                                 examListUiState = VipexamUiState.ExamListUiState(
-                                    examType = Constants.EXAMTYPES[0].first,
+                                    examType = Constants.EXAM_TYPES[0].first,
                                     examList = examList,
                                     currentPage = "1",
                                     questionListUiState = null,
@@ -169,7 +169,7 @@ class ExamViewModel @Inject constructor(
             val currentPage = "${_uiState.value.examListUiState.currentPage.toInt() + 1}"
             app.xlei.vipexam.core.network.module.NetWorkRepository.getExamList(
                 page = currentPage,
-                type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
+                type = Constants.EXAM_TYPES.toMap()[_uiState.value.examListUiState.examType]!!,
             ).onSuccess { examList ->
                 _uiState.update {
                     it.copy(
@@ -196,7 +196,7 @@ class ExamViewModel @Inject constructor(
             val currentPage = "${_uiState.value.examListUiState.currentPage.toInt() - 1}"
             NetWorkRepository.getExamList(
                 page = currentPage,
-                type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
+                type = Constants.EXAM_TYPES.toMap()[_uiState.value.examListUiState.examType]!!,
             ).onSuccess { examList ->
                 _uiState.update {
                     it.copy(
@@ -242,7 +242,7 @@ class ExamViewModel @Inject constructor(
         viewModelScope.launch {
             NetWorkRepository.getExamList(
                 page = _uiState.value.examListUiState.currentPage,
-                type = Constants.EXAMTYPES.toMap()[_uiState.value.examListUiState.examType]!!,
+                type = Constants.EXAM_TYPES.toMap()[_uiState.value.examListUiState.examType]!!,
             ).onSuccess { examList ->
                 _uiState.update {
                     it.copy(
@@ -279,7 +279,7 @@ class ExamViewModel @Inject constructor(
         viewModelScope.launch {
             NetWorkRepository.getExamList(
                 page = "1",
-                type = Constants.EXAMTYPES.toMap()[type]!!,
+                type = Constants.EXAM_TYPES.toMap()[type]!!,
             ).onSuccess { examList ->
                 _uiState.update {
                     it.copy(

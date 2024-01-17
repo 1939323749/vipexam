@@ -1,4 +1,4 @@
-package app.xlei.vipexam.util
+package app.xlei.vipexam.core.data.util
 
 import android.content.Context
 import android.content.SharedPreferences

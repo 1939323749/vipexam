@@ -17,8 +17,8 @@ import app.xlei.vipexam.core.data.util.NetworkMonitor
 import app.xlei.vipexam.ui.App
 import app.xlei.vipexam.ui.theme.VipexamTheme
 import app.xlei.vipexam.ui.theme.hexToColor
-import app.xlei.vipexam.util.LocaleHelper
-import app.xlei.vipexam.util.Preferences
+import app.xlei.vipexam.core.data.util.LocaleHelper
+import app.xlei.vipexam.core.data.util.Preferences
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

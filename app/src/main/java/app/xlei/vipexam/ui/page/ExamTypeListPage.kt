@@ -25,7 +25,7 @@ fun examTypeListView(
                 headlineContent = { Text(stringResource(examTypeListUiState.examTypeList[it])) },
                 modifier = Modifier
                     .clickable {
-                        onExamTypeClicked(Constants.EXAMTYPES[it].first)
+                        onExamTypeClicked(Constants.EXAM_TYPES[it].first)
                     }
             )
             HorizontalDivider()

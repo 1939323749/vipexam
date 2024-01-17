@@ -19,8 +19,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
-import app.xlei.vipexam.util.Preferences
-import app.xlei.vipexam.util.dataStore
+import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.core.data.util.dataStore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

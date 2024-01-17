@@ -35,8 +35,8 @@ import app.xlei.vipexam.ui.page.ShowAnswerOptions
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.examTypeListView
 import app.xlei.vipexam.ui.question.questionListView
-import app.xlei.vipexam.util.Preferences
-import app.xlei.vipexam.util.dataStore
+import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.core.data.util.dataStore
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Menu
 import kotlinx.coroutines.flow.map

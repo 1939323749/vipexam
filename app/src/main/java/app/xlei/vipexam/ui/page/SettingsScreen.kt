@@ -63,8 +63,8 @@ import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.constant.ThemeMode
 import app.xlei.vipexam.ui.theme.defaultAccentColor
 import app.xlei.vipexam.ui.theme.hexToColor
-import app.xlei.vipexam.util.LocaleHelper
-import app.xlei.vipexam.util.Preferences
+import app.xlei.vipexam.core.data.util.LocaleHelper
+import app.xlei.vipexam.core.data.util.Preferences
 import compose.icons.FeatherIcons
 import compose.icons.TablerIcons
 import compose.icons.feathericons.Menu

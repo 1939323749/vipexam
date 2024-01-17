@@ -33,8 +33,8 @@ import app.xlei.vipexam.ui.question.qread.qreadView
 import app.xlei.vipexam.ui.question.translate.translateView
 import app.xlei.vipexam.ui.question.writing.writingView
 import app.xlei.vipexam.ui.question.zread.zreadView
-import app.xlei.vipexam.util.Preferences
-import app.xlei.vipexam.util.dataStore
+import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.core.data.util.dataStore
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.P)

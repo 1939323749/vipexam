@@ -1,17 +1,40 @@
 package app.xlei.vipexam.ui
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -26,17 +49,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
+import app.xlei.vipexam.core.data.constant.ShowAnswerOption
+import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.core.data.util.dataStore
+import app.xlei.vipexam.ui.components.VipexamCheckbox
 import app.xlei.vipexam.ui.navgraph.homeScreenGraph
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
 import app.xlei.vipexam.ui.page.ExamPage
 import app.xlei.vipexam.ui.page.LoginView
-import app.xlei.vipexam.ui.page.ShowAnswerOptions
 import app.xlei.vipexam.ui.page.examListView
 import app.xlei.vipexam.ui.page.examTypeListView
 import app.xlei.vipexam.ui.question.questionListView
-import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.data.util.dataStore
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Menu
 import kotlinx.coroutines.flow.map
@@ -68,12 +92,7 @@ fun VipExamAppBar(
                 IconButton(
                     onClick = {
                         navigateUp()
-                        if (Preferences
-                                .get(
-                                    Preferences.alwaysShowAnswerKey,
-                                    ShowAnswerOptions.ONCE.value
-                                ) == ShowAnswerOptions.ONCE.value
-                        ) {
+                        if (showAnswer.value) {
                             coroutine.launch {
                                 context.dataStore.edit {
                                     it[Preferences.SHOW_ANSWER] = false
@@ -109,7 +128,7 @@ fun VipExamAppBar(
                 DropdownMenuItem(
                     text = {
                         Row {
-                            Checkbox(
+                            VipexamCheckbox(
                                 checked = showAnswer.value,
                                 onCheckedChange = null,
                             )
@@ -132,7 +151,8 @@ fun VipExamAppBar(
                 )
             }
         },
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
+        modifier = modifier
     )
 }
 
@@ -141,7 +161,7 @@ fun VipExamAppBar(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
 @Composable
 fun HomeRoute(
-    logoText: MutableState<HomeScreen>,
+    logoText: @Composable () -> Unit,
     widthSizeClass: WindowWidthSizeClass,
     viewModel: ExamViewModel = hiltViewModel(),
     navController: NavHostController,
@@ -178,6 +198,7 @@ fun HomeRoute(
                         openDrawer = openDrawer,
                         scrollBehavior = scrollBehavior,
                     )
+                WindowWidthSizeClass.Medium -> logoText()
             }
         }
     ) { padding ->
@@ -192,14 +213,20 @@ fun HomeRoute(
                 LoginView(
                     account = uiState.loginUiState.account,
                     password = uiState.loginUiState.password,
-                    users = uiState.loginUiState.users.collectAsState(initial = emptyList()),
-                    setting = uiState.loginUiState.setting,
+                    users = uiState.loginUiState.users.collectAsState(initial = emptyList()).value,
                     loginResponse = uiState.loginUiState.loginResponse,
                     onAccountChange = viewModel::setAccount,
                     onPasswordChange = viewModel::setPassword,
                     onDeleteUser = viewModel::deleteUser,
-                    onSettingChange = viewModel::setSetting,
                     onLoginButtonClicked = viewModel::login,
+                    isRememberAccount = uiState.loginUiState.loginSetting.isRememberAccount.collectAsState(
+                        initial = false
+                    ).value,
+                    isAutoLogin = uiState.loginUiState.loginSetting.isAutoLogin.collectAsState(
+                        initial = false
+                    ).value,
+                    toggleAutoLogin = viewModel::toggleAutoLogin,
+                    toggleRememberAccount = viewModel::toggleRememberAccount
                 )
             }
             homeScreenGraph(
@@ -218,7 +245,7 @@ fun HomeRoute(
 
 
 @Composable
-fun examTypeListWithExamListView(
+fun ExamTypeListWithExamListView(
     examTypeListUiState: VipexamUiState.ExamTypeListUiState,
     onExamTypeClick: (Int) -> Unit,
     onExamClick: (String) -> Unit,
@@ -313,7 +340,7 @@ fun examTypeListWithExamListView(
 }
 
 @Composable
-fun examListWithQuestionsView(
+fun ExamListWithQuestionsView(
     examListUiState: VipexamUiState.ExamListUiState,
     onPreviousPageClicked: () -> Unit,
     onNextPageClicked: () -> Unit,
@@ -412,16 +439,18 @@ fun examListWithQuestionsView(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun questionListWithQuestionView(
+fun QuestionListWithQuestionView(
     questionListUiState: VipexamUiState.QuestionListUiState,
     setQuestion: (String) -> Unit,
-    navController: NavHostController = rememberNavController(),
     widthSizeClass: WindowWidthSizeClass,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
 ) {
+    val showAnswerOption = ShowAnswerOption.entries[
+        Preferences.showAnswerOption.collectAsState(initial = ShowAnswerOption.ONCE.value).value
+    ]
     val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
 
@@ -462,11 +491,7 @@ fun questionListWithQuestionView(
                                         launchSingleTop = true
                                         restoreState = true
                                     }
-                                    if (Preferences.get(
-                                            key = Preferences.alwaysShowAnswerKey,
-                                            ShowAnswerOptions.ONCE.value
-                                        ) == ShowAnswerOptions.ONCE.value
-                                    ) {
+                                    if (showAnswerOption == ShowAnswerOption.ONCE) {
                                         coroutine.launch {
                                             context.dataStore.edit { preferences ->
                                                 preferences[Preferences.SHOW_ANSWER] = false
@@ -491,11 +516,7 @@ fun questionListWithQuestionView(
                                         launchSingleTop = true
                                         restoreState = true
                                     }
-                                    if (Preferences.get(
-                                            key = Preferences.alwaysShowAnswerKey,
-                                            ShowAnswerOptions.ONCE.value
-                                        ) == ShowAnswerOptions.ONCE.value
-                                    ) {
+                                    if (showAnswerOption == ShowAnswerOption.ONCE) {
                                         coroutine.launch {
                                             context.dataStore.edit { preferences ->
                                                 preferences[Preferences.SHOW_ANSWER] = false

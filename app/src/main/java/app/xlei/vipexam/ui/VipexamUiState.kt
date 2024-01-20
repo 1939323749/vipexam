@@ -22,8 +22,13 @@ data class VipexamUiState(
         val password: String,
         val loginResponse: LoginResponse?,
         val users: Flow<List<User>>,
-        val setting: LoginSetting,
+        val loginSetting: LoginSetting,
         val connectivity: Boolean,
+    )
+
+    data class LoginSetting(
+        val isAutoLogin: Flow<Boolean>,
+        val isRememberAccount: Flow<Boolean>,
     )
 
     data class ExamTypeListUiState(

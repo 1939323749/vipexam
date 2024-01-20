@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,13 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.ui.components.VipexamArticleContainer
 
 @Composable
 fun translateView(
     viewModel: TranslateViewModel = hiltViewModel(),
     muban: Muban,
 ){
-    val showAnswer = Preferences.showAnswerFlow.collectAsState(initial = false)
+    val showAnswer by Preferences.showAnswer.collectAsState(initial = false)
     viewModel.setMuban(muban)
     viewModel.setTranslations()
     val uiState by viewModel.uiState.collectAsState()
@@ -39,7 +39,7 @@ fun translateView(
 @Composable
 private fun translate(
     translations: List<TranslateUiState.Translation>,
-    showAnswer: State<Boolean>,
+    showAnswer: Boolean,
 ){
     val scrollState = rememberLazyListState()
 
@@ -61,18 +61,20 @@ private fun translate(
                 )
             }
 
-            if(showAnswer.value){
-                Column {
-                    Text(
-                        text = translations[it].refAnswer,
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp)
-                    )
-                    Text(
-                        text = translations[it].description,
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp)
-                    )
+            if(showAnswer){
+                VipexamArticleContainer {
+                    Column {
+                        Text(
+                            text = translations[it].refAnswer,
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp)
+                        )
+                        Text(
+                            text = translations[it].description,
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp)
+                        )
+                    }
                 }
             }
         }

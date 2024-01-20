@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.question.listening
 
 import android.media.MediaPlayer
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -40,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.ui.components.VipexamArticleContainer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,8 +52,10 @@ fun listeningView(
 ){
     viewModel.setMuban(muban)
     viewModel.setListenings()
-    val showAnswer = Preferences.showAnswerFlow.collectAsState(initial = false)
+    val showAnswer = Preferences.showAnswer.collectAsState(initial = false)
     val uiState by viewModel.uiState.collectAsState()
+    val vibrate by Preferences.vibrate.collectAsState(initial = true)
+
     var selectedQuestionIndex by remember { mutableStateOf(0) }
     val haptics = LocalHapticFeedback.current
 
@@ -64,18 +66,18 @@ fun listeningView(
         onQuestionClick = {
             selectedQuestionIndex = it
             viewModel.toggleOptionsSheet()
-            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         onOptionClick = {selectedListeningIndex,option->
             viewModel.setOption(selectedListeningIndex,selectedQuestionIndex,option)
             viewModel.toggleOptionsSheet()
-            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         showAnswer = showAnswer,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun listening(
     listenings: List<ListeningUiState.Listening>,
@@ -133,50 +135,53 @@ private fun listening(
                         },
                         state = question.tooltipState
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .clickable {
-                                    selectedListening = it
-                                    onQuestionClick(index)
-                                }
-                        ) {
-                            Text(question.index)
-                            Column (
+                        VipexamArticleContainer {
+                            Column(
                                 modifier = Modifier
-                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                            ){
-                                question.options.forEach { option ->
-                                    Text("${option.index}. " + option.option)
-                                }
-                                if (showAnswer.value) {
-                                    Spacer(
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .height(24.dp))
-                                    Text(
-                                        text = question.description,
-                                        modifier = Modifier
-                                            .padding(horizontal = 24.dp)
-                                    )
-                                }
-                            }
-                            if (question.choice.value!="")
-                                SuggestionChip(
-                                    onClick = {},
-                                    label = {
-                                        Text(question.choice.value)
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .clickable {
+                                        selectedListening = it
+                                        onQuestionClick(index)
                                     }
-                                )
+                            ) {
+                                Text(question.index)
+                                Column (
+                                    modifier = Modifier
+                                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                ){
+                                    question.options.forEach { option ->
+                                        Text("${option.index}. " + option.option)
+                                    }
+                                    if (showAnswer.value) {
+                                        Spacer(
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .height(24.dp))
+                                        Text(
+                                            text = question.description,
+                                            modifier = Modifier
+                                                .padding(horizontal = 24.dp)
+                                        )
+                                    }
+                                }
+                                if (question.choice.value!="")
+                                    SuggestionChip(
+                                        onClick = {},
+                                        label = {
+                                            Text(question.choice.value)
+                                        }
+                                    )
+                            }
                         }
                     }
                 }
 
             }
         }
+
 
         if(showOptionsSheet){
             ModalBottomSheet(
@@ -204,6 +209,8 @@ fun AudioPlayer(
 ) {
     var isPlaying by rememberSaveable { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
+    val vibrate by Preferences.vibrate.collectAsState(initial = true)
+
     Column {
         Button(
             onClick = {
@@ -213,7 +220,7 @@ fun AudioPlayer(
                 } else {
                     mediaPlayer.pause()
                 }
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             },
             enabled = enabled
         ) {

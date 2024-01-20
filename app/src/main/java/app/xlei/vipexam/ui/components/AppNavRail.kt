@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppNavRail(
-    logo: MutableState<HomeScreen>,
+    logo:  @Composable () -> Unit = {},
     homeNavController: NavHostController,
     currentRoute: String,
     navigationToTopLevelDestination: (AppDestinations) -> Unit,
@@ -60,7 +60,7 @@ fun AppNavRail(
                         )
                 )
             else
-                Icon(logo.value.icon, "", Modifier.padding(vertical = 24.dp))
+                logo()
             CustomFloatingActionButton(
                 expandable = true,
                 onFabClick = {},
@@ -77,7 +77,6 @@ fun AppNavRail(
                                 }
                             }
                         }
-
                         else -> {}
                     }
                 }

@@ -1,8 +1,6 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -22,6 +20,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import app.xlei.vipexam.core.data.constant.ShowAnswerOption
+import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.core.data.util.dataStore
 import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.core.network.module.NetWorkRepository.getQuestions
 import app.xlei.vipexam.ui.VipexamUiState
@@ -33,11 +34,8 @@ import app.xlei.vipexam.ui.question.qread.qreadView
 import app.xlei.vipexam.ui.question.translate.translateView
 import app.xlei.vipexam.ui.question.writing.writingView
 import app.xlei.vipexam.ui.question.zread.zreadView
-import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.data.util.dataStore
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ExamPage(
     questionListUiState: VipexamUiState.QuestionListUiState,
@@ -47,6 +45,11 @@ fun ExamPage(
 ) {
     viewModel.setMubanList(mubanList = questionListUiState.exam.muban)
     val uiState by viewModel.uiState.collectAsState()
+    val vibrate by Preferences.vibrate.collectAsState(initial = true)
+    val showAnswerOption = ShowAnswerOption.entries[
+            Preferences.showAnswerOption.collectAsState(initial = ShowAnswerOption.ONCE.value).value
+    ]
+
     val questions = getQuestions(uiState.mubanList!!)
     val haptics = LocalHapticFeedback.current
     val coroutine = rememberCoroutineScope()
@@ -67,7 +70,7 @@ fun ExamPage(
         CustomFloatingActionButton(
             expandable = true,
             onFabClick = {
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             },
             iconExpanded = Icons.Filled.KeyboardArrowDown,
             iconUnExpanded = Icons.Filled.KeyboardArrowUp,
@@ -80,13 +83,8 @@ fun ExamPage(
                     launchSingleTop = true
                     restoreState = true
                 }
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                if (Preferences.get(
-                        Preferences.alwaysShowAnswerKey,
-                        ShowAnswerOptions.ONCE.value
-                    )
-                    == ShowAnswerOptions.ONCE.value
-                ) {
+                if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                if (showAnswerOption == ShowAnswerOption.ONCE) {
                     coroutine.launch {
                         context.dataStore.edit { preferences ->
                             preferences[Preferences.SHOW_ANSWER] = false
@@ -98,7 +96,6 @@ fun ExamPage(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun questions(

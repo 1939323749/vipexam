@@ -1,5 +1,6 @@
 package app.xlei.vipexam.ui.components
 
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,22 +34,20 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Loader
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun TranslateDialog(
-    expanded: MutableState<Boolean>,
-    onAddButtonClick: (String) -> Unit,
+    confirmButton: @Composable () -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
     val coroutine = rememberCoroutineScope()
     val context = LocalContext.current
-    val clipBoardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    DisposableEffect(key1 = Unit, effect = {
-        onDispose { clipBoardManager.clearPrimaryClip() }
-    })
+    val clipboardManager = context.getSystemService(
+        Context.CLIPBOARD_SERVICE
+    ) as ClipboardManager
     AlertDialog(
-        onDismissRequest = { expanded.value = false },
+        onDismissRequest = onDismissRequest,
         title = {
-            clipBoardManager.primaryClip?.getItemAt(0)?.text?.toString()?.let { Text(it) }
+            clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()?.let { Text(it) }
         },
         text = {
             var translation by remember {
@@ -63,18 +63,23 @@ fun TranslateDialog(
             DisposableEffect(Unit) {
                 coroutine.launch {
                     val res = app.xlei.vipexam.core.network.module.NetWorkRepository.translateToZH(
-                        text = clipBoardManager.primaryClip?.getItemAt(0)?.text?.toString()!!
+                        text = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()!!
                     )
                     res.onSuccess {
                         translation = it
-                    }
-                    res.onFailure {
-                        expanded.value = false
+                    }.onFailure {
+                        onDismissRequest.invoke()
                         Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
                 onDispose {
-
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        clipboardManager.clearPrimaryClip()
+                    } else {
+                        clipboardManager.setPrimaryClip(
+                            ClipData.newPlainText("", "")
+                        )
+                    }
                 }
             }
             Column {
@@ -108,9 +113,7 @@ fun TranslateDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = {
-                    expanded.value = false
-                }
+                onClick = onDismissRequest
             ) {
                 Text(
                     stringResource(
@@ -119,15 +122,6 @@ fun TranslateDialog(
                 )
             }
         },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onAddButtonClick(clipBoardManager.primaryClip?.getItemAt(0)?.text?.toString()!!)
-                    expanded.value = false
-                }
-            ) {
-                Text(stringResource(id = R.string.add_to_word_list))
-            }
-        }
+        confirmButton = confirmButton
     )
 }

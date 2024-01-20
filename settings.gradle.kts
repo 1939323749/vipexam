@@ -22,4 +22,4 @@ include(":core:database")
 include(":core:network")
 
 include(":feature:wordlist")
-
+include(":feature:settings")

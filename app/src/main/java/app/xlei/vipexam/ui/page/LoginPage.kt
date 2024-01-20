@@ -1,6 +1,7 @@
 package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
@@ -19,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import app.xlei.vipexam.R
 import app.xlei.vipexam.core.database.module.User
 import app.xlei.vipexam.core.network.module.LoginResponse
-import app.xlei.vipexam.ui.LoginSetting
+import app.xlei.vipexam.ui.components.VipexamCheckbox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -27,16 +29,19 @@ import app.xlei.vipexam.ui.LoginSetting
 fun LoginView(
     account: String,
     password: String,
-    users: State<List<User>>,
-    setting: LoginSetting,
+    users: List<User>,
     loginResponse: LoginResponse?,
     onAccountChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onSettingChange: (LoginSetting) -> Unit,
     onDeleteUser: (User) -> Unit,
     onLoginButtonClicked: () -> Unit,
+    isAutoLogin: Boolean,
+    isRememberAccount: Boolean,
+    toggleAutoLogin: (Context, Boolean) -> Unit,
+    toggleRememberAccount: (Context, Boolean) -> Unit,
 ) {
     var showUsers by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -64,7 +69,7 @@ fun LoginView(
                     expanded = showUsers,
                     onDismissRequest = { showUsers = false }
                 ) {
-                    users.value.forEach {
+                    users.forEach {
                         DropdownMenuItem(
                             text = { Text(it.account) },
                             trailingIcon = {
@@ -87,7 +92,9 @@ fun LoginView(
                 }
             }
             val expanded = remember { mutableStateOf(false) }
-            val emptyTextToolbar = remember { EmptyTextToolbar(expanded) }
+            val emptyTextToolbar = remember { EmptyTextToolbar {
+                expanded.value = true
+            } }
 
             CompositionLocalProvider(
                 LocalTextToolbar provides emptyTextToolbar
@@ -118,14 +125,10 @@ fun LoginView(
 
             Row {
                 Row {
-                    Checkbox(
-                        checked = setting.isRememberAccount,
-                        onCheckedChange = {
-                            onSettingChange(
-                                setting.copy(
-                                    isRememberAccount = it,
-                                )
-                            )
+                    VipexamCheckbox(
+                        checked = isRememberAccount,
+                        onCheckedChange = {newBoolean->
+                            toggleRememberAccount(context, newBoolean)
                         }
                     )
                     Text(
@@ -135,15 +138,11 @@ fun LoginView(
                     )
                 }
                 Row {
-                    Checkbox(
-                        checked = setting.isAutoLogin,
-                        onCheckedChange = {
-                            onSettingChange(
-                                setting.copy(
-                                    isAutoLogin = it
-                                )
-                            )
-                        }
+                    VipexamCheckbox(
+                        checked = isAutoLogin,
+                        onCheckedChange = {newBoolean->
+                            toggleAutoLogin(context, newBoolean)
+                        },
                     )
                     Text(
                         text = stringResource(R.string.auto_login),
@@ -156,7 +155,9 @@ fun LoginView(
     }
 }
 
-class EmptyTextToolbar(private val expended: MutableState<Boolean>) : TextToolbar {
+class EmptyTextToolbar(
+    private val onSelect: () -> Unit,
+) : TextToolbar {
     override val status: TextToolbarStatus = TextToolbarStatus.Hidden
 
     override fun hide() {
@@ -170,7 +171,7 @@ class EmptyTextToolbar(private val expended: MutableState<Boolean>) : TextToolba
         onCutRequested: (() -> Unit)?,
         onSelectAllRequested: (() -> Unit)?,
     ) {
-        expended.value = true
+        onSelect.invoke()
         onCopyRequested?.invoke()
     }
 

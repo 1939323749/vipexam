@@ -1,10 +1,8 @@
 package app.xlei.vipexam.ui.navgraph
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,16 +12,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
+import app.xlei.vipexam.ui.ExamListWithQuestionsView
+import app.xlei.vipexam.ui.ExamTypeListWithExamListView
 import app.xlei.vipexam.ui.ExamViewModel
 import app.xlei.vipexam.ui.HomeRoute
-import app.xlei.vipexam.ui.examListWithQuestionsView
-import app.xlei.vipexam.ui.examTypeListWithExamListView
+import app.xlei.vipexam.ui.QuestionListWithQuestionView
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
-import app.xlei.vipexam.ui.questionListWithQuestionView
 
 fun NavGraphBuilder.homeScreen(
-    logoText: MutableState<HomeScreen>,
+    logoText: @Composable () -> Unit = {},
     homeNavController: NavHostController,
     widthSizeClass: WindowWidthSizeClass,
     openDrawer: () -> Unit,
@@ -48,7 +46,6 @@ fun NavGraphBuilder.homeScreen(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.P)
 fun NavGraphBuilder.homeScreenGraph(
     viewModel: ExamViewModel,
     onExamTypeClick: (Int) -> Unit,
@@ -68,7 +65,7 @@ fun NavGraphBuilder.homeScreenGraph(
         ){
             val uiState by viewModel.uiState.collectAsState()
             viewModel.setCurrentRoute(HomeScreen.ExamTypeWithExamList)
-            examTypeListWithExamListView(
+            ExamTypeListWithExamListView(
                 examTypeListUiState = uiState.examTypeListUiState,
                 onExamTypeClick = onExamTypeClick,
                 onExamClick = onExamClick,
@@ -84,7 +81,7 @@ fun NavGraphBuilder.homeScreenGraph(
         ){
             val uiState by viewModel.uiState.collectAsState()
             viewModel.setCurrentRoute(HomeScreen.ExamListWithQuestions)
-            examListWithQuestionsView(
+            ExamListWithQuestionsView(
                 examListUiState = uiState.examListUiState,
                 onPreviousPageClicked = onPreviousPageClicked,
                 onNextPageClicked = onNextPageClicked,
@@ -100,7 +97,7 @@ fun NavGraphBuilder.homeScreenGraph(
         ) {
             val uiState by viewModel.uiState.collectAsState()
             viewModel.setCurrentRoute(HomeScreen.QuestionListWithQuestion)
-            questionListWithQuestionView(
+            QuestionListWithQuestionView(
                 questionListUiState = uiState.questionListUiState,
                 setQuestion = viewModel::setTitle,
                 widthSizeClass = widthSizeClass,

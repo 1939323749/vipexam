@@ -1,16 +1,15 @@
 package app.xlei.vipexam.ui.question
 
+import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.Exam
 import app.xlei.vipexam.core.network.module.ExamList
 import app.xlei.vipexam.ui.VipexamUiState
-import app.xlei.vipexam.ui.LoginSetting
 import app.xlei.vipexam.ui.question.cloze.ClozeUiState
 import app.xlei.vipexam.ui.question.listening.ListeningUiState
 import app.xlei.vipexam.ui.question.qread.QreadUiState
 import app.xlei.vipexam.ui.question.translate.TranslateUiState
 import app.xlei.vipexam.ui.question.writing.WritingUiState
 import app.xlei.vipexam.ui.question.zread.ZreadUiState
-import app.xlei.vipexam.core.data.util.Preferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,9 +42,9 @@ object QuestionModule {
             password = "",
             connectivity = false,
             loginResponse = null,
-            setting = LoginSetting(
-                isRememberAccount = Preferences.get(Preferences.rememberAccountKey, false),
-                isAutoLogin = Preferences.get(Preferences.autoLoginKey, false),
+            loginSetting = VipexamUiState.LoginSetting(
+                isAutoLogin = Preferences.autoLogin,
+                isRememberAccount = Preferences.rememberAccount
             ),
             users = emptyFlow(),
         ),

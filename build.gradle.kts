@@ -8,8 +8,3 @@ plugins {
     alias(libs.plugins.androidLibrary) apply false
     alias(libs.plugins.org.jetbrains.kotlin.jvm) apply false
 }
-buildscript {
-    extra.apply {
-        set("lifecycle_version", "2.6.1")
-    }
-}

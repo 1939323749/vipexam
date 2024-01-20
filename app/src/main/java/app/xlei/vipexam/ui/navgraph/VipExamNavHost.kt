@@ -1,28 +1,30 @@
 package app.xlei.vipexam.ui.navgraph
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import app.xlei.vipexam.MainActivity
+import app.xlei.vipexam.feature.settings.SettingsScreen
 import app.xlei.vipexam.feature.wordlist.WordListScreen
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import app.xlei.vipexam.ui.navigation.HomeScreen
-import app.xlei.vipexam.ui.page.SettingsScreen
 
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun VipExamNavHost(
-    logoText: MutableState<HomeScreen>,
+    logoText:  @Composable () -> Unit = {},
     navHostController: NavHostController,
     homeNavController: NavHostController,
     widthSizeClass: WindowWidthSizeClass,
     openDrawer: () -> Unit,
 ) {
+    val context = LocalContext.current
     NavHost(
         navController = navHostController,
         startDestination = AppDestinations.HOME_ROUTE.name
@@ -45,6 +47,11 @@ fun VipExamNavHost(
         ) { navBackStackEntry ->
             SettingsScreen(
                 openDrawer = openDrawer,
+                onLanguageChange = {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        (context as MainActivity).recreate()
+                    }, 100)
+                }
             )
         }
     }

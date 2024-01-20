@@ -35,11 +35,8 @@ object LocaleHelper {
         }
     }
 
-    fun getLanguages(context: Context) = listOf(
+    fun getLanguages() = listOf(
         Language("en", "English"),
-        Language("zh-rCN", "Chinese (Simplified)")
+        Language("zh-rCN", "简体中文")
     ).sortedBy { it.name }.toMutableList()
-        .apply {
-            add(0, Language("", context.getString(R.string.system)))
-        }
 }

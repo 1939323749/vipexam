@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.ui.components.VipexamArticleContainer
 import coil.compose.AsyncImage
 
 
@@ -31,7 +32,7 @@ fun writingView(
     viewModel: WritingViewModel = hiltViewModel(),
     muban: Muban,
 ){
-    val showAnswer = Preferences.showAnswerFlow.collectAsState(initial = false)
+    val showAnswer = Preferences.showAnswer.collectAsState(initial = false)
     viewModel.setMuban(muban)
     viewModel.setWritings()
     val uiState by viewModel.uiState.collectAsState()
@@ -60,12 +61,15 @@ private fun writing(
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
-                Text(
-                    text = writings[it].question,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier
-                        .padding(start = 4.dp, end = 4.dp)
-                )
+                VipexamArticleContainer {
+                    Text(
+                        text = writings[it].question,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier
+                            .padding(start = 4.dp, end = 4.dp)
+                    )
+                }
+
                 if (shouldShowImage(writings[it].question)) {
                     Row {
                         Spacer(Modifier.weight(2f))
@@ -82,7 +86,6 @@ private fun writing(
                         Spacer(Modifier.weight(2f))
                     }
                 }
-
             }
             if (showAnswer.value) {
                 Column {

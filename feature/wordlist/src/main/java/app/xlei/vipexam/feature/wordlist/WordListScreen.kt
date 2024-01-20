@@ -49,7 +49,6 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Menu
 import java.util.Date
 
-@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(
     ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
 )

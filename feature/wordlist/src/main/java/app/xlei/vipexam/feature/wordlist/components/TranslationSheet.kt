@@ -1,8 +1,6 @@
 package app.xlei.vipexam.feature.wordlist.components
 
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -28,7 +26,6 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Loader
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranslationSheet(

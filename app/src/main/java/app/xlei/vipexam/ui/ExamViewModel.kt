@@ -1,6 +1,10 @@
 package app.xlei.vipexam.ui
 
+import android.content.Context
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.constant.Constants
@@ -10,26 +14,24 @@ import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.ui.navigation.HomeScreen
 import app.xlei.vipexam.ui.navigation.HomeScreenNavigationActions
 import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.core.data.util.dataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-
-data class LoginSetting(
-    val isRememberAccount: Boolean,
-    val isAutoLogin: Boolean,
-)
-
 @HiltViewModel
 class ExamViewModel @Inject constructor(
     vipexamUiState: VipexamUiState,
-    private val userRepository: Repository<User>
+    private val userRepository: Repository<User>,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(vipexamUiState)
     private lateinit var homeScreenNavigationActions: HomeScreenNavigationActions
@@ -90,7 +92,7 @@ class ExamViewModel @Inject constructor(
                     return@launch
                 }
                 if (_uiState.value.examTypeListUiState.examTypeList.isEmpty()) {
-                    app.xlei.vipexam.core.network.module.NetWorkRepository.getExamList(
+                    NetWorkRepository.getExamList(
                         page = "1",
                         type = Constants.EXAM_TYPES[0].second,
                     ).onSuccess { examList ->
@@ -120,15 +122,25 @@ class ExamViewModel @Inject constructor(
                     }
                 }
                 navigate(HomeScreen.LoggedIn)
-                if (_uiState.value.loginUiState.setting.isRememberAccount)
-                    withContext(Dispatchers.IO) {
-                        userRepository.add(
-                            item = User(
-                                account = _uiState.value.loginUiState.account,
-                                password = _uiState.value.loginUiState.password,
-                            )
-                        )
+                _uiState.value.loginUiState.loginSetting.isRememberAccount.collectLatest {isRememberAccount->
+                    if (isRememberAccount) {
+                        addCurrentUser()
+                        return@collectLatest
                     }
+                }
+            }
+        }
+    }
+
+    private fun addCurrentUser(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                userRepository.add(
+                    item = User(
+                        account = _uiState.value.loginUiState.account,
+                        password = _uiState.value.loginUiState.password,
+                    )
+                )
             }
         }
     }
@@ -158,16 +170,17 @@ class ExamViewModel @Inject constructor(
 
     fun setNavigationActions(homeScreenNavigationActions: HomeScreenNavigationActions) {
         this.homeScreenNavigationActions = homeScreenNavigationActions
-        if (_uiState.value.loginUiState.setting.isAutoLogin
-            && _uiState.value.loginUiState.loginResponse == null
-        )
-            login()
+        viewModelScope.launch {
+            _uiState.value.loginUiState.loginSetting.isAutoLogin.collectLatest {isAutoLogin->
+                if (isAutoLogin && _uiState.value.loginUiState.loginResponse == null) login()
+            }
+        }
     }
 
     fun nextPage() {
         viewModelScope.launch {
             val currentPage = "${_uiState.value.examListUiState.currentPage.toInt() + 1}"
-            app.xlei.vipexam.core.network.module.NetWorkRepository.getExamList(
+            NetWorkRepository.getExamList(
                 page = currentPage,
                 type = Constants.EXAM_TYPES.toMap()[_uiState.value.examListUiState.examType]!!,
             ).onSuccess { examList ->
@@ -263,18 +276,6 @@ class ExamViewModel @Inject constructor(
         }
     }
 
-    fun setSetting(setting: LoginSetting) {
-        _uiState.update {
-            it.copy(
-                loginUiState = it.loginUiState.copy(
-                    setting = setting
-                )
-            )
-        }
-        Preferences.put(Preferences.autoLoginKey, setting.isAutoLogin)
-        Preferences.put(Preferences.rememberAccountKey, setting.isRememberAccount)
-    }
-
     fun setExamType(type: Int) {
         viewModelScope.launch {
             NetWorkRepository.getExamList(
@@ -364,6 +365,22 @@ class ExamViewModel @Inject constructor(
             it.copy(
                 currentRoute = homeScreen
             )
+        }
+    }
+
+    fun toggleAutoLogin(context: Context, isAutoLogin: Boolean) {
+        viewModelScope.launch {
+            context.dataStore.edit {
+                it[Preferences.AUTOLOGIN] = isAutoLogin
+            }
+        }
+    }
+
+    fun toggleRememberAccount(context: Context, isRememberAccount: Boolean) {
+        viewModelScope.launch {
+            context.dataStore.edit {
+                it[Preferences.REMEMBER_ACCOUNT] = isRememberAccount
+            }
         }
     }
 }

@@ -8,8 +8,8 @@ import dagger.hilt.android.HiltAndroidApp
 class VipExamApplication : Application() {
 
     override fun onCreate() {
-        super.onCreate()
         Preferences.initialize(this)
-        //DB.provide(this)
+
+        super.onCreate()
     }
 }

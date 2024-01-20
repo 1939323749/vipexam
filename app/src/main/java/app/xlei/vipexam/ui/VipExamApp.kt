@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -31,10 +30,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.util.NetworkMonitor
+import app.xlei.vipexam.ui.components.AppDrawer
 import app.xlei.vipexam.ui.components.AppNavRail
 import app.xlei.vipexam.ui.navgraph.VipExamNavHost
 import app.xlei.vipexam.ui.navigation.AppDestinations
-import app.xlei.vipexam.ui.navigation.HomeScreen
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
@@ -55,25 +54,16 @@ fun App(
 
     val sizeAwareDrawerState = rememberSizeAwareDrawerState(appState.shouldShowTopBar)
 
-    val currentHomeScreenRoute = homeNavController.currentBackStackEntryAsState()
-        .value?.destination?.route ?: HomeScreen.Login.name
-
-    val logoText = remember {
-        mutableStateOf(
-            HomeScreen.valueOf(currentHomeScreenRoute)
-        )
-    }
-
     val coroutine = rememberCoroutineScope()
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val isOffline by appState.isOffline.collectAsState()
 
     val notConnectedMessage = stringResource(R.string.not_connected)
     LaunchedEffect(isOffline) {
         if (isOffline) {
-            snackbarHostState.showSnackbar(
+            snackBarHostState.showSnackbar(
                 message = notConnectedMessage,
                 duration = SnackbarDuration.Indefinite,
             )
@@ -83,8 +73,8 @@ fun App(
     Scaffold(
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onBackground,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 24),
+        snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { padding ->
         ModalNavigationDrawer(
             drawerContent = {
@@ -106,14 +96,12 @@ fun App(
             Row {
                 if (appState.shouldShowNavRail) {
                     AppNavRail(
-                        logo = logoText,
                         homeNavController = homeNavController,
                         currentRoute = currentRoute,
                         navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
                     )
                 }
                 VipExamNavHost(
-                    logoText = logoText,
                     navHostController = appState.navController,
                     homeNavController = homeNavController,
                     widthSizeClass = widthSizeClass,

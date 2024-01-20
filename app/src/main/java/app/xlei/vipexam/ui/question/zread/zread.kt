@@ -1,18 +1,13 @@
 package app.xlei.vipexam.ui.question.zread
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -20,12 +15,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -33,17 +26,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.network.module.Muban
-import app.xlei.vipexam.ui.components.TranslateDialog
-import app.xlei.vipexam.ui.page.EmptyTextToolbar
-import app.xlei.vipexam.ui.page.LongPressActions
 import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.core.network.module.Muban
+import app.xlei.vipexam.ui.components.VipexamArticleContainer
 
-@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun zreadView(
     muban: Muban,
@@ -51,11 +40,11 @@ fun zreadView(
 ){
     viewModel.setMuban(muban)
     viewModel.setArticles()
-    val showAnswer = Preferences.showAnswerFlow.collectAsState(initial = false)
+    val showAnswer = Preferences.showAnswer.collectAsState(initial = false)
 
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
-    var selectedQuestionIndex by rememberSaveable { mutableStateOf(0) }
+    var selectedQuestionIndex by rememberSaveable { mutableIntStateOf(0) }
 
     zread(
         articles = uiState.articles,
@@ -65,7 +54,6 @@ fun zreadView(
         toggleQuestionsSheet = viewModel::toggleQuestionsSheet,
         onArticleLongClick = {
             selectedQuestionIndex = it
-            viewModel.toggleQuestionsSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
         onQuestionClicked = {
@@ -79,13 +67,11 @@ fun zreadView(
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
         showAnswer = showAnswer,
-        addToWordList = viewModel::addToWordList,
     )
 }
 
 
-@RequiresApi(Build.VERSION_CODES.P)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun zread(
     articles: List<ZreadUiState.Article>,
@@ -97,35 +83,10 @@ private fun zread(
     onQuestionClicked: (Int) -> Unit,
     onOptionClicked: (Int, String) -> Unit,
     showAnswer: State<Boolean>,
-    addToWordList: (String) -> Unit,
 ){
-    val scrollState = rememberLazyListState()
-    var selectedArticle by rememberSaveable { mutableStateOf(0) }
 
-    val expanded = remember { mutableStateOf(false) }
-    val content: @Composable (Int, ZreadUiState.Article) -> Unit = { articleIndex, ti ->
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .combinedClickable(
-                    onClick = {},
-                    onLongClick = {
-                        selectedArticle = articleIndex
-                        onArticleLongClick(articleIndex)
-                    }
-                )
-        ) {
-            Text(ti.index)
-            Text(
-                text = ti.content,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier
-                    .padding(16.dp)
-            )
-        }
-    }
+    val scrollState = rememberLazyListState()
+    var selectedArticle by rememberSaveable { mutableIntStateOf(0) }
 
     Column {
         LazyColumn(
@@ -133,20 +94,28 @@ private fun zread(
         ) {
             articles.forEachIndexed { articleIndex, ti ->
                 item {
-                    if (Preferences.get(
-                            Preferences.longPressActionKey,
-                            LongPressActions.SHOW_QUESTION.value
-                        )
-                        == LongPressActions.TRANSLATE.value
-                    )
-                        CompositionLocalProvider(
-                            LocalTextToolbar provides EmptyTextToolbar(expended = expanded)
-                        ) {
-                            SelectionContainer {
-                                content(articleIndex, ti)
-                            }
+                    VipexamArticleContainer(
+                        onArticleLongClick = {
+                            selectedArticle = articleIndex
+                            onArticleLongClick(articleIndex)
+                            toggleQuestionsSheet.invoke()
                         }
-                    else content(articleIndex, ti)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            Text(ti.index)
+                            Text(
+                                text = ti.content,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            )
+                        }
+                    }
                     HorizontalDivider(
                         modifier = Modifier
                             .padding(start = 16.dp, end = 16.dp),
@@ -212,17 +181,6 @@ private fun zread(
             }
         }
 
-        if (expanded.value &&
-            Preferences.get(
-                Preferences.longPressActionKey,
-                LongPressActions.SHOW_QUESTION.value
-            )
-            == LongPressActions.TRANSLATE.value
-        )
-            TranslateDialog(
-                expanded = expanded,
-                onAddButtonClick = addToWordList
-            )
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = toggleBottomSheet,
@@ -240,13 +198,7 @@ private fun zread(
             }
         }
 
-        if (showQuestionsSheet &&
-            Preferences.get(
-                Preferences.longPressActionKey,
-                LongPressActions.SHOW_QUESTION.value
-            )
-            == LongPressActions.SHOW_QUESTION.value
-        ) {
+        if (showQuestionsSheet) {
             ModalBottomSheet(
                 onDismissRequest = toggleQuestionsSheet,
             ) {

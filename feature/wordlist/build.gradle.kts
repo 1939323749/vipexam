@@ -2,7 +2,7 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.org.jetbrains.kotlin.android)
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.com.google.dagger.hilt.android)
     alias(libs.plugins.com.google.devtools.ksp)
     kotlin("kapt")
 }
@@ -42,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
     packaging {
         resources {
@@ -54,6 +54,7 @@ android {
 dependencies {
     implementation(projects.core.data)
     implementation(projects.core.database)
+    implementation(projects.core.ui)
     implementation(projects.core.network)
 
     implementation(libs.lifecycle.viewmodel.compose)

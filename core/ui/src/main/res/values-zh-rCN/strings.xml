@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="just_now">刚刚</string>
+    <string name="minute_before">分钟前</string>
+    <string name="hour_before">小时前</string>
+    <string name="ok">OK</string>
+    <string name="login_to_continue">请先登录再继续</string>
+    <string name="loading">玩命加载中QAQ</string>
+    <string name="internet_error">网络错误</string>
+</resources>

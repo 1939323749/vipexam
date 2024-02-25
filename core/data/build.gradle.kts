@@ -35,6 +35,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.network)
+
+    implementation(libs.paging.runtime)
     implementation(libs.datastore.core)
     implementation(libs.datastore.preferences)
     implementation(libs.core.ktx)
@@ -42,6 +45,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.hilt.android)
     implementation(project(":core:database"))
+    implementation(project(":core:network"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.espresso.core2)

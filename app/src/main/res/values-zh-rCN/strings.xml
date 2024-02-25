@@ -4,7 +4,7 @@
     <string name="back_button">返回</string>
     <string name="examlist">试卷列表</string>
     <string name="exam">试卷</string>
-    <string name="setting">设置</string>
+    <string name="settings">设置</string>
     <string name="main">主页面</string>
     <string name="second">单词</string>
     <string name="examtype">试卷类型</string>
@@ -28,4 +28,14 @@
     <string name="add_to_word_list">加入单词表</string>
     <string name="cancel">取消</string>
     <string name="show_answer">显示答案</string>
+    <string name="loading">玩命加载中QAQ</string>
+    <string name="just_now">刚刚</string>
+    <string name="minute_before">分钟前</string>
+    <string name="hour_before">小时前</string>
+    <string name="history">历史</string>
+    <string name="login_first">请先登录</string>
+    <string name="bookmarks">书签</string>
+    <string name="unknown_error">未知错误</string>
+    <string name="not_supported">不支持</string>
+    <string name="login_error">登录出错</string>
 </resources>

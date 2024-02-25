@@ -9,39 +9,43 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.constant.ShowAnswerOption
 import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.data.util.dataStore
-import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.core.network.module.NetWorkRepository.getQuestions
+import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
 import app.xlei.vipexam.ui.question.cloze.clozeView
-import app.xlei.vipexam.ui.question.listening.listeningView
-import app.xlei.vipexam.ui.question.qread.qreadView
-import app.xlei.vipexam.ui.question.translate.translateView
-import app.xlei.vipexam.ui.question.writing.writingView
-import app.xlei.vipexam.ui.question.zread.zreadView
+import app.xlei.vipexam.ui.question.listening.ListeningView
+import app.xlei.vipexam.ui.question.qread.QreadView
+import app.xlei.vipexam.ui.question.translate.TranslateView
+import app.xlei.vipexam.ui.question.writing.WritingView
+import app.xlei.vipexam.ui.question.zread.ZreadView
 import kotlinx.coroutines.launch
 
 @Composable
 fun ExamPage(
+    modifier: Modifier = Modifier,
     questionListUiState: VipexamUiState.QuestionListUiState,
     viewModel: QuestionsViewModel = hiltViewModel(),
-    setQuestion: (String) -> Unit,
-    navController: NavHostController = rememberNavController(),
+    setQuestion: (String,String,String) -> Unit,
+    navController: NavHostController,
+    showFab: Boolean = true,
 ) {
     viewModel.setMubanList(mubanList = questionListUiState.exam.muban)
     val uiState by viewModel.uiState.collectAsState()
@@ -54,51 +58,56 @@ fun ExamPage(
     val haptics = LocalHapticFeedback.current
     val coroutine = rememberCoroutineScope()
     val context = LocalContext.current
-    questions(
-        mubanList = questionListUiState.exam.muban,
-        question = if (questions.toMap().containsKey(questionListUiState.question)) {
-            questionListUiState.question!!
-        } else {
-            questions.first().first
-        },
-        questions = questions,
-        navController = navController,
-        setQuestion = { title ->
-            setQuestion(title)
-        },
-    ) {
-        CustomFloatingActionButton(
-            expandable = true,
-            onFabClick = {
-                if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+
+    if (questions.isNotEmpty())
+        Questions(
+            mubanList = questionListUiState.exam.muban,
+            question = if (questions.toMap().containsKey(questionListUiState.question)) {
+                questionListUiState.question!!
+            } else {
+                questions.first().first
             },
-            iconExpanded = Icons.Filled.KeyboardArrowDown,
-            iconUnExpanded = Icons.Filled.KeyboardArrowUp,
-            items = questions,
-            onItemClick = {
-                navController.navigate(it) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-                if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                if (showAnswerOption == ShowAnswerOption.ONCE) {
-                    coroutine.launch {
-                        context.dataStore.edit { preferences ->
-                            preferences[Preferences.SHOW_ANSWER] = false
+            questions = questions,
+            navController = navController,
+            setQuestion = { title ->
+                setQuestion(questionListUiState.exam.examName,questionListUiState.exam.examID,title)
+            },
+            modifier = modifier
+        ) {
+            if (showFab)
+                CustomFloatingActionButton(
+                    expandable = true,
+                    onFabClick = {
+                        if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    },
+                    iconExpanded = Icons.Filled.KeyboardArrowDown,
+                    iconUnExpanded = Icons.Filled.KeyboardArrowUp,
+                    items = questions,
+                    onItemClick = {
+                        navController.navigate(it) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                        if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        if (showAnswerOption == ShowAnswerOption.ONCE) {
+                            coroutine.launch {
+                                context.dataStore.edit { preferences ->
+                                    preferences[Preferences.SHOW_ANSWER] = false
+                                }
+                            }
                         }
                     }
-                }
-            }
-        )
-    }
+                )
+        }
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun questions(
+fun Questions(
+    modifier: Modifier = Modifier,
     mubanList: List<Muban>,
     question: String,
     questions: List<Pair<String, String>>,
@@ -108,6 +117,7 @@ fun questions(
 ) {
     Scaffold(
         floatingActionButton = FAB,
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier
@@ -117,27 +127,59 @@ fun questions(
                 navController = navController,
                 startDestination = question,
                 modifier = Modifier
+                    .fillMaxSize()
             ) {
                 for ((index, q) in questions.withIndex()) {
                     composable(route = q.first) {
                         setQuestion(mubanList[index].cname)
                         when (q.first) {
-                            "ecswriting" -> writingView(muban = mubanList[index])
+                            "ecswriting" -> WritingView(muban = mubanList[index])
                             "ecscloze" -> clozeView(muban = mubanList[index])
-                            "ecsqread" -> qreadView(muban = mubanList[index])
-                            "ecszread" -> zreadView(muban = mubanList[index])
-                            "ecstranslate" -> translateView(muban = mubanList[index])
-                            "ecfwriting" -> writingView(muban = mubanList[index])
+                            "ecsqread" -> QreadView(muban = mubanList[index])
+                            "ecszread" -> ZreadView(muban = mubanList[index])
+                            "ecstranslate" -> TranslateView(muban = mubanList[index])
+                            "ecfwriting" -> WritingView(muban = mubanList[index])
                             "ecfcloze" -> clozeView(muban = mubanList[index])
-                            "ecfqread" -> qreadView(muban = mubanList[index])
-                            "ecfzread" -> zreadView(muban = mubanList[index])
-                            "ecftranslate" -> translateView(muban = mubanList[index])
-                            "eylhlisteninga" -> listeningView(muban = mubanList[index])
-                            "eylhlisteningb" -> listeningView(muban = mubanList[index])
-                            "eylhlisteningc" -> listeningView(muban = mubanList[index])
+                            "ecfqread" -> QreadView(muban = mubanList[index])
+                            "ecfzread" -> ZreadView(muban = mubanList[index])
+                            "ecftranslate" -> TranslateView(muban = mubanList[index])
+                            "eylhlisteninga" -> ListeningView(muban = mubanList[index])
+                            "eylhlisteningb" -> ListeningView(muban = mubanList[index])
+                            "eylhlisteningc" -> ListeningView(muban = mubanList[index])
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun QuestionMapToView(question: String, muban: Muban){
+    return when (question) {
+        "ecswriting" -> WritingView(muban = muban)
+        "ecscloze" -> clozeView(muban = muban)
+        "ecsqread" -> QreadView(muban = muban)
+        "ecszread" -> ZreadView(muban = muban)
+        "ecstranslate" -> TranslateView(muban = muban)
+        "ecfwriting" -> WritingView(muban = muban)
+        "ecfcloze" -> clozeView(muban = muban)
+        "ecfqread" -> QreadView(muban = muban)
+        "ecfzread" -> ZreadView(muban = muban)
+        "ecftranslate" -> TranslateView(muban = muban)
+        "eylhlisteninga" -> ListeningView(muban = muban)
+        "eylhlisteningb" -> ListeningView(muban = muban)
+        "eylhlisteningc" -> ListeningView(muban = muban)
+        else -> {
+            Box (
+                modifier = Modifier
+                    .fillMaxSize()
+            ){
+                Text(
+                    text = stringResource(id = R.string.not_supported),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
             }
         }
     }

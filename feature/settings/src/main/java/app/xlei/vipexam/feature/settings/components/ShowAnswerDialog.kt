@@ -41,10 +41,8 @@ fun ShowAnswerDialog(
             ),
         ),
         onOptionSelected = {option->
-            coroutine.launch {
-                context.dataStore.edit {
-                    it[Preferences.SHOW_ANSWER_OPTION] = option.value
-                }
+            context.dataStore.edit {
+                it[Preferences.SHOW_ANSWER_OPTION] = option.value
             }
         }
     )

@@ -21,14 +21,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.network.module.Muban
 import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.ui.components.VipexamArticleContainer
 import coil.compose.AsyncImage
 
 
 @Composable
-fun writingView(
+fun WritingView(
     viewModel: WritingViewModel = hiltViewModel(),
     muban: Muban,
 ){
@@ -61,7 +61,11 @@ private fun writing(
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
-                VipexamArticleContainer {
+                VipexamArticleContainer(
+                    onDragContent = writings[it].question
+                            + "\n\n" + writings[it].refAnswer
+                            + "\n\n" + writings[it].description
+                ) {
                     Text(
                         text = writings[it].question,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,

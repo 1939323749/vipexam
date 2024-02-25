@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.serialization)
     kotlin("kapt")
 }
 
@@ -43,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
     packagingOptions {
         exclude("META-INF/DEPENDENCIES")
@@ -61,10 +62,14 @@ android {
 dependencies {
     implementation(projects.core.data)
     implementation(projects.core.database)
+    implementation(projects.core.domain)
     implementation(projects.core.network)
+    implementation(projects.core.ui)
 
     implementation(projects.feature.wordlist)
     implementation(projects.feature.settings)
+    implementation(projects.feature.history)
+    implementation(projects.feature.bookmarks)
 
     androidTestImplementation(libs.androidx.test.espresso.espresso.core2)
     androidTestImplementation(libs.ext.junit)

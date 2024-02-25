@@ -42,7 +42,6 @@ class TimerViewModel : ViewModel() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Timer(
@@ -58,7 +57,7 @@ fun Timer(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = formatTime(time), style = MaterialTheme.typography.bodyMedium)
+        Text(text = formatTime(time), style = MaterialTheme.typography.labelLarge)
     }
     if (isTimerStart)
         timerViewModel.startTimer()

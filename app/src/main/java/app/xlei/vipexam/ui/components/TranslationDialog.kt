@@ -7,7 +7,10 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -23,8 +26,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,10 +50,23 @@ fun TranslateDialog(
     val clipboardManager = context.getSystemService(
         Context.CLIPBOARD_SERVICE
     ) as ClipboardManager
+    val localConfiguration = LocalConfiguration.current
+
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
-            clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()?.let { Text(it) }
+            clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()?.let {
+                LazyColumn (
+                    modifier = Modifier
+                        .heightIn(max = (localConfiguration.screenHeightDp/2).dp)
+                ){
+                    item {
+                        Text(
+                            text = it
+                        )
+                    }
+                }
+            }
         },
         text = {
             var translation by remember {
@@ -82,33 +101,38 @@ fun TranslateDialog(
                     }
                 }
             }
-            Column {
-                Text(
-                    text = translation.data,
-                    fontSize = if (translation.alternatives.isNotEmpty()) 24.sp else TextUnit.Unspecified
-                )
+            LazyColumn {
+                item {
+                    Text(
+                        text = translation.data,
+                        fontSize = if (translation.alternatives.isNotEmpty()) 24.sp else TextUnit.Unspecified,
+                    )
+                }
 
-                LazyRow {
-                    when {
-                        translation.alternatives.isEmpty() && translation.data == "" -> {
-                            item {
-                                Icon(
-                                    imageVector = FeatherIcons.Loader,
-                                    contentDescription = null,
-                                )
+                item {
+                    LazyRow {
+                        when {
+                            translation.alternatives.isEmpty() && translation.data == "" -> {
+                                item {
+                                    Icon(
+                                        imageVector = FeatherIcons.Loader,
+                                        contentDescription = null,
+                                    )
+                                }
                             }
-                        }
 
-                        else -> {
-                            items(translation.alternatives.size) {
-                                Text(
-                                    text = translation.alternatives[it],
-                                    modifier = Modifier.padding(end = 12.dp)
-                                )
+                            else -> {
+                                items(translation.alternatives.size) {
+                                    Text(
+                                        text = translation.alternatives[it],
+                                        modifier = Modifier.padding(end = 12.dp)
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
             }
         },
         dismissButton = {

@@ -7,4 +7,5 @@ object Constants {
         R.string.practice_exam to "4",
         R.string.real_exam to "5"
     )
+    const val ORGANIZATION = "吉林大学"
 }

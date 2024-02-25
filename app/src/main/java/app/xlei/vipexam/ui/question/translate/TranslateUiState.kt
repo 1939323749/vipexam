@@ -1,6 +1,6 @@
 package app.xlei.vipexam.ui.question.translate
 
-import app.xlei.vipexam.core.network.module.Muban
+import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 
 data class TranslateUiState(
     val muban: Muban?=null,

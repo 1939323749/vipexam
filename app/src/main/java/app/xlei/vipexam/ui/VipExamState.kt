@@ -47,31 +47,21 @@ class VipExamState(
     val navController: NavHostController,
     networkMonitor: NetworkMonitor,
 ) {
-    val currentDestination: NavDestination?
-        @Composable get() = navController
-            .currentBackStackEntryAsState().value?.destination
-
-    val currentAppDestination: AppDestinations?
-        @Composable get() = when (currentDestination?.route) {
-            AppDestinations.HOME_ROUTE.name -> AppDestinations.HOME_ROUTE
-            AppDestinations.SECOND_ROUTE.name -> AppDestinations.SECOND_ROUTE
-            AppDestinations.SETTINGS_ROUTE.name -> AppDestinations.SETTINGS_ROUTE
-            else -> null
-        }
-
     val shouldShowTopBar: Boolean
         get() = widthSizeClass == WindowWidthSizeClass.Compact
 
     val shouldShowNavRail: Boolean
-        get() = !shouldShowTopBar
+        get() = widthSizeClass == WindowWidthSizeClass.Medium
 
-    val appDestinations: List<AppDestinations> = AppDestinations.entries
-
-    fun navigateToAppDestination(AppDestination: AppDestinations) {
-        when (AppDestination) {
+    val shouldShowAppDrawer: Boolean
+        get() = widthSizeClass == WindowWidthSizeClass.Expanded
+    fun navigateToAppDestination(appDestination: AppDestinations) {
+        when (appDestination) {
             AppDestinations.HOME_ROUTE -> vipExamNavigationActions.navigateToHome()
             AppDestinations.SECOND_ROUTE -> vipExamNavigationActions.navigateToSecond()
             AppDestinations.SETTINGS_ROUTE -> vipExamNavigationActions.navigateToSettings()
+            AppDestinations.HISTORY -> vipExamNavigationActions.navigateToHistory()
+            AppDestinations.BOOKMARKS -> vipExamNavigationActions.navigateToBookmarks()
         }
     }
 

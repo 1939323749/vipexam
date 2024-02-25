@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import app.xlei.vipexam.core.data.constant.Constants
 import app.xlei.vipexam.core.data.constant.LongPressAction
 import app.xlei.vipexam.core.data.constant.ShowAnswerOption
 import app.xlei.vipexam.core.data.constant.ThemeMode
@@ -18,21 +20,19 @@ val Context.dataStore by preferencesDataStore(
 object Preferences {
     const val appLanguageKey = "appLanguage"
 
-    val REMEMBER_ACCOUNT = booleanPreferencesKey("rememberAccount")
-    val AUTOLOGIN = booleanPreferencesKey("autoLogin")
     val VIBRATE = booleanPreferencesKey("vibrate")
     val LONG_PRESS_ACTION = intPreferencesKey("long_press_action")
     val THEME_MODE = intPreferencesKey("theme_mode")
     val SHOW_ANSWER = booleanPreferencesKey("show_answer")
     val SHOW_ANSWER_OPTION = intPreferencesKey("show_answer_option")
+    val ORGANIZATION = stringPreferencesKey("organization")
 
-    lateinit var rememberAccount: Flow<Boolean>
-    lateinit var autoLogin: Flow<Boolean>
     lateinit var vibrate: Flow<Boolean>
     lateinit var longPressAction: Flow<Int>
     lateinit var showAnswer: Flow<Boolean>
     lateinit var showAnswerOption: Flow<Int>
     lateinit var themeMode: Flow<Int>
+    lateinit var organization: Flow<String>
     lateinit var prefs: SharedPreferences
 
     fun initialize(context: Context) {
@@ -40,13 +40,12 @@ object Preferences {
             "preferences",
             Context.MODE_PRIVATE
         )
-        autoLogin = getPreferenceValue(context, AUTOLOGIN, false)
         vibrate = getPreferenceValue(context, VIBRATE, true)
         showAnswer = getPreferenceValue(context, SHOW_ANSWER, false)
         showAnswerOption = getPreferenceValue(context, SHOW_ANSWER_OPTION, ShowAnswerOption.ONCE.value)
         themeMode = getPreferenceValue(context, THEME_MODE, ThemeMode.AUTO.value)
         longPressAction = getPreferenceValue(context, LONG_PRESS_ACTION, LongPressAction.SHOW_QUESTION.value)
-        rememberAccount = getPreferenceValue(context, REMEMBER_ACCOUNT, false)
+        organization = getPreferenceValue(context, ORGANIZATION, Constants.ORGANIZATION)
     }
     fun <T> put(key: String, value: T) {
         when (value) {

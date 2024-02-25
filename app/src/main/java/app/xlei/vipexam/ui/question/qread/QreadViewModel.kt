@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.Word
-import app.xlei.vipexam.core.network.module.Children
-import app.xlei.vipexam.core.network.module.Muban
+import app.xlei.vipexam.core.network.module.getExamResponse.Children
+import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +36,7 @@ class QreadViewModel @Inject constructor(
     }
 
     @Composable
-    fun setArticles () {
+    fun SetArticles () {
         val articles = mutableListOf<QreadUiState.Article>()
         _uiState.value.muban!!.shiti.forEach {
             articles.add(
@@ -125,18 +125,6 @@ class QreadViewModel @Inject constructor(
             return text.substring(index + 1)
         }
         return ""
-    }
-
-    fun addToWordList(string: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            string.let {
-                repository.add(
-                    Word(
-                        word = it
-                    )
-                )
-            }
-        }
     }
 
 }

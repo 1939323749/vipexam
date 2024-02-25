@@ -19,26 +19,30 @@ fun AppDrawer(
     modifier: Modifier = Modifier
 ) {
     ModalDrawerSheet(modifier) {
-        NavigationDrawerItem(
-            label = { Text(stringResource(id = AppDestinations.HOME_ROUTE.title)) },
-            icon = { Icon(AppDestinations.HOME_ROUTE.icon, null) },
-            selected = currentRoute == AppDestinations.HOME_ROUTE.name,
-            onClick = { navigationToTopLevelDestination(AppDestinations.HOME_ROUTE); closeDrawer() },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
-        NavigationDrawerItem(
-            label = { Text(stringResource(id = AppDestinations.SECOND_ROUTE.title)) },
-            icon = { Icon(AppDestinations.SECOND_ROUTE.icon, null) },
-            selected = currentRoute == AppDestinations.SECOND_ROUTE.name,
-            onClick = { navigationToTopLevelDestination(AppDestinations.SECOND_ROUTE); closeDrawer() },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
-        NavigationDrawerItem(
-            label = { Text(stringResource(id = AppDestinations.SETTINGS_ROUTE.title)) },
-            icon = { Icon(AppDestinations.SETTINGS_ROUTE.icon, null) },
-            selected = currentRoute == AppDestinations.SETTINGS_ROUTE.name,
-            onClick = { navigationToTopLevelDestination(AppDestinations.SETTINGS_ROUTE); closeDrawer() },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
+        AppDestinations.entries.forEach {
+            VipexamDrawerItem(
+                currentRoute = currentRoute,
+                destination = it,
+                navigationToTopLevelDestination = navigationToTopLevelDestination
+            ) {
+                closeDrawer.invoke()
+            }
+        }
     }
+}
+
+@Composable
+private fun VipexamDrawerItem(
+    currentRoute: String,
+    destination: AppDestinations,
+    navigationToTopLevelDestination: (AppDestinations) -> Unit,
+    closeDrawer: () -> Unit,
+){
+    NavigationDrawerItem(
+        label = { Text(stringResource(id = destination.title)) },
+        icon = { Icon(destination.icon, null) },
+        selected = currentRoute == destination.name,
+        onClick = { navigationToTopLevelDestination(destination); closeDrawer() },
+        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+    )
 }

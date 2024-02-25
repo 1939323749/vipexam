@@ -22,7 +22,6 @@ import app.xlei.vipexam.core.database.module.Word
 import app.xlei.vipexam.ui.App
 import app.xlei.vipexam.ui.theme.VipexamTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

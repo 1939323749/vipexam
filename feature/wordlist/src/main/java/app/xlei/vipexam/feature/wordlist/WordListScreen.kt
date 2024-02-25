@@ -1,7 +1,5 @@
 package app.xlei.vipexam.feature.wordlist
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -42,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import app.xlei.vipexam.core.ui.DateText
 import app.xlei.vipexam.feature.wordlist.components.CopyToClipboardButton
 import app.xlei.vipexam.feature.wordlist.components.TranslationSheet
 import app.xlei.vipexam.feature.wordlist.constant.SortMethod
@@ -54,6 +53,7 @@ import java.util.Date
 )
 @Composable
 fun WordListScreen(
+    modifier: Modifier = Modifier,
     viewModel: WordListViewModel = hiltViewModel(),
     openDrawer: () -> Unit,
 ) {
@@ -95,7 +95,7 @@ fun WordListScreen(
                 scrollBehavior = scrollBehavior
             )
         },
-        modifier = Modifier
+        modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -152,7 +152,7 @@ fun WordListScreen(
                 items(wordListState.size) { index ->
                     ListItem(
                         headlineContent = { Text(wordListState[index].word) },
-                        supportingContent = { Text(Date(wordListState[index].created).toString()) },
+                        supportingContent = { DateText(wordListState[index].created) },
                         trailingContent = { CopyToClipboardButton(wordListState[index].word) },
                         modifier = Modifier
                             .combinedClickable(

@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.network.module.Muban
+import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.ui.components.VipexamArticleContainer
 
 @Composable
@@ -39,7 +39,7 @@ fun clozeView(
     muban: Muban,
 ){
     viewModel.setMuban(muban)
-    viewModel.setClozes()
+    viewModel.SetClozes()
     val showAnswer by Preferences.showAnswer.collectAsState(initial = false)
     val vibrate by Preferences.vibrate.collectAsState(initial = true)
 

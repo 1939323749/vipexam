@@ -1,8 +1,11 @@
 package app.xlei.vipexam.core.database.di
 
 import app.xlei.vipexam.core.database.VipexamDatabase
+import app.xlei.vipexam.core.database.dao.BookmarkDao
+import app.xlei.vipexam.core.database.dao.ExamHistoryDao
 import app.xlei.vipexam.core.database.dao.UserDao
 import app.xlei.vipexam.core.database.dao.WordDao
+import app.xlei.vipexam.core.database.module.ExamHistory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,4 +23,14 @@ object DaosModule {
     fun providesUserDao(
         database: VipexamDatabase
     ): UserDao = database.userDao()
+
+    @Provides
+    fun providesExamHistory(
+        database: VipexamDatabase
+    ): ExamHistoryDao = database.examHistoryDao()
+
+    @Provides
+    fun providesBookmark(
+        database: VipexamDatabase
+    ): BookmarkDao = database.bookmarkDao()
 }

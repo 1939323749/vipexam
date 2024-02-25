@@ -48,10 +48,8 @@ fun ThemeModeDialog(
             )
         ),
         onOptionSelected = {option->
-            coroutine.launch {
-                context.dataStore.edit {
-                    it[Preferences.THEME_MODE] = option.value
-                }
+            context.dataStore.edit {
+                it[Preferences.THEME_MODE] = option.value
             }
         }
     )

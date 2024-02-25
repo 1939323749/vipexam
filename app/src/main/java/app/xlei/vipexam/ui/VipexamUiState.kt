@@ -1,52 +1,47 @@
 package app.xlei.vipexam.ui
 
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.annotation.StringRes
 import app.xlei.vipexam.core.database.module.User
-import app.xlei.vipexam.core.network.module.Exam
-import app.xlei.vipexam.core.network.module.ExamList
-import app.xlei.vipexam.core.network.module.LoginResponse
-import app.xlei.vipexam.ui.navigation.HomeScreen
+import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
+import app.xlei.vipexam.core.network.module.login.LoginResponse
+import app.xlei.vipexam.ui.appbar.AppBarTitle
 import kotlinx.coroutines.flow.Flow
 
 data class VipexamUiState(
-    val loginUiState: LoginUiState,
-    val examTypeListUiState: ExamTypeListUiState,
-    val examListUiState: ExamListUiState,
-    val questionListUiState: QuestionListUiState,
-    val title: String,
-    val screenType: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
-    val currentRoute: HomeScreen = HomeScreen.Login,
+    var loginUiState: UiState<LoginUiState>,
+    var examTypeListUiState: UiState<ExamTypeListUiState>,
+    var examListUiState: UiState<ExamListUiState>,
+    var questionListUiState: UiState<QuestionListUiState>,
+    val title: AppBarTitle,
 ) {
     data class LoginUiState(
         val account: String,
         val password: String,
         val loginResponse: LoginResponse?,
         val users: Flow<List<User>>,
-        val loginSetting: LoginSetting,
-        val connectivity: Boolean,
-    )
-
-    data class LoginSetting(
-        val isAutoLogin: Flow<Boolean>,
-        val isRememberAccount: Flow<Boolean>,
     )
 
     data class ExamTypeListUiState(
         val examTypeList: List<Int>,
-        val examListUiState: ExamListUiState?,
+        val examListUiState: UiState<ExamListUiState>,
     )
 
     data class ExamListUiState(
         val examType: Int,
-        val examList: ExamList,
-        val currentPage: String,
-        val questionListUiState: QuestionListUiState?,
+        val questionListUiState: UiState<QuestionListUiState>,
     )
 
     data class QuestionListUiState(
-        val exam: Exam,
+        val exam: GetExamResponse,
         val questions: List<Pair<String, String>>,
         val question: String?,
     )
+}
 
+sealed class UiState<out T> {
+    data class Success<T>(val uiState: T) : UiState<T>()
+
+    data class Loading<T>(@StringRes val loadingMessageId: Int) : UiState<T>()
+
+    data class Error(@StringRes val errorMessageId: Int, val msg: String? = null) : UiState<Nothing>()
 }

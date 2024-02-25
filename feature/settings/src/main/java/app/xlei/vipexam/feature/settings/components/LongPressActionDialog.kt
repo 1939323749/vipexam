@@ -20,8 +20,8 @@ fun LongPressActionDialog(
         LongPressAction.entries[Preferences.longPressAction.collectAsState(
             LongPressAction.SHOW_QUESTION.value
         ).value]
-    val coroutine = rememberCoroutineScope()
     val context = LocalContext.current
+
     ListPreferenceDialog(
         title = stringResource(R.string.long_press_action),
         onDismissRequest = {
@@ -45,10 +45,8 @@ fun LongPressActionDialog(
             ),
         ),
         onOptionSelected = {option->
-            coroutine.launch {
-                context.dataStore.edit {
-                    it[Preferences.LONG_PRESS_ACTION] = option.value
-                }
+            context.dataStore.edit {
+                it[Preferences.LONG_PRESS_ACTION] = option.value
             }
         }
     )

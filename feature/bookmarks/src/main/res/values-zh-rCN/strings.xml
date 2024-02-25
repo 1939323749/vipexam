@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bookmarks">书签</string>
+    <string name="empty_bookmarks_tips">书签为空,点击星号加入书签</string>
+    <string name="question">问题</string>
+</resources>

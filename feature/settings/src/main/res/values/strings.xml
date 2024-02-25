@@ -24,4 +24,6 @@
     <string name="none">None</string>
     <string name="vibrate">Vibrate</string>
     <string name="vibrate_summary">vibrate</string>
+    <string name="edit_organiztion">Edit your orgnization</string>
+    <string name="organiztion">Organiztion</string>
 </resources>

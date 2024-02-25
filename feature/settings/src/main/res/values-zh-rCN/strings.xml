@@ -24,4 +24,6 @@
     <string name="none">无</string>
     <string name="vibrate">震动</string>
     <string name="vibrate_summary">打开震动</string>
+    <string name="edit_organiztion">修改你的组织</string>
+    <string name="organiztion">组织</string>
 </resources>

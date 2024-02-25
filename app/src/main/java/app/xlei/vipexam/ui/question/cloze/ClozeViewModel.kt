@@ -12,8 +12,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.Word
-import app.xlei.vipexam.core.network.module.Muban
-import app.xlei.vipexam.core.network.module.Shiti
+import app.xlei.vipexam.core.network.module.getExamResponse.Muban
+import app.xlei.vipexam.core.network.module.getExamResponse.Shiti
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +42,7 @@ class ClozeViewModel @Inject constructor(
     }
 
     @Composable
-    fun setClozes(){
+    fun SetClozes(){
         val clozes = mutableListOf<ClozeUiState.Cloze>()
 
         _uiState.value.muban!!.shiti.forEach {
@@ -66,7 +66,7 @@ class ClozeViewModel @Inject constructor(
         }
     }
 
-    fun addToWordList(string: String? = null) {
+    private fun addToWordList(string: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             string?.let {
                 repository.add(
@@ -127,7 +127,7 @@ class ClozeViewModel @Inject constructor(
         return options.sortedBy { it.index }
     }
 
-    fun getClickableArticle(text: String): ClozeUiState.Article {
+    private fun getClickableArticle(text: String): ClozeUiState.Article {
         val pattern = Regex("""C\d+""")
         val matches = pattern.findAll(text)
 

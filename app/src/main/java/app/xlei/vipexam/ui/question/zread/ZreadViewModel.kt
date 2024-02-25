@@ -4,24 +4,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import app.xlei.vipexam.core.data.repository.Repository
-import app.xlei.vipexam.core.database.module.Word
-import app.xlei.vipexam.core.network.module.Children
-import app.xlei.vipexam.core.network.module.Muban
+import app.xlei.vipexam.core.network.module.getExamResponse.Children
+import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ZreadViewModel @Inject constructor(
     zreadUiState: ZreadUiState,
-    private val wordRepository: Repository<Word>,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(zreadUiState)
@@ -36,7 +30,7 @@ class ZreadViewModel @Inject constructor(
     }
 
     @Composable
-    fun setArticles() {
+    fun SetArticles() {
         val articles = mutableListOf<ZreadUiState.Article>()
 
         _uiState.value.muban!!.shiti.forEachIndexed {index,it->
@@ -133,15 +127,4 @@ class ZreadViewModel @Inject constructor(
         }
     }
 
-    fun addToWordList(string: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            string.let {
-                wordRepository.add(
-                    Word(
-                        word = it
-                    )
-                )
-            }
-        }
-    }
 }

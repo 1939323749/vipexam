@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="just_now" />
+    <string name="minute_before">m before</string>
+    <string name="hour_before">h before</string>
+    <string name="ok">OK</string>
+    <string name="login_to_continue">Please login to continue</string>
+    <string name="loading">loading…</string>
+    <string name="internet_error">Network Error</string>
+</resources>

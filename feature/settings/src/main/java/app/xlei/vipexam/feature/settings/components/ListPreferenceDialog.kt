@@ -7,8 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import app.xlei.vipexam.feature.settings.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun ListPreferenceDialog(
@@ -16,8 +18,9 @@ fun ListPreferenceDialog(
     options: List<ListPreferenceOption>,
     currentValue: Int? = null,
     title: String? = null,
-    onOptionSelected: (ListPreferenceOption) -> Unit = {}
+    onOptionSelected: suspend (ListPreferenceOption) -> Unit = {}
 ) {
+    val  coroutine = rememberCoroutineScope()
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
@@ -30,8 +33,10 @@ fun ListPreferenceDialog(
                     SelectableItem(
                         text = if (it.value == currentValue) "${it.name}   ✓" else it.name,
                         onClick = {
-                            onOptionSelected.invoke(it)
-                            onDismissRequest.invoke()
+                            coroutine.launch {
+                                onOptionSelected.invoke(it)
+                                onDismissRequest.invoke()
+                            }
                         },
                         isSelected = it.isSelected
                     )

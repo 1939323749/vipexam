@@ -28,6 +28,7 @@ import app.xlei.vipexam.core.database.module.Language
 import app.xlei.vipexam.feature.settings.components.ListPreference
 import app.xlei.vipexam.feature.settings.components.ListPreferenceOption
 import app.xlei.vipexam.feature.settings.components.LongPressActionDialog
+import app.xlei.vipexam.feature.settings.components.OrganizationDialog
 import app.xlei.vipexam.feature.settings.components.PreferenceItem
 import app.xlei.vipexam.feature.settings.components.SettingsCategory
 import app.xlei.vipexam.feature.settings.components.ShowAnswerDialog
@@ -41,6 +42,7 @@ import compose.icons.feathericons.Menu
 fun SettingsScreen(
     openDrawer: () -> Unit,
     onLanguageChange: (ListPreferenceOption) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
 
     var showThemeOptions by remember {
@@ -55,12 +57,16 @@ fun SettingsScreen(
         mutableStateOf(false)
     }
 
+    var showOrganizationDialog by remember {
+        mutableStateOf(false)
+    }
+
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
     )
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .statusBarsPadding()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -148,6 +154,17 @@ fun SettingsScreen(
                     preferencesKey = Preferences.VIBRATE)
             }
 
+            item {
+                PreferenceItem(
+                    modifier = Modifier
+                        .padding(top = 10.dp),
+                    title = stringResource(id = R.string.organiztion),
+                    summary = stringResource(id = R.string.edit_organiztion)
+                ){
+                    showOrganizationDialog = true
+                }
+            }
+
         }
 
         if (showThemeOptions)
@@ -166,5 +183,9 @@ fun SettingsScreen(
                 showLongPressActions = false
             }
 
+        if (showOrganizationDialog)
+            OrganizationDialog {
+                showOrganizationDialog = false
+            }
     }
 }

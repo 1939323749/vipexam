@@ -1,9 +1,11 @@
 package app.xlei.vipexam.ui
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerState
@@ -23,7 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -32,7 +34,7 @@ import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.util.NetworkMonitor
 import app.xlei.vipexam.ui.components.AppDrawer
 import app.xlei.vipexam.ui.components.AppNavRail
-import app.xlei.vipexam.ui.navgraph.VipExamNavHost
+import app.xlei.vipexam.ui.navigation.VipExamNavHost
 import app.xlei.vipexam.ui.navigation.AppDestinations
 import kotlinx.coroutines.launch
 
@@ -61,6 +63,9 @@ fun App(
     val isOffline by appState.isOffline.collectAsState()
 
     val notConnectedMessage = stringResource(R.string.not_connected)
+
+    val configuration = LocalConfiguration.current
+
     LaunchedEffect(isOffline) {
         if (isOffline) {
             snackBarHostState.showSnackbar(
@@ -69,9 +74,9 @@ fun App(
             )
         }
     }
-
+    // consider replace with material3/adaptive/navigationsuite
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.onBackground,
         contentWindowInsets = WindowInsets(0, 0, 0, 24),
         snackbarHost = { SnackbarHost(snackBarHostState) },
@@ -88,29 +93,51 @@ fun App(
                 )
             },
             drawerState = sizeAwareDrawerState,
-            gesturesEnabled = appState.shouldShowTopBar,
+            gesturesEnabled = appState.shouldShowTopBar ||
+                    appState.shouldShowAppDrawer && configuration.orientation == Configuration.ORIENTATION_PORTRAIT,
             modifier = Modifier
                 .padding(padding)
                 .consumeWindowInsets(padding)
         ) {
-            Row {
-                if (appState.shouldShowNavRail) {
-                    AppNavRail(
-                        homeNavController = homeNavController,
-                        currentRoute = currentRoute,
-                        navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
-                    )
+            Row (
+                modifier = Modifier
+                    .fillMaxSize()
+            ){
+                when (configuration.orientation) {
+                    Configuration.ORIENTATION_LANDSCAPE -> {
+                        if (appState.shouldShowAppDrawer)
+                            AppDrawer(
+                                currentRoute = currentRoute,
+                                navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
+                                closeDrawer = {},
+                                modifier = Modifier
+                                    .width(300.dp)
+                                    .padding(top = 24.dp)
+                            )
+                    }
+                    else -> {
+                        if (appState.shouldShowNavRail) {
+                            AppNavRail(
+                                homeNavController = homeNavController,
+                                currentRoute = currentRoute,
+                                navigationToTopLevelDestination = { appState.navigateToAppDestination(it) },
+                            )
+                        }
+                    }
                 }
                 VipExamNavHost(
                     navHostController = appState.navController,
                     homeNavController = homeNavController,
                     widthSizeClass = widthSizeClass,
-                    openDrawer = { coroutine.launch { sizeAwareDrawerState.open() } },
+                    openDrawer = {
+                        if (appState.shouldShowAppDrawer.not() || configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+                            coroutine.launch {
+                                sizeAwareDrawerState.open()
+                            } },
                 )
             }
         }
     }
-
 }
 
 

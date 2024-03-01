@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import app.xlei.vipexam.core.data.ExamListItem
-import app.xlei.vipexam.core.data.GetExamListUseCase
+import app.xlei.vipexam.core.data.paging.ExamListItem
+import app.xlei.vipexam.core.data.paging.GetExamListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged

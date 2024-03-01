@@ -2,7 +2,6 @@ package app.xlei.vipexam.core.data.util
 
 import android.content.Context
 import android.content.res.Configuration
-import app.xlei.vipexam.core.data.R
 import app.xlei.vipexam.core.database.module.Language
 import java.util.Locale
 

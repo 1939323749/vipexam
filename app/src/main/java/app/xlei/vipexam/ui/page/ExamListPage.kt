@@ -28,7 +28,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.xlei.vipexam.R
-import app.xlei.vipexam.core.data.ExamListItem
+import app.xlei.vipexam.core.data.paging.ExamListItem
 import app.xlei.vipexam.core.ui.DateText
 import app.xlei.vipexam.core.ui.ErrorMessage
 import app.xlei.vipexam.core.ui.LoadingNextPageItem

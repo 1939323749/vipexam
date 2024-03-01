@@ -3,8 +3,8 @@ package app.xlei.vipexam.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.R
-import app.xlei.vipexam.core.data.ExamListApi
 import app.xlei.vipexam.core.data.constant.Constants
+import app.xlei.vipexam.core.data.paging.ExamListApi
 import app.xlei.vipexam.core.data.repository.ExamHistoryRepository
 import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.database.module.User

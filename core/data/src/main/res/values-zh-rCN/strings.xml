@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="practice_exam">模拟试卷</string>
+    <string name="real_exam">真题试卷</string>
+    <string name="system">系统</string>
+</resources>

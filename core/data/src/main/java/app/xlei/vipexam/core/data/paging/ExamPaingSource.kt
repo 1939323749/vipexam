@@ -1,4 +1,4 @@
-package app.xlei.vipexam.core.data
+package app.xlei.vipexam.core.data.paging
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig

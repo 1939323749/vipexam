@@ -57,6 +57,8 @@ dependencies {
     implementation(projects.core.ui)
     implementation(projects.core.network)
 
+    implementation(libs.paging.compose)
+    implementation(libs.paging.runtime)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.commons.csv)
     implementation(libs.material3)

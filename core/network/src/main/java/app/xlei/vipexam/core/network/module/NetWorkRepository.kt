@@ -1,23 +1,16 @@
 package app.xlei.vipexam.core.network.module
 
-import android.app.DownloadManager
-import android.content.ContentValues
 import android.content.Context
-import android.net.Uri
-import android.os.Build
 import android.os.Environment
-import android.provider.MediaStore
-import android.widget.Toast
-import app.xlei.vipexam.core.network.R
 import app.xlei.vipexam.core.network.module.getExamList.GetExamListResponse
 import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.network.module.login.LoginResponse
+import app.xlei.vipexam.core.network.module.momoLookUp.MomoLookUpResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -25,7 +18,6 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.ContentDisposition.Companion.File
 import io.ktor.http.ContentType
 import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
@@ -33,8 +25,6 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
-import io.ktor.utils.io.write
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
 
 
@@ -237,9 +227,27 @@ object NetWorkRepository {
                 it.copyAndClose(file.writeChannel())
             }
             println(res)
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             println(e)
         }
+    }
 
+    suspend fun momoLookUp(
+        offset: Int,
+        keyword: String,
+        paperType: String = "CET6"
+    ): Result<MomoLookUpResponse> {
+        return try {
+            Result.success(
+                httpClient.get("https://lookup.maimemo.com/api/v1/search?offset=$offset&limit=10&keyword=$keyword&paper_type=$paperType")
+                    .body<MomoLookUpResponse>()
+                    .also {
+                        println(it)
+                    }
+            )
+        } catch (e: Exception) {
+            println(e)
+            Result.failure(e)
+        }
     }
 }

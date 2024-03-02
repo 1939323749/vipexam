@@ -46,6 +46,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.network)
+
+    implementation(libs.feather)
     implementation(libs.material3)
     implementation(libs.core.ktx)
     implementation(libs.appcompat)

@@ -7,4 +7,5 @@
     <string name="login_to_continue">请先登录再继续</string>
     <string name="loading">玩命加载中QAQ</string>
     <string name="internet_error">网络错误</string>
+    <string name="cancel">取消</string>
 </resources>

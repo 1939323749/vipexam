@@ -1,13 +1,10 @@
-package app.xlei.vipexam.ui.components
+package app.xlei.vipexam.core.ui
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,8 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,13 +23,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.xlei.vipexam.R
 import app.xlei.vipexam.core.network.module.TranslationResponse
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Loader
@@ -42,8 +34,17 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TranslateDialog(
-    confirmButton: @Composable () -> Unit,
     onDismissRequest: () -> Unit,
+    dismissButton: @Composable () -> Unit = {
+        TextButton(onClick = onDismissRequest) {
+            Text(text = stringResource(R.string.cancel))
+        }
+    },
+    confirmButton: @Composable () -> Unit = {
+        TextButton(onClick = onDismissRequest) {
+            Text(text = stringResource(id = R.string.ok))
+        }
+    },
 ) {
     val coroutine = rememberCoroutineScope()
     val context = LocalContext.current
@@ -135,17 +136,7 @@ fun TranslateDialog(
 
             }
         },
-        dismissButton = {
-            TextButton(
-                onClick = onDismissRequest
-            ) {
-                Text(
-                    stringResource(
-                        R.string.cancel
-                    )
-                )
-            }
-        },
+        dismissButton = dismissButton,
         confirmButton = confirmButton
     )
 }

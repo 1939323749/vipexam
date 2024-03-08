@@ -35,6 +35,15 @@ import app.xlei.vipexam.core.ui.LoadingNextPageItem
 import app.xlei.vipexam.core.ui.PageLoader
 import kotlinx.coroutines.launch
 
+/**
+ * Exam list view
+ *
+ * @param modifier
+ * @param type 试卷类型：模拟还是真题
+ * @param viewModel 试卷列表vm
+ * @param onExamClick 试卷点击事件
+ * @receiver
+ */
 @OptIn(
     ExperimentalMaterialApi::class,
 )

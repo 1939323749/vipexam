@@ -38,6 +38,17 @@ import app.xlei.vipexam.ui.question.writing.WritingView
 import app.xlei.vipexam.ui.question.zread.ZreadView
 import kotlinx.coroutines.launch
 
+/**
+ * Exam page
+ * 试卷页面
+ * @param modifier
+ * @param questionListUiState 问题列表状态
+ * @param viewModel 问题列表vm
+ * @param setQuestion 问题点击事件
+ * @param navController 导航控制器
+ * @param showFab 显示按钮
+ * @receiver
+ */
 @Composable
 fun ExamPage(
     modifier: Modifier = Modifier,
@@ -51,7 +62,7 @@ fun ExamPage(
     val uiState by viewModel.uiState.collectAsState()
     val vibrate by Preferences.vibrate.collectAsState(initial = true)
     val showAnswerOption = ShowAnswerOption.entries[
-            Preferences.showAnswerOption.collectAsState(initial = ShowAnswerOption.ONCE.value).value
+        Preferences.showAnswerOption.collectAsState(initial = ShowAnswerOption.ONCE.value).value
     ]
 
     val questions = getQuestions(uiState.mubanList!!)
@@ -154,6 +165,12 @@ fun Questions(
     }
 }
 
+/**
+ * Question map to view
+ * 根据问题类型切换不同的显示方式
+ * @param question 问题
+ * @param muban 模板
+ */
 @Composable
 fun QuestionMapToView(question: String, muban: Muban){
     return when (question) {

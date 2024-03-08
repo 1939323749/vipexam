@@ -19,6 +19,14 @@ import app.xlei.vipexam.ui.UiState
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.components.ExamSearchBar
 
+/**
+ * Exam type list view
+ * 试卷类型列表
+ * @param examTypeListUiState 试卷类型列表
+ * @param onExamTypeClick 试卷类型点击事件
+ * @param modifier
+ * @receiver
+ */
 @Composable
 fun ExamTypeListView(
     examTypeListUiState: UiState<VipexamUiState.ExamTypeListUiState>,
@@ -37,6 +45,7 @@ fun ExamTypeListView(
             is UiState.Loading -> {
                 OnLoading(examTypeListUiState.loadingMessageId)
             }
+
             is UiState.Success -> {
                 LazyColumn(
                     modifier = modifier
@@ -53,6 +62,7 @@ fun ExamTypeListView(
                     }
                 }
             }
+
             is UiState.Error -> {
                 OnError(
                     textId =  examTypeListUiState.errorMessageId,

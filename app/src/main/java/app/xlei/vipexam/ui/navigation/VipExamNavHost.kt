@@ -22,11 +22,19 @@ import app.xlei.vipexam.feature.history.HistoryScreen
 import app.xlei.vipexam.feature.settings.SettingsScreen
 import app.xlei.vipexam.feature.wordlist.WordListScreen
 import app.xlei.vipexam.ui.VipExamMainScreenViewModel
-import app.xlei.vipexam.ui.navigation.AppDestinations
-import app.xlei.vipexam.ui.navigation.Screen
 import app.xlei.vipexam.ui.screen.HomeScreen
 
-
+/**
+ * Vip exam nav host
+ *
+ * @param logoText logo
+ * @param navHostController app导航控制器
+ * @param homeNavController 主页导航控制器
+ * @param widthSizeClass 屏幕宽度
+ * @param openDrawer 打开抽屉事件
+ * @receiver
+ * @receiver
+ */
 @Composable
 fun VipExamNavHost(
     logoText:  @Composable () -> Unit = {},

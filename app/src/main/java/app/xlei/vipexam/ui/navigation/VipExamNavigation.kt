@@ -13,14 +13,28 @@ import app.xlei.vipexam.R
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Bookmark
 
+/**
+ * App destinations
+ * 导航栏的按钮，按出现顺序排列
+ * @property title 显示的标题
+ * @property icon 显示的图标
+ * @constructor Create empty App destinations
+ */
 enum class AppDestinations(@StringRes val title: Int, val icon: ImageVector) {
     HOME_ROUTE(title = R.string.main, icon = Icons.Filled.Home),
-    SECOND_ROUTE(title = R.string.second, icon = Icons.Filled.Edit),
-    SETTINGS_ROUTE(title = R.string.settings, icon = Icons.Filled.Settings),
+    SECOND_ROUTE(title = R.string.word, icon = Icons.Filled.Edit),
     HISTORY(title = R.string.history, icon = Icons.Filled.DateRange),
-    BOOKMARKS(title = R.string.bookmarks, icon = FeatherIcons.Bookmark)
+    BOOKMARKS(title = R.string.bookmarks, icon = FeatherIcons.Bookmark),
+    SETTINGS_ROUTE(title = R.string.settings, icon = Icons.Filled.Settings),
 }
 
+/**
+ * Vip exam navigation actions
+ * app导航事件
+ * @constructor
+ *
+ * @param navController
+ */
 class VipExamNavigationActions(navController: NavController) {
     val navigateToHome: () -> Unit = {
         navController.navigate(AppDestinations.HOME_ROUTE.name) {
@@ -31,7 +45,7 @@ class VipExamNavigationActions(navController: NavController) {
             restoreState = true
         }
     }
-    val navigateToSecond: () -> Unit = {
+    val navigateToWords: () -> Unit = {
         navController.navigate(AppDestinations.SECOND_ROUTE.name) {
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true

@@ -20,6 +20,14 @@ import app.xlei.vipexam.R
 import app.xlei.vipexam.core.ui.DateText
 import app.xlei.vipexam.feature.history.HistoryViewModel
 
+/**
+ * Exam list screen supporting pane
+ * 试卷列表屏幕的历史记录部分
+ * @param modifier
+ * @param viewModel 历史记录vm
+ * @param onExamClick 历史记录点击事件
+ * @receiver
+ */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 fun ExamListScreenSupportingPane(

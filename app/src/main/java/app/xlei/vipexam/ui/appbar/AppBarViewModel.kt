@@ -13,6 +13,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * App bar view model
+ *
+ * @property bookmarkRepository 用于书签按钮
+ * @constructor Create empty App bar view model
+ */
 @HiltViewModel
 class AppBarViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository
@@ -24,7 +30,11 @@ class AppBarViewModel @Inject constructor(
         getBookmarks()
     }
 
-    private fun getBookmarks(){
+    /**
+     * Get bookmarks
+     * 获得全部书签
+     */
+    private fun getBookmarks() {
         viewModelScope.launch {
             bookmarkRepository
                 .getAllBookmarks()
@@ -37,7 +47,14 @@ class AppBarViewModel @Inject constructor(
         }
     }
 
-    fun addToBookmark(examName: String, examId: String, question: String){
+    /**
+     * Add to bookmark
+     * 添加到书签
+     * @param examName 试卷名称
+     * @param examId 试卷id
+     * @param question 问题名称
+     */
+    fun addToBookmark(examName: String, examId: String, question: String) {
         viewModelScope.launch {
             bookmarkRepository
                 .addBookmark(
@@ -48,7 +65,12 @@ class AppBarViewModel @Inject constructor(
         }
     }
 
-    fun removeFromBookmarks(bookmark: Bookmark){
+    /**
+     * Remove from bookmarks
+     * 移除书签
+     * @param bookmark 书签对象
+     */
+    fun removeFromBookmarks(bookmark: Bookmark) {
         viewModelScope.launch {
             bookmarkRepository
                 .deleteBookmark(

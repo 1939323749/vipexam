@@ -38,6 +38,20 @@ import compose.icons.feathericons.Star
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+/**
+ * Vip exam app bar
+ *
+ * @param modifier
+ * @param scrollable 大屏情况下禁用滚动
+ * @param appBarTitle 标题
+ * @param canNavigateBack 是否能导航返回
+ * @param navigateUp 导航返回的函数
+ * @param openDrawer 打开侧边抽屉
+ * @param scrollBehavior 滚动行为
+ * @param viewModel 标题vm
+ * @receiver
+ * @receiver
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VipExamAppBar(
@@ -90,6 +104,7 @@ fun VipExamAppBar(
                     )
                 }
             }
+
             scrollable ->
                 IconButton(onClick = openDrawer) {
                     Icon(
@@ -155,6 +170,7 @@ fun VipExamAppBar(
                     )
                 }
             }
+
             else -> {}
         }
     }
@@ -166,6 +182,7 @@ fun VipExamAppBar(
             scrollBehavior = scrollBehavior,
             modifier = modifier
         )
+
         false -> TopAppBar(
             title = title,
             navigationIcon = navigationIcon,

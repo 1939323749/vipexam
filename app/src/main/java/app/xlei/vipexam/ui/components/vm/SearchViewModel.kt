@@ -13,14 +13,26 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Search view model
+ *
+ * @property examListRepository 试卷列表
+ * @constructor Create empty Search view model
+ */
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val examListRepository : ExamListRepository,
 ) : ViewModel() {
-    private val _examListState: MutableStateFlow<PagingData<ExamListItem>> = MutableStateFlow(value = PagingData.empty())
+    private val _examListState: MutableStateFlow<PagingData<ExamListItem>> =
+        MutableStateFlow(value = PagingData.empty())
     val examListState: MutableStateFlow<PagingData<ExamListItem>>
         get() = _examListState
 
+    /**
+     * Search
+     * 搜索试卷
+     * @param query 搜索关键词
+     */
     fun search(query: String) {
         viewModelScope.launch {
             examListRepository.search(query)
@@ -32,10 +44,16 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Download
+     * 下载试卷
+     * @param fileName 文件名
+     * @param examId 试卷id
+     */
     fun download(
         fileName: String,
         examId: String,
-    ){
+    ) {
         viewModelScope.launch {
             NetWorkRepository
                 .download(

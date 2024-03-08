@@ -13,6 +13,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Exam screen supporting pane view model
+ * 试卷页面显示试卷标题和问题列表，切换问题
+ * @property bookmarkRepository 用于显示是否已经加入书签
+ * @constructor Create empty Exam screen supporting pane view model
+ */
 @HiltViewModel
 class ExamScreenSupportingPaneViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository

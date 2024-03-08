@@ -25,6 +25,12 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Search
 import compose.icons.feathericons.X
 
+/**
+ * Exam search bar
+ *
+ * @param modifier
+ * @param viewModel 搜索vm
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExamSearchBar(
@@ -61,7 +67,7 @@ fun ExamSearchBar(
             items(results.itemCount) {
                 ListItem(
                     headlineContent = { results[it]?.exam?.let { exam->
-                    Text(text = exam.examname) } },
+                        Text(text = exam.examname) } },
                     modifier = Modifier
                         .clickable {
                             results[it]?.exam?.let { exam ->

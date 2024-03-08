@@ -20,6 +20,17 @@ import app.xlei.vipexam.ui.VipExamMainScreenViewModel
 import app.xlei.vipexam.ui.appbar.VipExamAppBar
 import app.xlei.vipexam.ui.navigation.MainScreenNavigation
 
+/**
+ * Home screen
+ *
+ * @param modifier
+ * @param logoText
+ * @param widthSizeClass 屏幕宽度
+ * @param viewModel 主页vm
+ * @param navController 主页导航控制器
+ * @param openDrawer 打开侧边抽屉事件
+ * @receiver
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -68,6 +79,7 @@ fun HomeScreen(
                         openDrawer = openDrawer,
                         scrollBehavior = scrollBehavior,
                     )
+
                 WindowWidthSizeClass.Medium -> {
                     VipExamAppBar(
                         appBarTitle = uiState.title,
@@ -77,6 +89,7 @@ fun HomeScreen(
                         scrollBehavior = scrollBehavior,
                     )
                 }
+
                 WindowWidthSizeClass.Expanded -> {
                     when (localConfiguration.orientation) {
                         Configuration.ORIENTATION_PORTRAIT -> {
@@ -88,6 +101,7 @@ fun HomeScreen(
                                 scrollBehavior = scrollBehavior,
                             )
                         }
+
                         else -> {
                             VipExamAppBar(
                                 appBarTitle = uiState.title,

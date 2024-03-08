@@ -44,6 +44,14 @@ import app.xlei.vipexam.ui.screen.ExamScreen
 import app.xlei.vipexam.ui.screen.ExamTypeListScreen
 import kotlinx.coroutines.launch
 
+/**
+ * Main screen navigation
+ *
+ * @param modifier
+ * @param navHostController 主页导航控制器，在主页页面之间跳转
+ * @param viewModel 主页vm
+ * @param widthSizeClass 用于根据屏幕宽度切换显示内容
+ */
 @Composable
 fun MainScreenNavigation(
     modifier: Modifier = Modifier,
@@ -68,6 +76,7 @@ fun MainScreenNavigation(
                 is UiState.Loading -> {
                     OnLoading()
                 }
+
                 is UiState.Success -> {
                     val loginUiState = (uiState.loginUiState as UiState.Success<VipexamUiState.LoginUiState>).uiState
                     LoginScreen(
@@ -88,6 +97,7 @@ fun MainScreenNavigation(
                             .fillMaxSize()
                     )
                 }
+
                 is UiState.Error -> {
                     OnError()
                 }
@@ -108,10 +118,6 @@ fun MainScreenNavigation(
                         viewModel.setExamType(it)
                         navHostController.navigate(Screen.ExamList.createRoute(Constants.EXAM_TYPES.toMap()[it]!!))
                     },
-                    onExamClick = {
-                        coroutine.launch {
-                            viewModel.setExam(it)
-                        } },
                     widthSizeClass = widthSizeClass,
                     modifier = Modifier
                         .fillMaxSize()
@@ -132,7 +138,6 @@ fun MainScreenNavigation(
                         navHostController.navigate(Screen.Exam.createRoute(it))
                     }
                 },
-                onQuestionClick = viewModel::setQuestion,
                 widthSizeClass = widthSizeClass,
                 modifier = Modifier
                     .fillMaxSize()
@@ -154,6 +159,7 @@ fun MainScreenNavigation(
                                                 viewModel.setExam(examId)
                                         }
                                     }
+
                                     else -> {
                                         viewModel.setExam(examId)
                                     }
@@ -168,6 +174,7 @@ fun MainScreenNavigation(
                 is UiState.Loading -> {
                     OnLoading((uiState.questionListUiState as UiState.Loading).loadingMessageId)
                 }
+
                 is UiState.Success -> {
                     val questionListUiState = (uiState.questionListUiState as UiState.Success<VipexamUiState.QuestionListUiState>).uiState
                     questionListUiState.question?.let {
@@ -183,6 +190,7 @@ fun MainScreenNavigation(
                             .fillMaxSize()
                     )
                 }
+
                 is UiState.Error -> {
                     uiState.questionListUiState.let {
                         Column(
@@ -230,10 +238,10 @@ fun MainScreenNavigation(
                 question?.let { q ->
                     viewModel.setTitle(
                         AppBarTitle.Exam(
-                        examName = exam!!.examName,
-                        examId = exam!!.examID,
-                        question = q,
-                    ) )
+                            examName = exam!!.examName,
+                            examId = exam!!.examID,
+                            question = q,
+                        ) )
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

@@ -11,6 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import app.xlei.vipexam.ui.navigation.AppDestinations
 
+/**
+ * App drawer
+ *
+ * @param currentRoute 当前导航
+ * @param navigationToTopLevelDestination 导航函数
+ * @param closeDrawer 关闭抽屉函数
+ * @param modifier
+ * @receiver
+ * @receiver
+ */
 @Composable
 fun AppDrawer(
     currentRoute: String,

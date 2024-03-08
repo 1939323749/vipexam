@@ -5,9 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.core.data.util.NetworkMonitor
 import app.xlei.vipexam.ui.navigation.AppDestinations
@@ -58,7 +56,7 @@ class VipExamState(
     fun navigateToAppDestination(appDestination: AppDestinations) {
         when (appDestination) {
             AppDestinations.HOME_ROUTE -> vipExamNavigationActions.navigateToHome()
-            AppDestinations.SECOND_ROUTE -> vipExamNavigationActions.navigateToSecond()
+            AppDestinations.SECOND_ROUTE -> vipExamNavigationActions.navigateToWords()
             AppDestinations.SETTINGS_ROUTE -> vipExamNavigationActions.navigateToSettings()
             AppDestinations.HISTORY -> vipExamNavigationActions.navigateToHistory()
             AppDestinations.BOOKMARKS -> vipExamNavigationActions.navigateToBookmarks()

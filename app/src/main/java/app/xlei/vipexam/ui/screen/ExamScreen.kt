@@ -15,7 +15,16 @@ import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.expanded.ExamScreenSupportingPane
 import app.xlei.vipexam.ui.page.ExamPage
 
-
+/**
+ * Exam screen
+ * 试卷页面
+ * @param questionListUiState 问题列表
+ * @param setQuestion 问题点击事件
+ * @param widthSizeClass 屏幕宽度
+ * @param modifier
+ * @param navController 试卷页面导航控制器，用于切换问题
+ * @receiver
+ */
 @Composable
 fun ExamScreen(
     questionListUiState: VipexamUiState.QuestionListUiState,

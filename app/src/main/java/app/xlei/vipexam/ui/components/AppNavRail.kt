@@ -1,7 +1,6 @@
 package app.xlei.vipexam.ui.components
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -12,6 +11,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import app.xlei.vipexam.ui.navigation.AppDestinations
 
+/**
+ * App nav rail
+ *
+ * @param logo 侧边导航的logo
+ * @param homeNavController 主页导航控制器
+ * @param currentRoute 当前导航页面
+ * @param navigationToTopLevelDestination 导航函数
+ * @param modifier
+ * @receiver
+ * @receiver
+ */
 @Composable
 fun AppNavRail(
     logo:  @Composable () -> Unit = {},

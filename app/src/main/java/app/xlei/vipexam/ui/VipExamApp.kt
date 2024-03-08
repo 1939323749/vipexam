@@ -1,6 +1,5 @@
 package app.xlei.vipexam.ui
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -34,11 +33,17 @@ import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.util.NetworkMonitor
 import app.xlei.vipexam.ui.components.AppDrawer
 import app.xlei.vipexam.ui.components.AppNavRail
-import app.xlei.vipexam.ui.navigation.VipExamNavHost
 import app.xlei.vipexam.ui.navigation.AppDestinations
+import app.xlei.vipexam.ui.navigation.VipExamNavHost
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ResourceType")
+/**
+ * App
+ *
+ * @param widthSizeClass 屏幕宽度
+ * @param networkMonitor 网络情况监控
+ * @param appState
+ */
 @Composable
 fun App(
     widthSizeClass: WindowWidthSizeClass,

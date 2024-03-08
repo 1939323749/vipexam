@@ -23,6 +23,14 @@ import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.ui.EmptyTextToolbar
 import app.xlei.vipexam.core.ui.TranslateDialog
 
+/**
+ * Vipexam article container
+ *
+ * @param onArticleLongClick 内容点击事件
+ * @param onDragContent 可以拖动的内容
+ * @param content 内容
+ * @receiver
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun VipexamArticleContainer(
@@ -46,6 +54,7 @@ fun VipexamArticleContainer(
                     content()
                 }
             }
+
         LongPressAction.SHOW_QUESTION ->
             Column(
                 modifier = Modifier
@@ -56,6 +65,7 @@ fun VipexamArticleContainer(
             ) {
                 content()
             }
+
         LongPressAction.NONE -> Column(
             modifier = Modifier
                 .dragAndDropSource {

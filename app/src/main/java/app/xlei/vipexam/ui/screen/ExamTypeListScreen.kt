@@ -11,11 +11,20 @@ import app.xlei.vipexam.ui.UiState
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.page.ExamTypeListView
 
+/**
+ * Exam type list screen
+ * 试卷类型列表页面
+ * @param examTypeListUiState 试卷类型列表
+ * @param onExamTypeClick 试卷类型点击事件
+ * @param widthSizeClass 屏幕宽度
+ * @param modifier
+ * @receiver
+ * @receiver
+ */
 @Composable
 fun ExamTypeListScreen(
     examTypeListUiState: UiState<VipexamUiState.ExamTypeListUiState>,
     onExamTypeClick: (Int) -> Unit,
-    onExamClick: (String) -> Unit,
     widthSizeClass: WindowWidthSizeClass,
     modifier: Modifier = Modifier
 ) {

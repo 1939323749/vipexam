@@ -12,6 +12,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Exam list view model
+ * 事件列表vm
+ * @property getExamListUseCase 获得试卷列表vm
+ * @constructor Create empty Exam list view model
+ */
 @HiltViewModel
 class ExamListViewModel @Inject constructor(
     private val getExamListUseCase: GetExamListUseCase,

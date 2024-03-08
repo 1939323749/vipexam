@@ -25,6 +25,17 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * Vip exam main screen view model
+ *
+ * @property getAllUsersUseCase
+ * @property addUserUseCase
+ * @property deleteUserUseCase
+ * @property examHistoryRepository
+ * @constructor
+ *
+ * @param vipexamUiState
+ */
 @HiltViewModel
 class VipExamMainScreenViewModel @Inject constructor(
     vipexamUiState: VipexamUiState,
@@ -63,6 +74,10 @@ class VipExamMainScreenViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Login
+     *
+     */
     fun login() {
         _uiState.update {
             it.copy(
@@ -112,7 +127,11 @@ class VipExamMainScreenViewModel @Inject constructor(
         }
     }
 
-    private fun addCurrentUser(){
+    /**
+     * Add current user
+     * 记录成功登录的账号
+     */
+    private fun addCurrentUser() {
         viewModelScope.launch {
             val loginUiState = (_uiState.value.loginUiState as UiState.Success).uiState
             addUserUseCase(
@@ -124,6 +143,11 @@ class VipExamMainScreenViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set account
+     *
+     * @param account
+     */
     fun setAccount(account: String) {
         val loginUiState = (_uiState.value.loginUiState as UiState.Success).uiState
 
@@ -138,6 +162,11 @@ class VipExamMainScreenViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set password
+     *
+     * @param password
+     */
     fun setPassword(password: String) {
         val loginUiState = (_uiState.value.loginUiState as UiState.Success).uiState
 
@@ -152,6 +181,11 @@ class VipExamMainScreenViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set exam type
+     *
+     * @param type
+     */
     fun setExamType(type: Int) {
         ExamListApi.setType(Constants.EXAM_TYPES.toMap()[type]!!)
         viewModelScope.launch {
@@ -160,7 +194,8 @@ class VipExamMainScreenViewModel @Inject constructor(
                 examStyle = Constants.EXAM_TYPES.toMap()[type]!!,
                 examTypeEName = "ve01002"
             ).onSuccess { examList ->
-                val examTypeListUiState = (_uiState.value.examTypeListUiState as UiState.Success).uiState
+                val examTypeListUiState =
+                    (_uiState.value.examTypeListUiState as UiState.Success).uiState
                 val examListUiState = UiState.Success(
                     uiState = VipexamUiState.ExamListUiState(
                         examType = type,
@@ -171,8 +206,8 @@ class VipExamMainScreenViewModel @Inject constructor(
                     it.copy(
                         examTypeListUiState = UiState.Success(
                             examTypeListUiState.copy(
-                            examListUiState = examListUiState
-                        ),),
+                                examListUiState = examListUiState
+                            ),),
                         examListUiState = examListUiState
                     )
                 }
@@ -186,6 +221,11 @@ class VipExamMainScreenViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set title
+     *
+     * @param title
+     */
     fun setTitle(title: AppBarTitle) {
         _uiState.update {
             it.copy(
@@ -194,26 +234,44 @@ class VipExamMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun setQuestion(examName: String ,examId: String, question: String) {
-        val questionListUiState = (_uiState.value.questionListUiState as UiState.Success<VipexamUiState.QuestionListUiState>).uiState
+    /**
+     * Set question
+     *
+     * @param examName
+     * @param examId
+     * @param question
+     */
+    fun setQuestion(examName: String, examId: String, question: String) {
+        val questionListUiState =
+            (_uiState.value.questionListUiState as UiState.Success<VipexamUiState.QuestionListUiState>).uiState
         _uiState.update {
             it.copy(
                 questionListUiState = UiState.Success(
                     questionListUiState.copy(
                         question = question,
                     )
-                ) ,
+                ),
                 title = AppBarTitle.Exam(examName = examName, examId = examId, question = question)
             )
         }
     }
 
+    /**
+     * Delete user
+     *
+     * @param user
+     */
     fun deleteUser(user: User) {
         viewModelScope.launch {
             deleteUserUseCase(user)
         }
     }
 
+    /**
+     * Set exam
+     *
+     * @param examId
+     */
     suspend fun setExam(examId: String) {
         _uiState.update {
             it.copy(
@@ -235,6 +293,7 @@ class VipExamMainScreenViewModel @Inject constructor(
                             )
                         }
                     }
+
                     else -> {
                         val questionListUiState = UiState.Success(
                             VipexamUiState.QuestionListUiState(

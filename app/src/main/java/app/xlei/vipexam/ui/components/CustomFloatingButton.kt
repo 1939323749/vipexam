@@ -36,6 +36,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.xlei.vipexam.R
 
+/**
+ * Custom floating action button
+ *
+ * @param expandable 是否能展开
+ * @param onFabClick 按钮点击事件
+ * @param iconUnExpanded 未展开图标
+ * @param iconExpanded 展开图标
+ * @param items 展开显示的内容，按从上到下排列
+ * @param onItemClick 内容点击事件
+ * @receiver
+ * @receiver
+ */
 @Composable
 fun CustomFloatingActionButton(
     expandable: Boolean,

@@ -4,6 +4,13 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
+/**
+ * Screen
+ * 主页页面
+ * @property route
+ * @property navArguments
+ * @constructor Create empty Screen
+ */
 sealed class Screen(
     val route: String,
     val navArguments: List<NamedNavArgument> = emptyList()

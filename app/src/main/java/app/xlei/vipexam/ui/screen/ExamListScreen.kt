@@ -26,12 +26,23 @@ import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.expanded.ExamListScreenSupportingPane
 import app.xlei.vipexam.ui.page.ExamListView
 
+/**
+ * Exam list screen
+ * 试卷列表页面
+ * @param examListUiState 试卷列表
+ * @param onLastExamClick 最近试卷点击事件
+ * @param onExamClick 试卷点击事件
+ * @param widthSizeClass 屏幕宽度
+ * @param modifier
+ * @receiver
+ * @receiver
+ * @receiver
+ */
 @Composable
 fun ExamListScreen(
     examListUiState: UiState<VipexamUiState.ExamListUiState>,
     onLastExamClick: (String) -> Unit,
     onExamClick: (String) -> Unit,
-    onQuestionClick: (String,String,String) -> Unit,
     widthSizeClass: WindowWidthSizeClass,
     modifier: Modifier = Modifier
 ) {
@@ -44,9 +55,11 @@ fun ExamListScreen(
                         onExamClick = onExamClick,
                     )
                 }
+
                 is UiState.Loading -> {
                     PageLoader()
                 }
+
                 is UiState.Error -> {
                     Column(
                         modifier = Modifier.fillMaxSize(),
@@ -63,6 +76,7 @@ fun ExamListScreen(
                 }
             }
         }
+
         WindowWidthSizeClass.Medium -> {
             when (examListUiState) {
                 is UiState.Success -> {
@@ -81,9 +95,11 @@ fun ExamListScreen(
                         Spacer(modifier = Modifier.width(24.dp))
                     }
                 }
+
                 is UiState.Loading -> {
                     OnLoading()
                 }
+
                 is UiState.Error -> {
                     OnError()
                 }
@@ -107,9 +123,11 @@ fun ExamListScreen(
                                 onExamClick = onExamClick,
                             )
                         }
+
                         is UiState.Loading -> {
                             //PageLoader()
                         }
+
                         is UiState.Error -> {
                             Column(
                                 modifier = Modifier.fillMaxSize(),

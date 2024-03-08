@@ -17,6 +17,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Timer view model
+ * 计时器vm
+ * @constructor Create empty Timer view model
+ */
 class TimerViewModel : ViewModel() {
     private val _time = MutableStateFlow(0)
     val time: StateFlow<Int> = _time
@@ -42,6 +47,14 @@ class TimerViewModel : ViewModel() {
     }
 }
 
+/**
+ * Timer
+ * 计时器
+ * @param timerViewModel 计时器vm
+ * @param isTimerStart 开始
+ * @param isResetTimer 结束
+ * @param modifier
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Timer(

@@ -46,6 +46,14 @@ import compose.icons.feathericons.Clock
 import compose.icons.feathericons.RotateCw
 import kotlinx.coroutines.launch
 
+/**
+ * Exam screen supporting pane
+ * 试卷页面显示的信息
+ * @param modifier
+ * @param viewModel
+ * @param questionListUiState 当前试卷页面要显示的问题列表
+ * @param navController 导航控制器，用于切换问题
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExamScreenSupportingPane(
@@ -81,7 +89,7 @@ fun ExamScreenSupportingPane(
                             visible = showTimer,
                             enter = fadeIn(animationSpec = tween(200), 0F),
                             exit = fadeOut(animationSpec = tween(200),0F)
-                            ) {
+                        ) {
                             Timer(
                                 isTimerStart = showTimer,
                                 isResetTimer = !showTimer,

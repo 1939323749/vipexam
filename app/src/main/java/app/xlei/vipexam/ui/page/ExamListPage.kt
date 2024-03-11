@@ -27,7 +27,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.paging.ExamListItem
 import app.xlei.vipexam.core.ui.DateText
 import app.xlei.vipexam.core.ui.ErrorMessage
@@ -39,7 +38,7 @@ import kotlinx.coroutines.launch
  * Exam list view
  *
  * @param modifier
- * @param type 试卷类型：模拟还是真题
+ * @param isReal 试卷类型：模拟还是真题
  * @param viewModel 试卷列表vm
  * @param onExamClick 试卷点击事件
  * @receiver
@@ -51,7 +50,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ExamListView(
     modifier: Modifier = Modifier,
-    type: Int,
+    isReal: Boolean,
     viewModel: ExamListViewModel = hiltViewModel(),
     onExamClick: (String) -> Unit,
 ) {
@@ -100,7 +99,7 @@ fun ExamListView(
                 ) {
 
                     items(examListPagingItems.itemCount) {
-                        if (type == R.string.practice_exam)
+                        if (!isReal)
                             ListItem(
                                 headlineContent = { Text(getExamNameAndNo(examListPagingItems[it]!!.exam.examname).first) },
                                 trailingContent = { Text(getExamNameAndNo(examListPagingItems[it]!!.exam.examname).second) },

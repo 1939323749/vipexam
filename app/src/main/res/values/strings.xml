@@ -25,7 +25,6 @@
     <string name="close_button">Close</string>
     <string name="clipToClipboardSuccess">copy success!</string>
     <string name="not_connected">Network not connected</string>
-    <string name="add_to_word_list">Add to word List</string>
     <string name="cancel">Cancel</string>
     <string name="show_answer">Show Answer</string>
     <string name="loading">loading…</string>

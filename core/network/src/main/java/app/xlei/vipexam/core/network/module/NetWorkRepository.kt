@@ -1,6 +1,5 @@
 package app.xlei.vipexam.core.network.module
 
-import android.content.Context
 import android.os.Environment
 import app.xlei.vipexam.core.network.module.getExamList.GetExamListResponse
 import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
@@ -127,15 +126,15 @@ object NetWorkRepository {
 
     suspend fun getExamList(
         page: String,
-        examStyle: String,
+        examStyle: Int,
         examTypeEName: String,
     ): Result<GetExamListResponse> {
         return try {
             Result.success(
-                httpClient.post("https://vipexam.cn/web/moreCourses"){
+                httpClient.post("https://vipexam.cn/web/moreCourses") {
                     vipExamHeaders(referrer = "https://vipexam.cn/resources_kinds.html?id=$examTypeEName")
                     setBody("data={\"account\":\"$account\",\"token\":\"$token\",\"typeCode\":\"$examTypeEName\",\"resourceType\":\"${examStyle}\",\"courriculumType\":\"0\",\"classHourS\":\"0\",\"classHourE\":\"0\",\"yearPublishedS\":\"0\",\"yearPublishedE\":\"0\",\"page\":$page,\"limit\":20,\"collegeName\":\"$organization\"}")
-                }.body()
+                }.body<GetExamListResponse>().also { println(it) }
             )
         } catch (e: Exception){
             Result.failure(e)
@@ -157,18 +156,6 @@ object NetWorkRepository {
             )
         } catch (e: Exception){
             Result.failure(e)
-        }
-    }
-
-    suspend fun download(context: Context, examId: String){
-        getExam(examId).onSuccess {
-            val client = HttpClient(CIO)
-
-            client.get("https://vipexam.cn/web/getExamWordByStu?examID=i${it.examID}&account=$account&token=$token")
-                .bodyAsChannel()
-                .copyAndClose(File(context.filesDir,it.examID).writeChannel())
-        }.onFailure {
-            println(it)
         }
     }
 

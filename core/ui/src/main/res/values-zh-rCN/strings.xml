@@ -8,4 +8,5 @@
     <string name="loading">玩命加载中QAQ</string>
     <string name="internet_error">网络错误</string>
     <string name="cancel">取消</string>
+    <string name="add_to_word_list">加入单词表</string>
 </resources>

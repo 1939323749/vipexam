@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui.components
+package app.xlei.vipexam.core.ui
 
 import android.content.ClipboardManager
 import android.content.Context
@@ -8,8 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.R
-import app.xlei.vipexam.ui.components.vm.AddToWordListButtonViewModel
+import app.xlei.vipexam.core.ui.vm.AddToWordListButtonViewModel
 
 /**
  * Add to word list button

@@ -9,24 +9,22 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.constant.ShowAnswerOption
 import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.data.util.dataStore
 import app.xlei.vipexam.core.network.module.NetWorkRepository.getQuestions
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
+import app.xlei.vipexam.template.Render
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
 import app.xlei.vipexam.ui.question.*
@@ -143,21 +141,7 @@ fun Questions(
                 for ((index, q) in questions.withIndex()) {
                     composable(route = q.first) {
                         setQuestion(mubanList[index].cname)
-                        when (q.first) {
-                            "ecswriting" -> WritingView(muban = mubanList[index])
-                            "ecscloze" -> clozeView(muban = mubanList[index])
-                            "ecsqread" -> QreadView(muban = mubanList[index])
-                            "ecszread" -> ZreadView(muban = mubanList[index])
-                            "ecstranslate" -> TranslateView(muban = mubanList[index])
-                            "ecfwriting" -> WritingView(muban = mubanList[index])
-                            "ecfcloze" -> clozeView(muban = mubanList[index])
-                            "ecfqread" -> QreadView(muban = mubanList[index])
-                            "ecfzread" -> ZreadView(muban = mubanList[index])
-                            "ecftranslate" -> TranslateView(muban = mubanList[index])
-                            "eylhlisteninga" -> ListeningView(muban = mubanList[index])
-                            "eylhlisteningb" -> ListeningView(muban = mubanList[index])
-                            "eylhlisteningc" -> ListeningView(muban = mubanList[index])
-                        }
+                        QuestionMapToView(question = q.first, muban = mubanList[index])
                     }
                 }
             }
@@ -187,17 +171,6 @@ fun QuestionMapToView(question: String, muban: Muban){
         "eylhlisteninga" -> ListeningView(muban = muban)
         "eylhlisteningb" -> ListeningView(muban = muban)
         "eylhlisteningc" -> ListeningView(muban = muban)
-        else -> {
-            Box (
-                modifier = Modifier
-                    .fillMaxSize()
-            ){
-                Text(
-                    text = stringResource(id = R.string.not_supported),
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                )
-            }
-        }
+        else -> Render(question = question, muban = muban)
     }
 }

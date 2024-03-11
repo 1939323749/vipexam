@@ -2,6 +2,9 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.org.jetbrains.kotlin.android)
+    alias(libs.plugins.com.google.dagger.hilt.android)
+    alias(libs.plugins.com.google.devtools.ksp)
+    kotlin("kapt")
 }
 
 android {
@@ -47,7 +50,12 @@ android {
 
 dependencies {
     implementation(projects.core.network)
+    implementation(projects.core.data)
+    implementation(projects.core.database)
 
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.feather)
     implementation(libs.material3)
     implementation(libs.core.ktx)

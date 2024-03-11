@@ -22,12 +22,11 @@ data class VipexamUiState(
     )
 
     data class ExamTypeListUiState(
-        val examTypeList: List<Int>,
         val examListUiState: UiState<ExamListUiState>,
     )
 
     data class ExamListUiState(
-        val examType: Int,
+        val isReal: Boolean,
         val questionListUiState: UiState<QuestionListUiState>,
     )
 

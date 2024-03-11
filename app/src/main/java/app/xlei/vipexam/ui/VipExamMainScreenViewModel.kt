@@ -3,7 +3,7 @@ package app.xlei.vipexam.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.R
-import app.xlei.vipexam.core.data.constant.Constants
+import app.xlei.vipexam.core.data.constant.ExamType
 import app.xlei.vipexam.core.data.paging.ExamListApi
 import app.xlei.vipexam.core.data.repository.ExamHistoryRepository
 import app.xlei.vipexam.core.data.util.Preferences
@@ -99,9 +99,6 @@ class VipExamMainScreenViewModel @Inject constructor(
                     it.copy(
                         examTypeListUiState = UiState.Success(
                             uiState = VipexamUiState.ExamTypeListUiState(
-                                examTypeList = Constants.EXAM_TYPES.toList().map { examType ->
-                                    examType.first
-                                },
                                 examListUiState = UiState.Loading(R.string.loading)
                             ),
                         ),
@@ -186,38 +183,25 @@ class VipExamMainScreenViewModel @Inject constructor(
      *
      * @param type
      */
-    fun setExamType(type: Int) {
-        ExamListApi.setType(Constants.EXAM_TYPES.toMap()[type]!!)
-        viewModelScope.launch {
-            NetWorkRepository.getExamList(
-                page = "1",
-                examStyle = Constants.EXAM_TYPES.toMap()[type]!!,
-                examTypeEName = "ve01002"
-            ).onSuccess { examList ->
-                val examTypeListUiState =
-                    (_uiState.value.examTypeListUiState as UiState.Success).uiState
-                val examListUiState = UiState.Success(
-                    uiState = VipexamUiState.ExamListUiState(
-                        examType = type,
-                        questionListUiState = UiState.Loading(R.string.loading)
-                    )
-                )
-                _uiState.update {
-                    it.copy(
-                        examTypeListUiState = UiState.Success(
-                            examTypeListUiState.copy(
-                                examListUiState = examListUiState
-                            ),),
+    fun setExamType(type: ExamType) {
+        ExamListApi.setType(type)
+        val examTypeListUiState =
+            (_uiState.value.examTypeListUiState as UiState.Success).uiState
+        val examListUiState = UiState.Success(
+            uiState = VipexamUiState.ExamListUiState(
+                isReal = type.isReal,
+                questionListUiState = UiState.Loading(R.string.loading)
+            )
+        )
+        _uiState.update {
+            it.copy(
+                examTypeListUiState = UiState.Success(
+                    examTypeListUiState.copy(
                         examListUiState = examListUiState
-                    )
-                }
-            }.onFailure {
-                _uiState.update {
-                    it.copy(
-                        examListUiState = UiState.Error(R.string.internet_error)
-                    )
-                }
-            }
+                    ),
+                ),
+                examListUiState = examListUiState
+            )
         }
     }
 

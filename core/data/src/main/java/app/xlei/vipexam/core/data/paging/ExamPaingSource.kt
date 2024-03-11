@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import app.xlei.vipexam.core.data.constant.ExamType
 import app.xlei.vipexam.core.data.repository.ExamHistoryRepository
 import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.core.network.module.getExamList.Exam
@@ -40,18 +41,20 @@ interface ExamListRemoteDataSource {
 }
 
 object ExamListApi {
-    private var type = "4"
+    private var examStyle = 5
+    private var examTypeCode = "ve01002"
 
-    fun setType(type: String) {
-        ExamListApi.type = type
+    fun setType(type: ExamType) {
+        examStyle = type.examStyle
+        examTypeCode = type.examTypeCode
     }
 
-    suspend fun getExamList(pageNumber: Int): List<Exam>{
+    suspend fun getExamList(pageNumber: Int): List<Exam> {
         var examList = listOf<Exam>()
         NetWorkRepository.getExamList(
             page = pageNumber.toString(),
-            examStyle = type,
-            examTypeEName = "ve01002"
+            examStyle = examStyle,
+            examTypeEName = examTypeCode
         )
             .onSuccess {
                 examList = it.list

@@ -65,6 +65,7 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.network)
     implementation(projects.core.ui)
+    implementation(projects.core.template)
 
     implementation(projects.feature.wordlist)
     implementation(projects.feature.settings)

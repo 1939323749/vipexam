@@ -28,7 +28,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import app.xlei.vipexam.core.data.constant.Constants
 import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.core.ui.OnError
@@ -116,7 +115,7 @@ fun MainScreenNavigation(
                     examTypeListUiState = uiState.examTypeListUiState,
                     onExamTypeClick = {
                         viewModel.setExamType(it)
-                        navHostController.navigate(Screen.ExamList.createRoute(Constants.EXAM_TYPES.toMap()[it]!!))
+                        navHostController.navigate(Screen.ExamList.createRoute(it.name))
                     },
                     widthSizeClass = widthSizeClass,
                     modifier = Modifier

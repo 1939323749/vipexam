@@ -8,4 +8,5 @@
     <string name="loading">loading…</string>
     <string name="internet_error">Network Error</string>
     <string name="cancel">Cancel</string>
+    <string name="add_to_word_list">Add to word List</string>
 </resources>

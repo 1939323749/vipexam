@@ -7,6 +7,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.xlei.vipexam.core.data.constant.ExamType
 import app.xlei.vipexam.ui.UiState
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.page.ExamTypeListView
@@ -24,7 +25,7 @@ import app.xlei.vipexam.ui.page.ExamTypeListView
 @Composable
 fun ExamTypeListScreen(
     examTypeListUiState: UiState<VipexamUiState.ExamTypeListUiState>,
-    onExamTypeClick: (Int) -> Unit,
+    onExamTypeClick: (ExamType) -> Unit,
     widthSizeClass: WindowWidthSizeClass,
     modifier: Modifier = Modifier
 ) {

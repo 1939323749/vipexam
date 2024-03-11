@@ -51,7 +51,7 @@ fun ExamListScreen(
             when (examListUiState) {
                 is UiState.Success -> {
                     ExamListView(
-                        type = examListUiState.uiState.examType,
+                        isReal = examListUiState.uiState.isReal,
                         onExamClick = onExamClick,
                     )
                 }
@@ -88,7 +88,7 @@ fun ExamListScreen(
                                 .width(360.dp)
                         ) {
                             ExamListView(
-                                type = examListUiState.uiState.examType,
+                                isReal = examListUiState.uiState.isReal,
                                 onExamClick = onExamClick,
                             )
                         }
@@ -119,7 +119,7 @@ fun ExamListScreen(
                     when (examListUiState) {
                         is UiState.Success -> {
                             ExamListView(
-                                type = examListUiState.uiState.examType,
+                                isReal = examListUiState.uiState.isReal,
                                 onExamClick = onExamClick,
                             )
                         }

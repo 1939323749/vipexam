@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui.components.vm
+package app.xlei.vipexam.core.ui.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

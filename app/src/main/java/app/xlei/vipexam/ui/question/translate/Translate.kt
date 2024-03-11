@@ -17,8 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
-import app.xlei.vipexam.ui.components.VipexamArticleContainer
-
+import app.xlei.vipexam.core.ui.VipexamArticleContainer
 @Composable
 fun TranslateView(
     viewModel: TranslateViewModel = hiltViewModel(),

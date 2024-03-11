@@ -10,9 +10,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import app.xlei.vipexam.core.data.constant.Constants
+import app.xlei.vipexam.core.data.constant.ExamType
 import app.xlei.vipexam.core.ui.OnError
 import app.xlei.vipexam.core.ui.OnLoading
 import app.xlei.vipexam.ui.UiState
@@ -30,7 +29,7 @@ import app.xlei.vipexam.ui.components.ExamSearchBar
 @Composable
 fun ExamTypeListView(
     examTypeListUiState: UiState<VipexamUiState.ExamTypeListUiState>,
-    onExamTypeClick: (Int) -> Unit,
+    onExamTypeClick: (ExamType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column (
@@ -50,12 +49,12 @@ fun ExamTypeListView(
                 LazyColumn(
                     modifier = modifier
                 ) {
-                    items(examTypeListUiState.uiState.examTypeList.size) {
+                    items(ExamType.entries.size) {
                         ListItem(
-                            headlineContent = { Text(stringResource(examTypeListUiState.uiState.examTypeList[it])) },
+                            headlineContent = { Text(ExamType.entries[it].examTypeName) },
                             modifier = Modifier
                                 .clickable {
-                                    onExamTypeClick(Constants.EXAM_TYPES[it].first)
+                                    onExamTypeClick(ExamType.entries[it])
                                 }
                         )
                         HorizontalDivider()

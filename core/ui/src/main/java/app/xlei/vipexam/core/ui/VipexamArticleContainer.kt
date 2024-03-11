@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui.components
+package app.xlei.vipexam.core.ui
 
 import android.content.ClipData
 import android.view.View
@@ -20,8 +20,6 @@ import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.platform.LocalTextToolbar
 import app.xlei.vipexam.core.data.constant.LongPressAction
 import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.ui.EmptyTextToolbar
-import app.xlei.vipexam.core.ui.TranslateDialog
 
 /**
  * Vipexam article container

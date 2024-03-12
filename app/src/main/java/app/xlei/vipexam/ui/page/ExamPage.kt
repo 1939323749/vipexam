@@ -171,6 +171,9 @@ fun QuestionMapToView(question: String, muban: Muban){
         "eylhlisteninga" -> ListeningView(muban = muban)
         "eylhlisteningb" -> ListeningView(muban = muban)
         "eylhlisteningc" -> ListeningView(muban = muban)
+
+        "kettrans" -> TranslateView(muban = muban)
+        "ketwrite" -> WritingView(muban = muban)
         else -> Render(question = question, muban = muban)
     }
 }

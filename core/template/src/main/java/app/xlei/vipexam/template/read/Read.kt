@@ -153,10 +153,12 @@ private fun Read(
                             )
 
                             ti.questions[index].options.forEach { option ->
-                                Text(
-                                    text = "[${option.index}]" + option.option,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                )
+                                option.option.takeIf { it != "" }?.let {
+                                    Text(
+                                        text = "[${option.index}]" + option.option,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    )
+                                }
                             }
                             if (ti.questions[index].choice.value != "")
                                 SuggestionChip(

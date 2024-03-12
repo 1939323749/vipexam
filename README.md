@@ -9,9 +9,10 @@ of [vipexam.cn](https://vipexam.cn).
 Browse and search question banks: Users can browse and search question banks available on
 vipexam.cn, including following exams and subjects:
 
-- [x] CET6
-- [ ] CET4
-- [ ] Postgraduate Entrance Examination English I/II
+- [x] CET4/6
+- [x] Postgraduate Entrance Examination English I/II
+- [ ] Postgraduate Entrance Examination Math I/II
+- [ ] Postgraduate Entrance Examination 408
 
 Mock exams: Users can take mock exams to assess their exam preparation.
 Favorites: Users can bookmark interesting questions.

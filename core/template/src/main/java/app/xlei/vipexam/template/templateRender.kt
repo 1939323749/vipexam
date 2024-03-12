@@ -28,6 +28,8 @@ fun Render(
         "kereadf" -> TranslateView(muban = muban)
         "kewritinga" -> WritingView(muban = muban)
         "kewritingb" -> WritingView(muban = muban)
+        "ketclose" -> ClozeView(muban = muban)
+        "ketread" -> ReadView(muban = muban)
         else -> {
             Box(
                 modifier = Modifier

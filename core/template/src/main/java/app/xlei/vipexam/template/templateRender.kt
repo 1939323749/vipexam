@@ -26,7 +26,14 @@ fun Render(
         "keclozea" -> ClozeView(muban = muban)
         "kereadcloze" -> ReadClozeView(muban = muban)
         "kereadf" -> TranslateView(muban = muban)
-        "kewritinga" -> WritingView(muban = muban)
+        //"kewritinga" -> WritingView(muban = muban)
+        "kewritinga" -> Template {
+            Questions(muban.shiti.size) { index ->
+                Question(muban.shiti[index].primQuestion)
+                Answer(muban.shiti[index].refAnswer)
+            }
+        }
+
         "kewritingb" -> WritingView(muban = muban)
         "ketclose" -> ClozeView(muban = muban)
         "ketread" -> ReadView(muban = muban)

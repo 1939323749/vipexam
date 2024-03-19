@@ -1,25 +1,20 @@
 package app.xlei.vipexam.feature.settings.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.datastore.preferences.core.edit
-import app.xlei.vipexam.core.data.constant.LongPressAction
-import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.data.util.dataStore
 import app.xlei.vipexam.feature.settings.R
-import kotlinx.coroutines.launch
+import app.xlei.vipexam.preference.DataStoreKeys
+import app.xlei.vipexam.preference.LocalLongPressAction
+import app.xlei.vipexam.preference.LongPressAction
+import app.xlei.vipexam.preference.dataStore
+import app.xlei.vipexam.preference.put
 
 @Composable
 fun LongPressActionDialog(
     onDismiss: () -> Unit
 ) {
-    val longPressAction =
-        LongPressAction.entries[Preferences.longPressAction.collectAsState(
-            LongPressAction.SHOW_QUESTION.value
-        ).value]
+    val longPressAction = LocalLongPressAction.current
     val context = LocalContext.current
 
     ListPreferenceDialog(
@@ -30,24 +25,25 @@ fun LongPressActionDialog(
         options = listOf(
             ListPreferenceOption(
                 name = stringResource(R.string.show_question),
-                value = LongPressAction.SHOW_QUESTION.value,
-                isSelected = longPressAction == LongPressAction.SHOW_QUESTION
+                value = LongPressAction.ShowQuestion.value,
+                isSelected = longPressAction.isShowQuestion()
             ),
             ListPreferenceOption(
                 name = stringResource(R.string.show_translation),
-                value = LongPressAction.TRANSLATE.value,
-                isSelected = longPressAction == LongPressAction.TRANSLATE
+                value = LongPressAction.ShowTranslation.value,
+                isSelected = longPressAction.isShowTranslation()
             ),
             ListPreferenceOption(
                 name = stringResource(R.string.none),
-                value = LongPressAction.NONE.value,
-                isSelected = longPressAction == LongPressAction.NONE
+                value = LongPressAction.None.value,
+                isSelected = longPressAction == LongPressAction.None
             ),
         ),
-        onOptionSelected = {option->
-            context.dataStore.edit {
-                it[Preferences.LONG_PRESS_ACTION] = option.value
-            }
+        onOptionSelected = { option ->
+            context.dataStore.put(
+                DataStoreKeys.LongPressAction,
+                option.value
+            )
         }
     )
 }

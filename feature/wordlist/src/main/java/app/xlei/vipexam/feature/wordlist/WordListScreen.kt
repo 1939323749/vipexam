@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +47,6 @@ import app.xlei.vipexam.feature.wordlist.components.TranslationSheet
 import app.xlei.vipexam.feature.wordlist.constant.SortMethod
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Menu
-import java.util.Date
 
 @OptIn(
     ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
@@ -54,6 +54,7 @@ import java.util.Date
 @Composable
 fun WordListScreen(
     modifier: Modifier = Modifier,
+    initSortMethod: SortMethod = SortMethod.OLD_TO_NEW,
     viewModel: WordListViewModel = hiltViewModel(),
     openDrawer: () -> Unit,
 ) {
@@ -66,6 +67,9 @@ fun WordListScreen(
 
     var showSortMethods by rememberSaveable {
         mutableStateOf(false)
+    }
+    LaunchedEffect(Unit) {
+        viewModel.setSortMethod(initSortMethod)
     }
     val sortMethod = viewModel.sortMethod.collectAsState()
     val context = LocalContext.current
@@ -153,7 +157,7 @@ fun WordListScreen(
                     ListItem(
                         headlineContent = { Text(wordListState[index].word) },
                         supportingContent = { DateText(wordListState[index].created) },
-                        trailingContent = { CopyToClipboardButton(wordListState[index].word) },
+                        trailingContent = { CopyToClipboardButton(text = wordListState[index].word) },
                         modifier = Modifier
                             .combinedClickable(
                                 onClick = {

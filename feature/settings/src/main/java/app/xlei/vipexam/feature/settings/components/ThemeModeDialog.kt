@@ -1,25 +1,22 @@
 package app.xlei.vipexam.feature.settings.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.datastore.preferences.core.edit
-import app.xlei.vipexam.core.data.constant.ThemeMode
-import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.data.util.dataStore
 import app.xlei.vipexam.feature.settings.R
-import kotlinx.coroutines.launch
+import app.xlei.vipexam.preference.DataStoreKeys
+import app.xlei.vipexam.preference.LocalThemeMode
+import app.xlei.vipexam.preference.ThemeModePreference
+import app.xlei.vipexam.preference.dataStore
+import app.xlei.vipexam.preference.put
 
 @Composable
 fun ThemeModeDialog(
     onDismiss: () -> Unit,
 ) {
-    val themeMode =
-        ThemeMode.entries[Preferences.themeMode.collectAsState(ThemeMode.AUTO.value).value]
-    val coroutine = rememberCoroutineScope()
+    val themeMode = LocalThemeMode.current
     val context = LocalContext.current
+
     ListPreferenceDialog(
         title = stringResource(R.string.select_theme),
         onDismissRequest = {
@@ -28,29 +25,27 @@ fun ThemeModeDialog(
         options = listOf(
             ListPreferenceOption(
                 name = stringResource(R.string.theme_auto),
-                value = ThemeMode.AUTO.value,
-                isSelected = themeMode == ThemeMode.AUTO
+                value = ThemeModePreference.Auto.value,
+                isSelected = themeMode == ThemeModePreference.Auto
             ),
             ListPreferenceOption(
                 name = stringResource(R.string.theme_light),
-                value = ThemeMode.LIGHT.value,
-                isSelected = themeMode == ThemeMode.LIGHT
+                value = ThemeModePreference.Light.value,
+                isSelected = themeMode == ThemeModePreference.Light
             ),
             ListPreferenceOption(
                 name = stringResource(R.string.theme_dark),
-                value = ThemeMode.DARK.value,
-                isSelected = themeMode == ThemeMode.DARK
+                value = ThemeModePreference.Dark.value,
+                isSelected = themeMode == ThemeModePreference.Dark
             ),
             ListPreferenceOption(
                 name = stringResource(R.string.theme_black),
-                value = ThemeMode.BLACK.value,
-                isSelected = themeMode == ThemeMode.BLACK
+                value = ThemeModePreference.Black.value,
+                isSelected = themeMode == ThemeModePreference.Black
             )
         ),
-        onOptionSelected = {option->
-            context.dataStore.edit {
-                it[Preferences.THEME_MODE] = option.value
-            }
+        onOptionSelected = { option ->
+            context.dataStore.put(DataStoreKeys.ThemeMode, option.value)
         }
     )
 }

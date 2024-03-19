@@ -37,7 +37,8 @@ import app.xlei.vipexam.ui.screen.HomeScreen
  */
 @Composable
 fun VipExamNavHost(
-    logoText:  @Composable () -> Unit = {},
+    modifier: Modifier = Modifier,
+    logoText: @Composable () -> Unit = {},
     navHostController: NavHostController,
     homeNavController: NavHostController,
     widthSizeClass: WindowWidthSizeClass,
@@ -49,8 +50,7 @@ fun VipExamNavHost(
     NavHost(
         navController = navHostController,
         startDestination = AppDestinations.HOME_ROUTE.name,
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
     ) {
         composable(
             route = AppDestinations.HOME_ROUTE.name,

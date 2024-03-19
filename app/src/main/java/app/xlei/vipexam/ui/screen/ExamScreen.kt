@@ -1,10 +1,10 @@
 package app.xlei.vipexam.ui.screen
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,7 +28,7 @@ import app.xlei.vipexam.ui.page.ExamPage
 @Composable
 fun ExamScreen(
     questionListUiState: VipexamUiState.QuestionListUiState,
-    setQuestion: (String,String,String) -> Unit,
+    setQuestion: (String, String, String, String) -> Unit,
     widthSizeClass: WindowWidthSizeClass,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
@@ -54,7 +54,7 @@ fun ExamScreen(
             Row (
                 modifier = modifier
             ){
-                ElevatedCard(
+                Column(
                     modifier = Modifier
                         .padding(horizontal = 24.dp)
                         .weight(1f)

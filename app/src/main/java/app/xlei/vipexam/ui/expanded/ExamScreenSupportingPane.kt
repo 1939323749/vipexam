@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,13 +33,15 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import app.xlei.vipexam.core.data.constant.ShowAnswerOption
-import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.data.util.dataStore
+import app.xlei.vipexam.preference.DataStoreKeys
+import app.xlei.vipexam.preference.LocalShowAnswerOption
+import app.xlei.vipexam.preference.LocalVibrate
+import app.xlei.vipexam.preference.ShowAnswerOptionPreference
+import app.xlei.vipexam.preference.dataStore
+import app.xlei.vipexam.preference.put
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.components.Timer
 import compose.icons.FeatherIcons
@@ -62,9 +65,7 @@ fun ExamScreenSupportingPane(
     questionListUiState: VipexamUiState.QuestionListUiState,
     navController: NavHostController,
 ){
-    val showAnswerOption = ShowAnswerOption.entries[
-        Preferences.showAnswerOption.collectAsState(initial = ShowAnswerOption.ONCE.value).value
-    ]
+    val showAnswerOption = LocalShowAnswerOption.current
     val bookmarks by viewModel.bookmarks.collectAsState()
     val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
@@ -78,9 +79,9 @@ fun ExamScreenSupportingPane(
             TopAppBar(title = { Text(text = questionListUiState.exam.examName) })
         },
         bottomBar = {
-            ElevatedCard(
+            Card(
                 modifier = Modifier
-                    .padding(top = 24.dp)
+                    .padding(bottom = 24.dp)
             ) {
                 BottomAppBar(
                     containerColor = CardDefaults.elevatedCardColors().containerColor,
@@ -88,7 +89,7 @@ fun ExamScreenSupportingPane(
                         AnimatedVisibility(
                             visible = showTimer,
                             enter = fadeIn(animationSpec = tween(200), 0F),
-                            exit = fadeOut(animationSpec = tween(200),0F)
+                            exit = fadeOut(animationSpec = tween(200), 0F)
                         ) {
                             Timer(
                                 isTimerStart = showTimer,
@@ -118,13 +119,14 @@ fun ExamScreenSupportingPane(
         modifier = modifier
     ){padding->
         ElevatedCard (
-            shape = CardDefaults.elevatedShape,
             modifier = Modifier
                 .padding(padding)
+                .padding(bottom = 24.dp)
                 .fillMaxSize()
         ){
-            val vibrate by Preferences.vibrate.collectAsState(initial = true)
+            val vibrate = LocalVibrate.current
             val haptics = LocalHapticFeedback.current
+
             LazyColumn {
                 items(questionListUiState.questions.size){index->
                     questionListUiState.questions[index].let {
@@ -146,13 +148,15 @@ fun ExamScreenSupportingPane(
                                         launchSingleTop = true
                                         restoreState = true
                                     }
-                                    if (vibrate) haptics.performHapticFeedback(
-                                        HapticFeedbackType.LongPress)
-                                    if (showAnswerOption == ShowAnswerOption.ONCE) {
+                                    if (vibrate.isVibrate()) haptics.performHapticFeedback(
+                                        HapticFeedbackType.LongPress
+                                    )
+                                    if (showAnswerOption == ShowAnswerOptionPreference.Once) {
                                         coroutine.launch {
-                                            context.dataStore.edit { preferences ->
-                                                preferences[Preferences.SHOW_ANSWER] = false
-                                            }
+                                            context.dataStore.put(
+                                                DataStoreKeys.ShowAnswer,
+                                                false
+                                            )
                                         }
                                     }
                                 }

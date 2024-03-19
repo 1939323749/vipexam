@@ -19,7 +19,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -34,21 +33,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.preference.LocalShowAnswer
+import app.xlei.vipexam.preference.LocalVibrate
 
 @Composable
 fun QreadView(
     viewModel: QreadViewModel = hiltViewModel(),
     muban: Muban,
-){
+) {
     viewModel.setMuban(muban)
     viewModel.SetArticles()
-    val showAnswer = Preferences.showAnswer.collectAsState(initial = false)
+
+    val vibrate = LocalVibrate.current.isVibrate()
+
+    val showAnswer = LocalShowAnswer.current.isShowAnswer()
 
     val uiState by viewModel.uiState.collectAsState()
-    val vibrate by Preferences.vibrate.collectAsState(initial = true)
 
     val haptics = LocalHapticFeedback.current
     var selectedQuestionIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -88,7 +90,7 @@ private fun Qread(
     onArticleLongClicked: () -> Unit,
     onQuestionClicked: (Int) -> Unit,
     onOptionClicked: (Int, String) -> Unit,
-    showAnswer: State<Boolean>,
+    showAnswer: Boolean,
 ){
     val scrollState = rememberLazyListState()
     val selectedArticle by rememberSaveable { mutableIntStateOf(0) }
@@ -160,7 +162,7 @@ private fun Qread(
                         }
                     }
 
-                    if (showAnswer.value)
+                    if (showAnswer)
                         articles[articleIndex].questions[it].let { question ->
                             Text(
                                 text = question.index + question.refAnswer,

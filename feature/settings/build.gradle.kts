@@ -43,6 +43,7 @@ android {
 dependencies {
     implementation(projects.core.data)
     implementation(projects.core.database)
+    implementation(projects.core.preference)
 
     implementation(libs.feather)
     implementation(libs.tabler.icons)

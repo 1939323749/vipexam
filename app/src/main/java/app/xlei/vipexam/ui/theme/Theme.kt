@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import app.xlei.vipexam.core.data.constant.ThemeMode
+import app.xlei.vipexam.preference.ThemeModePreference
 import com.google.android.material.color.utilities.Scheme
 
 
@@ -25,13 +25,14 @@ fun String.hexToColor() = Color(android.graphics.Color.parseColor("#$this"))
 @SuppressLint("RestrictedApi")
 @Composable
 fun VipexamTheme(
-    themeMode: ThemeMode = ThemeMode.AUTO,
-    content: @Composable () -> Unit
+    themeMode: ThemeModePreference,
+    shouldShowNavigationRegion: Boolean = false,
+    content: @Composable () -> Unit,
 ) {
     val darkTheme = when (themeMode) {
-        ThemeMode.AUTO -> isSystemInDarkTheme()
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK, ThemeMode.BLACK -> true
+        ThemeModePreference.Auto -> isSystemInDarkTheme()
+        ThemeModePreference.Light -> false
+        ThemeModePreference.Dark, ThemeModePreference.Black -> true
     }
     var colorScheme = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -45,45 +46,25 @@ fun VipexamTheme(
         }
     }
 
-//    var colorScheme = when {
-//        Build.VERSION.SDK_INT == Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-//
-//        else -> {
-//            val primary = defaultAccentColor.hexToColor()
-//            val onPrimary = MaterialTheme.colorScheme.contentColorFor(primary)
-//            val blendColor =
-//                if (darkTheme) android.graphics.Color.WHITE else android.graphics.Color.BLACK
-//            val secondary = Color(ColorUtils.blendARGB(primary.toArgb(), blendColor, 0.3f))
-//            val onSecondary = MaterialTheme.colorScheme.contentColorFor(secondary)
-//            if (darkTheme) {
-//                DarkColors.copy(
-//                    primary = primary,
-//                    onPrimary = onPrimary,
-//                    secondary = secondary,
-//                    onSecondary = onSecondary,
-//                )
-//            } else {
-//                LightColors.copy(
-//                    primary = primary,
-//                    onPrimary = onPrimary,
-//                    secondary = secondary,
-//                    onSecondary = onSecondary,
-//                )
-//            }
-//        }
-//    }
-    if (themeMode == ThemeMode.BLACK) colorScheme =
+    if (themeMode == ThemeModePreference.Black) colorScheme =
         colorScheme.copy(background = Color.Black, surface = Color.Black)
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val activity = view.context as Activity
-            activity.window.navigationBarColor = colorScheme.background.toArgb()
-            activity.window.statusBarColor = colorScheme.background.toArgb()
+            activity.window.navigationBarColor = colorScheme.run {
+                if (shouldShowNavigationRegion)
+                    this.surfaceContainer.toArgb()
+                else
+                    this.surface.toArgb()
+            }
+            activity.window.statusBarColor = colorScheme.run {
+                if (shouldShowNavigationRegion)
+                    this.surfaceContainer.toArgb()
+                else
+                    this.surface.toArgb()
+            }
             WindowCompat.getInsetsController(
                 activity.window,
                 view

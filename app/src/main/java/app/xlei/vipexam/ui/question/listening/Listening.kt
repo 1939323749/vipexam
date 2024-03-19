@@ -23,7 +23,6 @@ import androidx.compose.material3.TooltipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,9 +37,10 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.preference.LocalShowAnswer
+import app.xlei.vipexam.preference.LocalVibrate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,9 +53,9 @@ fun ListeningView(
 ){
     viewModel.setMuban(muban)
     viewModel.SetListening()
-    val showAnswer = Preferences.showAnswer.collectAsState(initial = false)
+    val showAnswer = LocalShowAnswer.current.isShowAnswer()
     val uiState by viewModel.uiState.collectAsState()
-    val vibrate by Preferences.vibrate.collectAsState(initial = true)
+    val vibrate = LocalVibrate.current.isVibrate()
 
     var selectedQuestionIndex by remember { mutableIntStateOf(0) }
     val haptics = LocalHapticFeedback.current
@@ -86,7 +86,7 @@ private fun Listening(
     toggleOptionsSheet: () -> Unit,
     onQuestionClick: (Int) -> Unit,
     onOptionClick: (Int, String) -> Unit,
-    showAnswer: State<Boolean>,
+    showAnswer: Boolean,
 ){
     var selectedListening by rememberSaveable { mutableIntStateOf(0) }
     val scrollState = rememberLazyListState()
@@ -123,12 +123,12 @@ private fun Listening(
                     TooltipBox(
                         positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
                         tooltip = {
-                            if (showAnswer.value)
+                            if (showAnswer)
                                 RichTooltip(
-                                    title = { Text(question.index+question.refAnswer) },
+                                    title = { Text(question.index + question.refAnswer) },
                                     modifier = Modifier
                                         .padding(top = 100.dp, bottom = 100.dp)
-                                ){
+                                ) {
                                     LazyColumn {
                                         item { Text(listenings[it].originalText) }
                                     }
@@ -156,11 +156,12 @@ private fun Listening(
                                     question.options.forEach { option ->
                                         Text("${option.index}. " + option.option)
                                     }
-                                    if (showAnswer.value) {
+                                    if (showAnswer) {
                                         Spacer(
                                             Modifier
                                                 .fillMaxWidth()
-                                                .height(24.dp))
+                                                .height(24.dp)
+                                        )
                                         Text(
                                             text = question.description,
                                             modifier = Modifier
@@ -208,9 +209,9 @@ fun AudioPlayer(
     mediaPlayer: MediaPlayer,
     enabled: Boolean,
 ) {
+    val vibrate = LocalVibrate.current.isVibrate()
     var isPlaying by rememberSaveable { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
-    val vibrate by Preferences.vibrate.collectAsState(initial = true)
 
     Column {
         Button(

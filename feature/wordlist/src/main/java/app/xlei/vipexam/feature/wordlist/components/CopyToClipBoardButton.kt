@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.xlei.vipexam.feature.wordlist.R
@@ -16,6 +17,7 @@ import compose.icons.feathericons.Clipboard
 
 @Composable
 fun CopyToClipboardButton(
+    modifier: Modifier = Modifier,
     text: String,
 ) {
     val context = LocalContext.current
@@ -29,7 +31,8 @@ fun CopyToClipboardButton(
         onClick = {
             copyToClipboard(text)
             Toast.makeText(context, "$text $string", Toast.LENGTH_LONG).show()
-        }
+        },
+        modifier = modifier,
     ) {
         Icon(
             imageVector = FeatherIcons.Clipboard,

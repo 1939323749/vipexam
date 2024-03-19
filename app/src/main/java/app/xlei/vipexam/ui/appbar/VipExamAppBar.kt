@@ -26,16 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.R
-import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.data.util.dataStore
+import app.xlei.vipexam.preference.DataStoreKeys
+import app.xlei.vipexam.preference.LocalShowAnswer
+import app.xlei.vipexam.preference.dataStore
+import app.xlei.vipexam.preference.put
 import app.xlei.vipexam.ui.components.VipexamCheckbox
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Menu
 import compose.icons.feathericons.Star
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
@@ -67,9 +67,7 @@ fun VipExamAppBar(
     var showMenu by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
-    val showAnswer = context.dataStore.data.map {
-        it[Preferences.SHOW_ANSWER] ?: false
-    }.collectAsState(initial = false)
+    val showAnswer = LocalShowAnswer.current.isShowAnswer()
 
     val uiState by viewModel.bookmarks.collectAsState()
 
@@ -89,11 +87,12 @@ fun VipExamAppBar(
                 IconButton(
                     onClick = {
                         navigateUp()
-                        if (showAnswer.value) {
+                        if (showAnswer) {
                             coroutine.launch {
-                                context.dataStore.edit {
-                                    it[Preferences.SHOW_ANSWER] = false
-                                }
+                                context.dataStore.put(
+                                    DataStoreKeys.ShowAnswer,
+                                    false
+                                )
                             }
                         }
                     }
@@ -127,7 +126,7 @@ fun VipExamAppBar(
                     else viewModel.addToBookmark(
                         appBarTitle.examName,
                         appBarTitle.examId,
-                        appBarTitle.question
+                        appBarTitle.question,
                     )
                 }) {
                     Icon(
@@ -148,7 +147,7 @@ fun VipExamAppBar(
                         text = {
                             Row {
                                 VipexamCheckbox(
-                                    checked = showAnswer.value,
+                                    checked = showAnswer,
                                     onCheckedChange = null,
                                 )
                                 Text(
@@ -161,9 +160,10 @@ fun VipExamAppBar(
                         },
                         onClick = {
                             coroutine.launch {
-                                context.dataStore.edit {
-                                    it[Preferences.SHOW_ANSWER] = showAnswer.value.not()
-                                }
+                                context.dataStore.put(
+                                    DataStoreKeys.ShowAnswer,
+                                    showAnswer.not()
+                                )
                             }
                             showMenu = false
                         }

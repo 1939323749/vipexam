@@ -32,6 +32,7 @@ import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.core.ui.OnError
 import app.xlei.vipexam.core.ui.OnLoading
+import app.xlei.vipexam.preference.LocalOrganization
 import app.xlei.vipexam.ui.UiState
 import app.xlei.vipexam.ui.VipExamMainScreenViewModel
 import app.xlei.vipexam.ui.VipexamUiState
@@ -58,6 +59,7 @@ fun MainScreenNavigation(
     viewModel: VipExamMainScreenViewModel,
     widthSizeClass: WindowWidthSizeClass,
 ){
+    val organization = LocalOrganization.current
     val uiState by viewModel.uiState.collectAsState()
     val coroutine = rememberCoroutineScope()
 
@@ -88,7 +90,7 @@ fun MainScreenNavigation(
                         onDeleteUser = viewModel::deleteUser,
                         onLoginButtonClicked = {
                             coroutine.launch {
-                                viewModel.login()
+                                viewModel.login(organization.value)
                                 navHostController.navigate(Screen.ExamTypeList.route)
                             }
                         },
@@ -118,6 +120,9 @@ fun MainScreenNavigation(
                         navHostController.navigate(Screen.ExamList.createRoute(it.name))
                     },
                     widthSizeClass = widthSizeClass,
+                    onLastViewedClick = {
+                        navHostController.navigate(Screen.Exam.createRoute(it))
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -177,7 +182,11 @@ fun MainScreenNavigation(
                 is UiState.Success -> {
                     val questionListUiState = (uiState.questionListUiState as UiState.Success<VipexamUiState.QuestionListUiState>).uiState
                     questionListUiState.question?.let {
-                        AppBarTitle.Exam(questionListUiState.exam.examName, questionListUiState.exam.examID, it)
+                        AppBarTitle.Exam(
+                            questionListUiState.exam.examName,
+                            questionListUiState.exam.examID,
+                            it
+                        )
                     }?.let {
                         viewModel.setTitle(it)
                     }

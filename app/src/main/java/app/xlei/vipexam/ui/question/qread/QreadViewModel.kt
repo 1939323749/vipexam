@@ -1,21 +1,19 @@
 package app.xlei.vipexam.ui.question.qread
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.Word
 import app.xlei.vipexam.core.network.module.getExamResponse.Children
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,14 +36,15 @@ class QreadViewModel @Inject constructor(
     @Composable
     fun SetArticles () {
         val articles = mutableListOf<QreadUiState.Article>()
-        _uiState.value.muban!!.shiti.forEach {
+        _uiState.collectAsState().value.muban!!.shiti.forEach {
             articles.add(
                 QreadUiState.Article(
                     title = extractFirstPart(it.primQuestion),
                     content = extractSecondPart(it.primQuestion),
                     questions = getQuestions(it.children),
                     options = getOptions(it.primQuestion),
-            ))
+                )
+            )
         }
         _uiState.update {
             it.copy(

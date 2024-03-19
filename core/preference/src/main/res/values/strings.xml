@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="use_device_languages">use device languages</string>
+    <string name="chinese_simplified">Chinese Simplified</string>
+    <string name="english">English</string>
+</resources>

@@ -19,7 +19,7 @@ import app.xlei.vipexam.core.ui.vm.AddToWordListButtonViewModel
  */
 @Composable
 fun AddToWordListButton(
-    onClick: () -> Unit,
+    onClick: (() -> Unit) = {},
     viewModel: AddToWordListButtonViewModel = hiltViewModel()
 ){
     val context = LocalContext.current

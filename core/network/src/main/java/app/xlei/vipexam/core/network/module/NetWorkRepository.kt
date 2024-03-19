@@ -1,6 +1,8 @@
 package app.xlei.vipexam.core.network.module
 
 import android.os.Environment
+import app.xlei.vipexam.core.network.module.addQCollect.AddQCollectResponse
+import app.xlei.vipexam.core.network.module.deleteQCollect.DeleteQCollectResponse
 import app.xlei.vipexam.core.network.module.getExamList.GetExamListResponse
 import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
@@ -84,17 +86,19 @@ object NetWorkRepository {
         this.organization = organization
 
         return try {
-                httpClient.post("https://vipexam.cn/user/login.action") {
-                    vipExamHeaders(referrer = "https://vipexam.cn/login2.html")
-                    setBody("account=$account&password=$password")
-                }.body<LoginResponse>().also {
-                    if (it.code == "1") this.token = it.token
-                }.run {
-                    when(code) {
-                        "1" -> Result.success(this)
-                        else -> Result.failure(error(msg))
-                    }
+            httpClient.post("https://vipexam.cn/user/login.action") {
+                vipExamHeaders(referrer = "https://vipexam.cn/login2.html")
+                setBody("account=$account&password=$password")
+            }.body<LoginResponse>().also {
+                if (it.code == "1") this.token = it.token
+            }.run {
+                when (code) {
+                    "1" -> Result.success(this)
+                    else -> Result.failure(error(msg))
                 }
+            }.also {
+                println(organization)
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -219,6 +223,46 @@ object NetWorkRepository {
         }
     }
 
+    suspend fun addQCollect(
+        examId: String,
+        questionCode: String
+    ): Result<AddQCollectResponse> {
+        return try {
+            Result.success(
+                httpClient.post("https://vipexam.cn/questioncollect/addQCollect.action") {
+                    vipExamHeaders("https://vipexam.cn/begin_testing2.html?id=$examId")
+                    setBody(
+                        """
+                        account=$account&token=$token&ExamID=$examId&QuestionCode=$questionCode
+                    """.trimIndent()
+                    )
+                }.body()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteQCollect(
+        examId: String,
+        questionCode: String
+    ): Result<DeleteQCollectResponse> {
+        return try {
+            Result.success(
+                httpClient.post("https://vipexam.cn/questioncollect/deleteQCollect.action") {
+                    vipExamHeaders("https://vipexam.cn/begin_testing2.html?id=$examId")
+                    setBody(
+                        """
+                        account=$account&token=$token&ExamID=$examId&QuestionCode=$questionCode
+                    """.trimIndent()
+                    )
+                }.body()
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun momoLookUp(
         offset: Int,
         keyword: String,
@@ -228,12 +272,8 @@ object NetWorkRepository {
             Result.success(
                 httpClient.get("https://lookup.maimemo.com/api/v1/search?offset=$offset&limit=10&keyword=$keyword&paper_type=$paperType")
                     .body<MomoLookUpResponse>()
-                    .also {
-                        println(it)
-                    }
             )
         } catch (e: Exception) {
-            println(e)
             Result.failure(e)
         }
     }

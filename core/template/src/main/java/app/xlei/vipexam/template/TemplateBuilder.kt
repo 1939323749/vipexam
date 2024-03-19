@@ -17,7 +17,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,8 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.preference.LocalShowAnswer
 
 /**
  * Template builder
@@ -104,7 +103,7 @@ class TemplateBuilder {
             var showOptions by remember {
                 mutableStateOf(false)
             }
-            val showAnswer by Preferences.showAnswer.collectAsState(initial = false)
+            val showAnswer = LocalShowAnswer.current.isShowAnswer()
 
             Column {
                 VipexamArticleContainer(

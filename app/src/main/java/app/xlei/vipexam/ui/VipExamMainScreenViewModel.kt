@@ -6,7 +6,6 @@ import app.xlei.vipexam.R
 import app.xlei.vipexam.core.data.constant.ExamType
 import app.xlei.vipexam.core.data.paging.ExamListApi
 import app.xlei.vipexam.core.data.repository.ExamHistoryRepository
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.database.module.User
 import app.xlei.vipexam.core.domain.AddUserUseCase
 import app.xlei.vipexam.core.domain.DeleteUserUseCase
@@ -18,10 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -78,17 +75,13 @@ class VipExamMainScreenViewModel @Inject constructor(
      * Login
      *
      */
-    fun login() {
+    fun login(organization: String) {
         _uiState.update {
             it.copy(
                 examTypeListUiState = UiState.Loading(R.string.loading)
             )
         }
         viewModelScope.launch {
-            var organization: String
-            runBlocking {
-                organization = Preferences.organization.first()
-            }
             val loginUiState = (_uiState.value.loginUiState as UiState.Success).uiState
             NetWorkRepository.getToken(
                 account = loginUiState.account,
@@ -225,7 +218,12 @@ class VipExamMainScreenViewModel @Inject constructor(
      * @param examId
      * @param question
      */
-    fun setQuestion(examName: String, examId: String, question: String) {
+    fun setQuestion(
+        examName: String,
+        examId: String,
+        question: String,
+        questionCode: String,
+    ) {
         val questionListUiState =
             (_uiState.value.questionListUiState as UiState.Success<VipexamUiState.QuestionListUiState>).uiState
         _uiState.update {
@@ -235,7 +233,11 @@ class VipExamMainScreenViewModel @Inject constructor(
                         question = question,
                     )
                 ),
-                title = AppBarTitle.Exam(examName = examName, examId = examId, question = question)
+                title = AppBarTitle.Exam(
+                    examName = examName,
+                    examId = examId,
+                    question = question,
+                )
             )
         }
     }

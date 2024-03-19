@@ -19,7 +19,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,9 +30,10 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.preference.LocalShowAnswer
+import app.xlei.vipexam.preference.LocalVibrate
 
 @Composable
 fun ReadClozeView(
@@ -42,10 +42,9 @@ fun ReadClozeView(
 ) {
     viewModel.setMuban(muban)
     viewModel.SetArticles()
-    val showAnswer = Preferences.showAnswer.collectAsState(initial = false)
 
     val uiState by viewModel.uiState.collectAsState()
-    val vibrate by Preferences.vibrate.collectAsState(initial = true)
+    val vibrate = LocalVibrate.current.isVibrate()
 
     val haptics = LocalHapticFeedback.current
     var selectedQuestionIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -67,7 +66,6 @@ fun ReadClozeView(
             viewModel.setOption(selectedArticleIndex, selectedQuestionIndex, option)
             if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        showAnswer = showAnswer,
     )
 }
 
@@ -85,8 +83,8 @@ private fun ReadCloze(
     onArticleLongClicked: () -> Unit,
     onQuestionClicked: (Int) -> Unit,
     onOptionClicked: (Int, String) -> Unit,
-    showAnswer: State<Boolean>,
 ) {
+    val showAnswer = LocalShowAnswer.current.isShowAnswer()
     val scrollState = rememberLazyListState()
     val selectedArticle by rememberSaveable { mutableIntStateOf(0) }
 
@@ -148,7 +146,7 @@ private fun ReadCloze(
                         }
                     }
 
-                    if (showAnswer.value)
+                    if (showAnswer)
                         articles[articleIndex].questions[it].let { question ->
                             Text(
                                 text = question.index + question.refAnswer,

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,8 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.platform.LocalTextToolbar
-import app.xlei.vipexam.core.data.constant.LongPressAction
-import app.xlei.vipexam.core.data.util.Preferences
+import app.xlei.vipexam.preference.LocalLongPressAction
+import app.xlei.vipexam.preference.LongPressAction
 
 /**
  * Vipexam article container
@@ -37,12 +36,10 @@ fun VipexamArticleContainer(
     content: @Composable () -> Unit
 ){
     var showTranslateDialog by rememberSaveable { mutableStateOf(false) }
-    val longPressAction = LongPressAction.entries[Preferences
-        .longPressAction.collectAsState(initial = LongPressAction.SHOW_QUESTION.value)
-        .value]
+    val longPressAction = LocalLongPressAction.current
 
     when (longPressAction) {
-        LongPressAction.TRANSLATE ->
+        LongPressAction.ShowTranslation ->
             CompositionLocalProvider(
                 value = LocalTextToolbar provides EmptyTextToolbar {
                     showTranslateDialog = true
@@ -53,7 +50,7 @@ fun VipexamArticleContainer(
                 }
             }
 
-        LongPressAction.SHOW_QUESTION ->
+        LongPressAction.ShowQuestion ->
             Column(
                 modifier = Modifier
                     .combinedClickable(
@@ -64,7 +61,7 @@ fun VipexamArticleContainer(
                 content()
             }
 
-        LongPressAction.NONE -> Column(
+        LongPressAction.None -> Column(
             modifier = Modifier
                 .dragAndDropSource {
                     detectTapGestures(
@@ -84,7 +81,7 @@ fun VipexamArticleContainer(
     }
 
 
-    if (longPressAction==LongPressAction.TRANSLATE && showTranslateDialog)
+    if (longPressAction.isShowTranslation() && showTranslateDialog)
         TranslateDialog(
             onDismissRequest = {
                 showTranslateDialog = false

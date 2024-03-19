@@ -13,17 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import app.xlei.vipexam.core.data.constant.ShowAnswerOption
-import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.data.util.dataStore
 import app.xlei.vipexam.core.network.module.NetWorkRepository.getQuestions
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
+import app.xlei.vipexam.preference.DataStoreKeys
+import app.xlei.vipexam.preference.LocalShowAnswerOption
+import app.xlei.vipexam.preference.LocalVibrate
+import app.xlei.vipexam.preference.ShowAnswerOptionPreference
+import app.xlei.vipexam.preference.dataStore
+import app.xlei.vipexam.preference.put
 import app.xlei.vipexam.template.Render
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.components.CustomFloatingActionButton
@@ -52,16 +54,15 @@ fun ExamPage(
     modifier: Modifier = Modifier,
     questionListUiState: VipexamUiState.QuestionListUiState,
     viewModel: QuestionsViewModel = hiltViewModel(),
-    setQuestion: (String,String,String) -> Unit,
+    setQuestion: (String, String, String, String) -> Unit,
     navController: NavHostController,
     showFab: Boolean = true,
 ) {
+    val vibrate = LocalVibrate.current
+
     viewModel.setMubanList(mubanList = questionListUiState.exam.muban)
     val uiState by viewModel.uiState.collectAsState()
-    val vibrate by Preferences.vibrate.collectAsState(initial = true)
-    val showAnswerOption = ShowAnswerOption.entries[
-        Preferences.showAnswerOption.collectAsState(initial = ShowAnswerOption.ONCE.value).value
-    ]
+    val showAnswerOption = LocalShowAnswerOption.current
 
     val questions = getQuestions(uiState.mubanList!!)
     val haptics = LocalHapticFeedback.current
@@ -78,8 +79,13 @@ fun ExamPage(
             },
             questions = questions,
             navController = navController,
-            setQuestion = { title ->
-                setQuestion(questionListUiState.exam.examName,questionListUiState.exam.examID,title)
+            setQuestion = { question, questionCode ->
+                setQuestion(
+                    questionListUiState.exam.examName,
+                    questionListUiState.exam.examID,
+                    question,
+                    questionCode,
+                )
             },
             modifier = modifier
         ) {
@@ -87,7 +93,7 @@ fun ExamPage(
                 CustomFloatingActionButton(
                     expandable = true,
                     onFabClick = {
-                        if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        if (vibrate.isVibrate()) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     },
                     iconExpanded = Icons.Filled.KeyboardArrowDown,
                     iconUnExpanded = Icons.Filled.KeyboardArrowUp,
@@ -100,12 +106,13 @@ fun ExamPage(
                             launchSingleTop = true
                             restoreState = true
                         }
-                        if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                        if (showAnswerOption == ShowAnswerOption.ONCE) {
+                        if (vibrate.isVibrate()) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        if (showAnswerOption == ShowAnswerOptionPreference.Once) {
                             coroutine.launch {
-                                context.dataStore.edit { preferences ->
-                                    preferences[Preferences.SHOW_ANSWER] = false
-                                }
+                                context.dataStore.put(
+                                    DataStoreKeys.ShowAnswer,
+                                    false
+                                )
                             }
                         }
                     }
@@ -121,7 +128,7 @@ fun Questions(
     question: String,
     questions: List<Pair<String, String>>,
     navController: NavHostController,
-    setQuestion: (String) -> Unit,
+    setQuestion: (String, String) -> Unit,
     FAB: @Composable () -> Unit,
 ) {
     Scaffold(
@@ -140,7 +147,7 @@ fun Questions(
             ) {
                 for ((index, q) in questions.withIndex()) {
                     composable(route = q.first) {
-                        setQuestion(mubanList[index].cname)
+                        setQuestion(mubanList[index].cname, mubanList[index].shiti[0].questionCode)
                         QuestionMapToView(question = q.first, muban = mubanList[index])
                     }
                 }

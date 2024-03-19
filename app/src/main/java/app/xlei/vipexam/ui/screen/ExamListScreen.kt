@@ -1,13 +1,13 @@
 package app.xlei.vipexam.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -80,20 +80,12 @@ fun ExamListScreen(
         WindowWidthSizeClass.Medium -> {
             when (examListUiState) {
                 is UiState.Success -> {
-                    Row(
+                    ExamListView(
+                        isReal = examListUiState.uiState.isReal,
+                        onExamClick = onExamClick,
                         modifier = modifier
-                    ) {
-                        ElevatedCard(
-                            modifier = Modifier
-                                .width(360.dp)
-                        ) {
-                            ExamListView(
-                                isReal = examListUiState.uiState.isReal,
-                                onExamClick = onExamClick,
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(24.dp))
-                    }
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                    )
                 }
 
                 is UiState.Loading -> {
@@ -111,8 +103,9 @@ fun ExamListScreen(
             Row(
                 modifier = modifier
             ) {
-                ElevatedCard(
+                Card(
                     modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(horizontal = 24.dp)
                         .weight(1f)
                 ) {
@@ -121,26 +114,18 @@ fun ExamListScreen(
                             ExamListView(
                                 isReal = examListUiState.uiState.isReal,
                                 onExamClick = onExamClick,
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .fillMaxSize()
                             )
                         }
 
                         is UiState.Loading -> {
-                            //PageLoader()
+                            OnLoading()
                         }
 
                         is UiState.Error -> {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.internet_error),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
+                            OnError()
                         }
                     }
                 }

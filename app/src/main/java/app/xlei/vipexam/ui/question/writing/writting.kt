@@ -2,6 +2,7 @@ package app.xlei.vipexam.ui.question.writing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,10 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -21,18 +22,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.preference.LocalShowAnswer
 import coil.compose.AsyncImage
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WritingView(
     viewModel: WritingViewModel = hiltViewModel(),
     muban: Muban,
 ){
-    val showAnswer = Preferences.showAnswer.collectAsState(initial = false)
+    val showAnswer = LocalShowAnswer.current.isShowAnswer()
     viewModel.setMuban(muban)
     viewModel.setWritings()
     val uiState by viewModel.uiState.collectAsState()
@@ -42,10 +44,11 @@ fun WritingView(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun writing(
     writings: List<WritingUiState.Writing>,
-    showAnswer: State<Boolean>,
+    showAnswer: Boolean,
 ) {
     val scrollState = rememberLazyListState()
 
@@ -91,7 +94,8 @@ private fun writing(
                     }
                 }
             }
-            if (showAnswer.value) {
+
+            if (showAnswer) {
                 Column {
                     Text(
                         text = writings[it].refAnswer,

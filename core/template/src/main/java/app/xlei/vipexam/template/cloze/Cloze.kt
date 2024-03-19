@@ -29,9 +29,10 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.preference.LocalShowAnswer
+import app.xlei.vipexam.preference.LocalVibrate
 
 @Composable
 fun ClozeView(
@@ -40,8 +41,8 @@ fun ClozeView(
 ) {
     viewModel.setMuban(muban)
     viewModel.SetClozes()
-    val showAnswer by Preferences.showAnswer.collectAsState(initial = false)
-    val vibrate by Preferences.vibrate.collectAsState(initial = true)
+    val showAnswer = LocalShowAnswer.current.isShowAnswer()
+    val vibrate = LocalVibrate.current.isVibrate()
 
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current

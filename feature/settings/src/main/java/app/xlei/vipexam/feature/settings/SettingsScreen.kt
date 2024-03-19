@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,10 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import app.xlei.vipexam.core.data.util.LocaleHelper
-import app.xlei.vipexam.core.data.util.Preferences
-import app.xlei.vipexam.core.database.module.Language
-import app.xlei.vipexam.feature.settings.components.ListPreference
+import app.xlei.vipexam.feature.settings.components.LanguagePreferenceDialog
 import app.xlei.vipexam.feature.settings.components.ListPreferenceOption
 import app.xlei.vipexam.feature.settings.components.LongPressActionDialog
 import app.xlei.vipexam.feature.settings.components.OrganizationDialog
@@ -34,6 +30,9 @@ import app.xlei.vipexam.feature.settings.components.SettingsCategory
 import app.xlei.vipexam.feature.settings.components.ShowAnswerDialog
 import app.xlei.vipexam.feature.settings.components.SwitchPreference
 import app.xlei.vipexam.feature.settings.components.ThemeModeDialog
+import app.xlei.vipexam.preference.DataStoreKeys
+import app.xlei.vipexam.preference.LocalVibrate
+import app.xlei.vipexam.preference.VibratePreference
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Menu
 
@@ -44,6 +43,9 @@ fun SettingsScreen(
     onLanguageChange: (ListPreferenceOption) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showLanguagePreference by remember {
+        mutableStateOf(false)
+    }
 
     var showThemeOptions by remember {
         mutableStateOf(false)
@@ -98,17 +100,17 @@ fun SettingsScreen(
         ) {
             item {
                 SettingsCategory(stringResource(R.string.general))
+            }
 
-                val appLanguages = LocaleHelper.getLanguages()
-
-                ListPreference(
-                    title = stringResource(R.string.app_language),
-                    preferenceKey = Preferences.appLanguageKey,
-                    defaultValue = "",
-                    entries = appLanguages.map { it: Language -> it.name },
-                    values = appLanguages.map { it: Language -> it.code },
-                    onOptionSelected = onLanguageChange
-                )
+            item {
+                PreferenceItem(
+                    modifier = Modifier
+                        .padding(top = 10.dp),
+                    title = stringResource(id = R.string.app_language),
+                    summary = stringResource(id = R.string.app_language),
+                ) {
+                    showLanguagePreference = true
+                }
             }
 
             item {
@@ -150,8 +152,9 @@ fun SettingsScreen(
                         .padding(top = 10.dp),
                     title = stringResource(id = R.string.vibrate),
                     summary = stringResource(id = R.string.vibrate_summary),
-                    checked = Preferences.vibrate.collectAsState(initial = false).value,
-                    preferencesKey = Preferences.VIBRATE)
+                    checked = LocalVibrate.current == VibratePreference.On,
+                    preferencesKey = DataStoreKeys.Vibrate
+                )
             }
 
             item {
@@ -160,12 +163,17 @@ fun SettingsScreen(
                         .padding(top = 10.dp),
                     title = stringResource(id = R.string.organiztion),
                     summary = stringResource(id = R.string.edit_organiztion)
-                ){
+                ) {
                     showOrganizationDialog = true
                 }
             }
 
         }
+
+        if (showLanguagePreference)
+            LanguagePreferenceDialog {
+                showLanguagePreference = false
+            }
 
         if (showThemeOptions)
             ThemeModeDialog {

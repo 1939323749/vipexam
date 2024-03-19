@@ -47,6 +47,7 @@ dependencies {
     implementation(projects.core.database)
     implementation(projects.core.network)
     implementation(projects.core.ui)
+    implementation(projects.core.preference)
 
     implementation(libs.coil.compose)
     implementation(libs.ui.tooling.preview)

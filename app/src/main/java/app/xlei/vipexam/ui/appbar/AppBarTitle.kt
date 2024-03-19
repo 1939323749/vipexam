@@ -25,6 +25,9 @@ sealed class AppBarTitle(
      * @property question
      * @constructor Create empty Exam
      */
-    data class Exam(var examName: String, var examId: String, var question: String) :
-        AppBarTitle(R.string.exam)
+    data class Exam(
+        var examName: String,
+        var examId: String,
+        var question: String,
+    ) : AppBarTitle(R.string.exam)
 }

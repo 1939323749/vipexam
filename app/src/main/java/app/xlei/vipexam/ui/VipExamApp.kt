@@ -2,7 +2,6 @@ package app.xlei.vipexam.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,13 +23,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.R
-import app.xlei.vipexam.core.data.util.NetworkMonitor
 import app.xlei.vipexam.ui.components.AppDrawer
 import app.xlei.vipexam.ui.components.AppNavRail
 import app.xlei.vipexam.ui.navigation.AppDestinations
@@ -41,17 +40,12 @@ import kotlinx.coroutines.launch
  * App
  *
  * @param widthSizeClass 屏幕宽度
- * @param networkMonitor 网络情况监控
  * @param appState
  */
 @Composable
 fun App(
     widthSizeClass: WindowWidthSizeClass,
-    networkMonitor: NetworkMonitor,
-    appState: VipExamState = rememberVipExamAppState(
-        windowSizeClass = widthSizeClass,
-        networkMonitor = networkMonitor,
-    ),
+    appState: VipExamState,
 ) {
     val homeNavController = rememberNavController()
 
@@ -71,6 +65,7 @@ fun App(
 
     val configuration = LocalConfiguration.current
 
+
     LaunchedEffect(isOffline) {
         if (isOffline) {
             snackBarHostState.showSnackbar(
@@ -81,9 +76,7 @@ fun App(
     }
     // consider replace with material3/adaptive/navigationsuite
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        contentWindowInsets = WindowInsets(0, 0, 0, 24),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { padding ->
         ModalNavigationDrawer(
@@ -138,7 +131,11 @@ fun App(
                         if (appState.shouldShowAppDrawer.not() || configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
                             coroutine.launch {
                                 sizeAwareDrawerState.open()
-                            } },
+                            }
+                    },
+                    modifier = Modifier
+                        .run { if (appState.shouldShowAppDrawer) clip(MaterialTheme.shapes.extraLarge) else this }
+                        .fillMaxSize()
                 )
             }
         }

@@ -2,9 +2,8 @@ package app.xlei.vipexam.ui.page
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,11 +26,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import app.xlei.vipexam.LocalScrollAwareWindowInsets
 import app.xlei.vipexam.core.data.paging.ExamListItem
 import app.xlei.vipexam.core.ui.DateText
 import app.xlei.vipexam.core.ui.ErrorMessage
 import app.xlei.vipexam.core.ui.LoadingNextPageItem
 import app.xlei.vipexam.core.ui.PageLoader
+import app.xlei.vipexam.core.ui.util.isScrollingUp
 import kotlinx.coroutines.launch
 
 /**
@@ -62,9 +63,14 @@ fun ExamListView(
     Scaffold(
         floatingActionButton = {
             AnimatedVisibility(
-                visible = firstVisibleItemIndex > 10,
-                enter = fadeIn(animationSpec = tween(200)),
-                exit = fadeOut(animationSpec = tween(200)),
+                visible = firstVisibleItemIndex > 10 && scrollState.isScrollingUp(),
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it },
+                modifier = Modifier
+                    .windowInsetsPadding(
+                        LocalScrollAwareWindowInsets.current
+                            .only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal)
+                    )
             ) {
                 FloatingActionButton(
                     onClick = {

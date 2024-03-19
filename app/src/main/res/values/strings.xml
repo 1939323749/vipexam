@@ -37,4 +37,6 @@
     <string name="unknown_error">Unknown error</string>
     <string name="not_supported">Not supported</string>
     <string name="login_error">Login error</string>
+    <string name="add_to_word_list_success">Add to word list success!</string>
+    <string name="lastViewd">Last viewed</string>
 </resources>

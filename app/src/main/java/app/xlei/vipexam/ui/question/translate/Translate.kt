@@ -15,15 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.preference.LocalShowAnswer
+
 @Composable
 fun TranslateView(
     viewModel: TranslateViewModel = hiltViewModel(),
     muban: Muban,
-){
-    val showAnswer by Preferences.showAnswer.collectAsState(initial = false)
+) {
+    val showAnswer = LocalShowAnswer.current.isShowAnswer()
     viewModel.setMuban(muban)
     viewModel.setTranslations()
     val uiState by viewModel.uiState.collectAsState()

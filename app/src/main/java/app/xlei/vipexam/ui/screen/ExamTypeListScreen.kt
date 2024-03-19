@@ -1,11 +1,13 @@
 package app.xlei.vipexam.ui.screen
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import app.xlei.vipexam.core.data.constant.ExamType
 import app.xlei.vipexam.ui.UiState
@@ -26,6 +28,7 @@ import app.xlei.vipexam.ui.page.ExamTypeListView
 fun ExamTypeListScreen(
     examTypeListUiState: UiState<VipexamUiState.ExamTypeListUiState>,
     onExamTypeClick: (ExamType) -> Unit,
+    onLastViewedClick: (String) -> Unit,
     widthSizeClass: WindowWidthSizeClass,
     modifier: Modifier = Modifier
 ) {
@@ -34,6 +37,7 @@ fun ExamTypeListScreen(
             ExamTypeListView(
                 examTypeListUiState = examTypeListUiState,
                 onExamTypeClick = onExamTypeClick,
+                onLastViewedClick = onLastViewedClick
             )
         }
 
@@ -41,17 +45,21 @@ fun ExamTypeListScreen(
             ExamTypeListView(
                 examTypeListUiState = examTypeListUiState,
                 onExamTypeClick = onExamTypeClick,
+                onLastViewedClick = onLastViewedClick
             )
         }
 
         WindowWidthSizeClass.Expanded -> {
-            ElevatedCard(
+            Column(
                 modifier = modifier
                     .padding(horizontal = 24.dp)
+                    .clip(MaterialTheme.shapes.extraLarge)
+                //.background(MaterialTheme.colorScheme.surfaceContainer)
             ) {
                 ExamTypeListView(
                     examTypeListUiState = examTypeListUiState,
                     onExamTypeClick = onExamTypeClick,
+                    onLastViewedClick = onLastViewedClick,
                     modifier = Modifier
                         .fillMaxSize()
                 )

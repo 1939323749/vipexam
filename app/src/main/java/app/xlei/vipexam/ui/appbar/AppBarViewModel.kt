@@ -54,7 +54,11 @@ class AppBarViewModel @Inject constructor(
      * @param examId 试卷id
      * @param question 问题名称
      */
-    fun addToBookmark(examName: String, examId: String, question: String) {
+    fun addToBookmark(
+        examName: String,
+        examId: String,
+        question: String,
+    ) {
         viewModelScope.launch {
             bookmarkRepository
                 .addBookmark(

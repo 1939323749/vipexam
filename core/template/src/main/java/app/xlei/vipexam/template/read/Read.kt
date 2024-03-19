@@ -15,7 +15,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -29,9 +28,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.xlei.vipexam.core.data.util.Preferences
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.preference.LocalShowAnswer
 
 
 @Composable
@@ -41,7 +40,6 @@ fun ReadView(
 ) {
     viewModel.setMuban(muban)
     viewModel.SetArticles()
-    val showAnswer = Preferences.showAnswer.collectAsState(initial = false)
 
     val uiState by viewModel.uiState.collectAsState()
     val haptics = LocalHapticFeedback.current
@@ -67,7 +65,6 @@ fun ReadView(
             viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
-        showAnswer = showAnswer,
     )
 }
 
@@ -83,9 +80,8 @@ private fun Read(
     onArticleLongClick: (Int) -> Unit,
     onQuestionClicked: (Int) -> Unit,
     onOptionClicked: (Int, String) -> Unit,
-    showAnswer: State<Boolean>,
 ) {
-
+    val showAnswer = LocalShowAnswer.current.isShowAnswer()
     val scrollState = rememberLazyListState()
     var selectedArticle by rememberSaveable { mutableIntStateOf(0) }
 
@@ -167,7 +163,7 @@ private fun Read(
                                 )
                         }
                     }
-                    if (showAnswer.value)
+                    if (showAnswer)
                         articles[articleIndex].questions[index].let {
                             Text(
                                 text = "${it.index}." + it.refAnswer,

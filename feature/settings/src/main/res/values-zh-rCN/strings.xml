@@ -26,4 +26,9 @@
     <string name="vibrate_summary">打开震动</string>
     <string name="edit_organiztion">修改你的组织</string>
     <string name="organiztion">组织</string>
+    <string name="edit_eudic_apikey">修改欧陆词典Api Key</string>
+    <string name="get_your_eudic_apikey">获取Api Key</string>
+    <string name="advanced">高级</string>
+    <string name="eudic">欧陆词典 Api Key</string>
+    <string name="check_availability">检查可用性</string>
 </resources>

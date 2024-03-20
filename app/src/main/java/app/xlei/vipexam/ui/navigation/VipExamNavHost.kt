@@ -1,7 +1,5 @@
 package app.xlei.vipexam.ui.navigation
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -9,13 +7,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import app.xlei.vipexam.MainActivity
 import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.feature.bookmarks.BookmarksScreen
 import app.xlei.vipexam.feature.history.HistoryScreen
@@ -44,7 +40,6 @@ fun VipExamNavHost(
     widthSizeClass: WindowWidthSizeClass,
     openDrawer: () -> Unit,
 ) {
-    val context = LocalContext.current
     val viewModel : VipExamMainScreenViewModel = hiltViewModel()
 
     NavHost(
@@ -79,11 +74,6 @@ fun VipExamNavHost(
         ) { _ ->
             SettingsScreen(
                 openDrawer = openDrawer,
-                onLanguageChange = {
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        (context as MainActivity).recreate()
-                    }, 100)
-                },
                 modifier = Modifier
                     .fillMaxSize()
             )

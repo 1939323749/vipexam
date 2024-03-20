@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.xlei.vipexam.feature.settings.components.EudicApiKeyDialog
 import app.xlei.vipexam.feature.settings.components.LanguagePreferenceDialog
-import app.xlei.vipexam.feature.settings.components.ListPreferenceOption
 import app.xlei.vipexam.feature.settings.components.LongPressActionDialog
 import app.xlei.vipexam.feature.settings.components.OrganizationDialog
 import app.xlei.vipexam.feature.settings.components.PreferenceItem
@@ -40,7 +40,6 @@ import compose.icons.feathericons.Menu
 @Composable
 fun SettingsScreen(
     openDrawer: () -> Unit,
-    onLanguageChange: (ListPreferenceOption) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showLanguagePreference by remember {
@@ -60,6 +59,10 @@ fun SettingsScreen(
     }
 
     var showOrganizationDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showEudicApiKeyDialog by remember {
         mutableStateOf(false)
     }
 
@@ -168,6 +171,21 @@ fun SettingsScreen(
                 }
             }
 
+            item {
+                SettingsCategory(stringResource(R.string.advanced))
+            }
+
+            item {
+                PreferenceItem(
+                    modifier = Modifier
+                        .padding(top = 10.dp),
+                    title = stringResource(id = R.string.eudic),
+                    summary = stringResource(id = R.string.edit_eudic_apikey),
+                ) {
+                    showEudicApiKeyDialog = true
+                }
+            }
+
         }
 
         if (showLanguagePreference)
@@ -194,6 +212,11 @@ fun SettingsScreen(
         if (showOrganizationDialog)
             OrganizationDialog {
                 showOrganizationDialog = false
+            }
+
+        if (showEudicApiKeyDialog)
+            EudicApiKeyDialog {
+                showEudicApiKeyDialog = false
             }
     }
 }

@@ -93,4 +93,9 @@ sealed class DataStoreKeys<T> {
         override val key: Preferences.Key<Int>
             get() = intPreferencesKey("language")
     }
+
+    data object EudicApiKey : DataStoreKeys<String>() {
+        override val key: Preferences.Key<String>
+            get() = stringPreferencesKey("LocalEudicApiKey")
+    }
 }

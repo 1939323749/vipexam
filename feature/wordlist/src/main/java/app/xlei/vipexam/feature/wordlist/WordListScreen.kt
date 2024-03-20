@@ -45,8 +45,15 @@ import app.xlei.vipexam.core.ui.DateText
 import app.xlei.vipexam.feature.wordlist.components.CopyToClipboardButton
 import app.xlei.vipexam.feature.wordlist.components.TranslationSheet
 import app.xlei.vipexam.feature.wordlist.constant.SortMethod
+import app.xlei.vipexam.preference.EudicApiKey
+import app.xlei.vipexam.preference.LocalEudicApiKey
 import compose.icons.FeatherIcons
+import compose.icons.feathericons.Check
 import compose.icons.feathericons.Menu
+import compose.icons.feathericons.RefreshCcw
+import compose.icons.feathericons.RefreshCw
+import compose.icons.feathericons.X
+import kotlinx.coroutines.delay
 
 @OptIn(
     ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
@@ -59,6 +66,7 @@ fun WordListScreen(
     openDrawer: () -> Unit,
 ) {
     val wordListState by viewModel.wordList.collectAsState()
+    val syncState by viewModel.syncState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
     )
@@ -71,12 +79,51 @@ fun WordListScreen(
     LaunchedEffect(Unit) {
         viewModel.setSortMethod(initSortMethod)
     }
+
     val sortMethod = viewModel.sortMethod.collectAsState()
     val context = LocalContext.current
+    val eudicApiKey = LocalEudicApiKey.current
+
+    LaunchedEffect(syncState) {
+        if (syncState == SyncState.Success || syncState == SyncState.Error) {
+            delay(2000)
+            viewModel.resetSyncState()
+        }
+    }
+
     Scaffold(
         topBar = {
             LargeTopAppBar(
                 actions = {
+                    IconButton(
+                        onClick = { viewModel.syncToEudic(eudicApiKey.value) },
+                        enabled = eudicApiKey is EudicApiKey.Some
+                    ) {
+                        when (syncState) {
+                            SyncState.Default -> {
+                                Icon(
+                                    imageVector = FeatherIcons.RefreshCw,
+                                    contentDescription = null
+                                )
+                            }
+
+                            SyncState.Error -> {
+                                Icon(imageVector = FeatherIcons.X, contentDescription = null)
+                            }
+
+                            SyncState.Success -> {
+                                Icon(imageVector = FeatherIcons.Check, contentDescription = null)
+                            }
+
+                            SyncState.Syncing -> {
+                                Icon(
+                                    imageVector = FeatherIcons.RefreshCcw,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+
+                    }
                     IconButton(onClick = { viewModel.exportWordsToCSV(context) }) {
                         Icon(imageVector = Icons.Default.Share, contentDescription = null)
                     }

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.Word
+import app.xlei.vipexam.core.network.module.EudicRemoteDatasource
 import app.xlei.vipexam.feature.wordlist.constant.SortMethod
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,8 +31,12 @@ class WordListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _wordList = MutableStateFlow(emptyList<Word>())
+    private val _syncState = MutableStateFlow<SyncState<Nothing>>(SyncState.Default)
+    val wordList
+        get() = _wordList.asStateFlow()
+    val syncState
+        get() = _syncState.asStateFlow()
 
-    val wordList = _wordList.asStateFlow()
     var sortMethod = MutableStateFlow(SortMethod.OLD_TO_NEW)
 
     init {
@@ -111,4 +116,31 @@ class WordListViewModel @Inject constructor(
         }
         context.startActivity(Intent.createChooser(shareIntent, "Save file..."))
     }
+
+    fun syncToEudic(apiKey: String) {
+        apiKey.takeIf { it != "" }?.let {
+            _syncState.update {
+                SyncState.Syncing
+            }
+            viewModelScope.launch {
+                EudicRemoteDatasource.api = it
+                if (EudicRemoteDatasource.sync(_wordList.value.map { it.word }))
+                    _syncState.update { SyncState.Success }
+                else _syncState.update { SyncState.Error }
+            }
+        }
+    }
+
+    fun resetSyncState() {
+        _syncState.update {
+            SyncState.Default
+        }
+    }
+}
+
+sealed class SyncState<out T> {
+    data object Default : SyncState<Nothing>()
+    data object Success : SyncState<Nothing>()
+    data object Syncing : SyncState<Nothing>()
+    data object Error : SyncState<Nothing>()
 }

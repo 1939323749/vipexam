@@ -25,5 +25,10 @@
     <string name="vibrate">Vibrate</string>
     <string name="vibrate_summary">vibrate</string>
     <string name="edit_organiztion">Edit your orgnization</string>
-    <string name="organiztion">Organiztion</string>
+    <string name="organiztion">Organization</string>
+    <string name="edit_eudic_apikey">Edit your eudic Api Key</string>
+    <string name="get_your_eudic_apikey">Get one</string>
+    <string name="advanced">Advanced</string>
+    <string name="eudic">Eudic Api Key</string>
+    <string name="check_availability">Check availability</string>
 </resources>

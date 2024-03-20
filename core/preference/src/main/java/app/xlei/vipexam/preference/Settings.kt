@@ -17,6 +17,7 @@ val LocalShowAnswerOption =
     compositionLocalOf<ShowAnswerOptionPreference> { ShowAnswerOptionPreference.default }
 val LocalOrganization = compositionLocalOf<Organization> { Organization.default }
 val LocalLanguage = compositionLocalOf<LanguagePreference> { LanguagePreference.default }
+val LocalEudicApiKey = compositionLocalOf<EudicApiKey> { EudicApiKey.default }
 
 data class Settings(
     val themeMode: ThemeModePreference = ThemeModePreference.default,
@@ -26,6 +27,7 @@ data class Settings(
     val showAnswerOptionPreference: ShowAnswerOptionPreference = ShowAnswerOptionPreference.default,
     val organization: Organization = Organization.default,
     val language: LanguagePreference = LanguagePreference.default,
+    val localEudicApiKey: EudicApiKey = EudicApiKey.default,
 )
 
 @Composable
@@ -47,6 +49,7 @@ fun SettingsProvider(
         LocalShowAnswerOption provides settings.showAnswerOptionPreference,
         LocalOrganization provides settings.organization,
         LocalLanguage provides settings.language,
+        LocalEudicApiKey provides settings.localEudicApiKey,
     ) {
         content()
     }

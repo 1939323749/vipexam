@@ -16,6 +16,6 @@ fun Preferences.toSettings(): Settings {
         longPressAction = LongPressAction.fromPreferences(this),
         showAnswerOptionPreference = ShowAnswerOptionPreference.fromPreferences(this),
         organization = Organization.fromPreferences(this),
-        language = LanguagePreference.fromPreferences(this)
+        language = LanguagePreference.fromPreferences(this),
     )
 }

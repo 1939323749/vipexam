@@ -1,5 +1,7 @@
 package app.xlei.vipexam.ui.components
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -10,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import app.xlei.vipexam.ui.navigation.AppDestinations
 
 /**
@@ -34,13 +37,19 @@ fun AppDrawer(
         drawerContentColor = MaterialTheme.colorScheme.surface,
         modifier = modifier
     ) {
-        AppDestinations.entries.forEach {
-            VipexamDrawerItem(
-                currentRoute = currentRoute,
-                destination = it,
-                navigationToTopLevelDestination = navigationToTopLevelDestination
-            ) {
-                closeDrawer.invoke()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 24.dp)
+        ) {
+            AppDestinations.entries.forEach {
+                VipexamDrawerItem(
+                    currentRoute = currentRoute,
+                    destination = it,
+                    navigationToTopLevelDestination = navigationToTopLevelDestination
+                ) {
+                    closeDrawer.invoke()
+                }
             }
         }
     }

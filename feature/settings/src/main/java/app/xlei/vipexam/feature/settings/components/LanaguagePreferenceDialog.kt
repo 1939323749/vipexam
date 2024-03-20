@@ -1,14 +1,14 @@
 package app.xlei.vipexam.feature.settings.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.xlei.vipexam.feature.settings.R
+import app.xlei.vipexam.preference.DataStoreKeys
 import app.xlei.vipexam.preference.LanguagePreference
 import app.xlei.vipexam.preference.LocalLanguage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import app.xlei.vipexam.preference.dataStore
+import app.xlei.vipexam.preference.put
 
 @Composable
 fun LanguagePreferenceDialog(
@@ -16,7 +16,6 @@ fun LanguagePreferenceDialog(
 ) {
     val language = LocalLanguage.current
     val context = LocalContext.current
-    val coroutine = rememberCoroutineScope()
 
     ListPreferenceDialog(
         title = stringResource(R.string.app_language),
@@ -34,10 +33,12 @@ fun LanguagePreferenceDialog(
             LanguagePreference.values.first {
                 it.value == option.value
             }.apply {
-                coroutine.launch(Dispatchers.Main) {
-                    LanguagePreference.setLocale(this@apply)
-                }
-            }.put(context, coroutine)
+                context.dataStore.put(
+                    DataStoreKeys.Language,
+                    option.value
+                )
+                LanguagePreference.setLocale(this@apply)
+            }
         }
     )
 }

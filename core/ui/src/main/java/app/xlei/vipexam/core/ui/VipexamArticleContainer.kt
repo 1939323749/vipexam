@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.LocalView
 import app.xlei.vipexam.preference.LocalLongPressAction
 import app.xlei.vipexam.preference.LongPressAction
 
@@ -41,7 +42,9 @@ fun VipexamArticleContainer(
     when (longPressAction) {
         LongPressAction.ShowTranslation ->
             CompositionLocalProvider(
-                value = LocalTextToolbar provides EmptyTextToolbar {
+                value = LocalTextToolbar provides VipexamTextToolbar(
+                    view = LocalView.current
+                ) {
                     showTranslateDialog = true
                 }
             ) {

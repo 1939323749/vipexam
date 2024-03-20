@@ -33,7 +33,7 @@ fun ListPreferenceDialog(
                         text = if (it.value == currentValue) "${it.name}   ✓" else it.name,
                         onClick = {
                             coroutine.launch {
-                                onOptionSelected.invoke(it).also {
+                                onOptionSelected.invoke(it).apply {
                                     onDismissRequest.invoke()
                                 }
                             }

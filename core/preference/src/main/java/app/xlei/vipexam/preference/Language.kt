@@ -22,14 +22,15 @@ sealed class LanguagePreference(val value: Int) : Preference() {
     override fun put(context: Context, scope: CoroutineScope) {
         scope.launch {
             context.dataStore.put(
-                DataStoreKeys.Language, value
+                DataStoreKeys.Language,
+                value
             )
         }
     }
 
-    fun toLocale(): Locale? = when (this) {
+    private fun toLocale(): Locale? = when (this) {
         UseDeviceLanguages -> null
-        ChineseSimplified -> Locale.forLanguageTag("zh-rCN")
+        ChineseSimplified -> Locale.forLanguageTag("zh-Hans")
         English -> Locale("en")
     }
 

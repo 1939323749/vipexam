@@ -87,7 +87,6 @@ fun App(
                     closeDrawer = { coroutine.launch { sizeAwareDrawerState.close() } },
                     modifier = Modifier
                         .width(300.dp)
-                        .padding(top = 24.dp)
                 )
             },
             drawerState = sizeAwareDrawerState,
@@ -134,7 +133,12 @@ fun App(
                             }
                     },
                     modifier = Modifier
-                        .run { if (appState.shouldShowAppDrawer) clip(MaterialTheme.shapes.extraLarge) else this }
+                        .run {
+                            if (appState.shouldShowAppDrawer && configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                                clip(MaterialTheme.shapes.extraLarge)
+                            else
+                                this
+                        }
                         .fillMaxSize()
                 )
             }

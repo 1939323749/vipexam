@@ -15,8 +15,11 @@ vipexam.cn, including following exams and subjects:
 - [ ] Postgraduate Entrance Examination 408
 
 Mock exams: Users can take mock exams to assess their exam preparation.
+
 Favorites: Users can bookmark interesting questions.
+
 History: Users can view their exam history.
+
 Translation: Users can long press to translate content and add to word list.
 
 ## Screenshots
@@ -75,4 +78,9 @@ to VipExam:
   operations and manage local data in VipExam.
 - [Coil](https://coil-kt.github.io/coil/): Coil is an image loading library for Android. We utilize
   Coil to efficiently load and display images in VipExam.
-  
+
+## Sponsor
+
+[<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="200" alt="Copyright © 2000-2023 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o."/>](https://www.jetbrains.com/)
+
+Thanks to **JetBrains** for allocating free open-source licences for IDEs for **vipexam**.

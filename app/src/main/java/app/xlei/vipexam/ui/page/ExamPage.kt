@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import app.xlei.vipexam.core.network.module.NetWorkRepository.getQuestions
+import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.preference.DataStoreKeys
 import app.xlei.vipexam.preference.LocalShowAnswerOption
@@ -54,20 +55,20 @@ fun ExamPage(
     modifier: Modifier = Modifier,
     questionListUiState: VipexamUiState.QuestionListUiState,
     viewModel: QuestionsViewModel = hiltViewModel(),
-    setQuestion: (String, String, String, String) -> Unit,
+    setQuestion: (String, GetExamResponse) -> Unit,
     navController: NavHostController,
     showFab: Boolean = true,
+    submitMyAnswer: (String, String) -> Unit
 ) {
+    val context = LocalContext.current
     val vibrate = LocalVibrate.current
-
+    val showAnswerOption = LocalShowAnswerOption.current
+    val haptics = LocalHapticFeedback.current
     viewModel.setMubanList(mubanList = questionListUiState.exam.muban)
     val uiState by viewModel.uiState.collectAsState()
-    val showAnswerOption = LocalShowAnswerOption.current
+    val coroutine = rememberCoroutineScope()
 
     val questions = getQuestions(uiState.mubanList!!)
-    val haptics = LocalHapticFeedback.current
-    val coroutine = rememberCoroutineScope()
-    val context = LocalContext.current
 
     if (questions.isNotEmpty())
         Questions(
@@ -79,15 +80,14 @@ fun ExamPage(
             },
             questions = questions,
             navController = navController,
-            setQuestion = { question, questionCode ->
+            setQuestion = { question ->
                 setQuestion(
-                    questionListUiState.exam.examName,
-                    questionListUiState.exam.examID,
                     question,
-                    questionCode,
+                    questionListUiState.exam,
                 )
             },
-            modifier = modifier
+            modifier = modifier,
+            submitMyAnswer = submitMyAnswer
         ) {
             if (showFab)
                 CustomFloatingActionButton(
@@ -128,7 +128,8 @@ fun Questions(
     question: String,
     questions: List<Pair<String, String>>,
     navController: NavHostController,
-    setQuestion: (String, String) -> Unit,
+    setQuestion: (String) -> Unit,
+    submitMyAnswer: (String, String) -> Unit,
     FAB: @Composable () -> Unit,
 ) {
     Scaffold(
@@ -147,8 +148,12 @@ fun Questions(
             ) {
                 for ((index, q) in questions.withIndex()) {
                     composable(route = q.first) {
-                        setQuestion(mubanList[index].cname, mubanList[index].shiti[0].questionCode)
-                        QuestionMapToView(question = q.first, muban = mubanList[index])
+                        setQuestion(mubanList[index].cname)
+                        QuestionMapToView(
+                            question = q.first,
+                            muban = mubanList[index],
+                            submitMyAnswer = submitMyAnswer
+                        )
                     }
                 }
             }
@@ -163,24 +168,28 @@ fun Questions(
  * @param muban 模板
  */
 @Composable
-fun QuestionMapToView(question: String, muban: Muban){
+fun QuestionMapToView(
+    question: String,
+    muban: Muban,
+    submitMyAnswer: (String, String) -> Unit,
+) {
     return when (question) {
         "ecswriting" -> WritingView(muban = muban)
-        "ecscloze" -> clozeView(muban = muban)
-        "ecsqread" -> QreadView(muban = muban)
-        "ecszread" -> ZreadView(muban = muban)
+        "ecscloze" -> clozeView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "ecsqread" -> QreadView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "ecszread" -> ZreadView(muban = muban, submitMyAnswer = submitMyAnswer)
         "ecstranslate" -> TranslateView(muban = muban)
         "ecfwriting" -> WritingView(muban = muban)
-        "ecfcloze" -> clozeView(muban = muban)
-        "ecfqread" -> QreadView(muban = muban)
-        "ecfzread" -> ZreadView(muban = muban)
+        "ecfcloze" -> clozeView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "ecfqread" -> QreadView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "ecfzread" -> ZreadView(muban = muban, submitMyAnswer = submitMyAnswer)
         "ecftranslate" -> TranslateView(muban = muban)
-        "eylhlisteninga" -> ListeningView(muban = muban)
-        "eylhlisteningb" -> ListeningView(muban = muban)
-        "eylhlisteningc" -> ListeningView(muban = muban)
+        "eylhlisteninga" -> ListeningView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "eylhlisteningb" -> ListeningView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "eylhlisteningc" -> ListeningView(muban = muban, submitMyAnswer = submitMyAnswer)
 
         "kettrans" -> TranslateView(muban = muban)
         "ketwrite" -> WritingView(muban = muban)
-        else -> Render(question = question, muban = muban)
+        else -> Render(question = question, muban = muban, submitMyAnswer = submitMyAnswer)
     }
 }

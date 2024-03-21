@@ -18,13 +18,14 @@ import app.xlei.vipexam.ui.question.writing.WritingView
 
 @Composable
 fun Render(
+    submitMyAnswer: (String, String) -> Unit,
     question: String,
     muban: Muban,
 ) {
     when (question) {
-        "keread" -> ReadView(muban = muban)
-        "keclozea" -> ClozeView(muban = muban)
-        "kereadcloze" -> ReadClozeView(muban = muban)
+        "keread" -> ReadView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "keclozea" -> ClozeView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "kereadcloze" -> ReadClozeView(muban = muban, submitMyAnswer = submitMyAnswer)
         "kereadf" -> TranslateView(muban = muban)
         //"kewritinga" -> WritingView(muban = muban)
         "kewritinga" -> Template {
@@ -35,8 +36,8 @@ fun Render(
         }
 
         "kewritingb" -> WritingView(muban = muban)
-        "ketclose" -> ClozeView(muban = muban)
-        "ketread" -> ReadView(muban = muban)
+        "ketclose" -> ClozeView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "ketread" -> ReadView(muban = muban, submitMyAnswer = submitMyAnswer)
         else -> {
             Box(
                 modifier = Modifier

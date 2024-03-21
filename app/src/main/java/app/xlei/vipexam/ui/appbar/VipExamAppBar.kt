@@ -1,17 +1,20 @@
 package app.xlei.vipexam.ui.appbar
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -62,6 +65,7 @@ fun VipExamAppBar(
     navigateUp: () -> Unit,
     openDrawer: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
+    myAnswer: Map<String, String>,
     viewModel: AppBarViewModel = hiltViewModel()
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -70,9 +74,10 @@ fun VipExamAppBar(
     val showAnswer = LocalShowAnswer.current.isShowAnswer()
 
     val uiState by viewModel.bookmarks.collectAsState()
+    val submitState by viewModel.submitState.collectAsState()
 
     val isInBookmark = when (appBarTitle) {
-        is AppBarTitle.Exam -> uiState.any { it.examId == appBarTitle.examId && it.question == appBarTitle.question }
+        is AppBarTitle.Exam -> uiState.any { it.examId == appBarTitle.exam.examID && it.question == appBarTitle.question }
         else -> false
     }
     val title = @Composable {
@@ -81,6 +86,7 @@ fun VipExamAppBar(
             else -> Text(text = stringResource(id = appBarTitle.nameId))
         }
     }
+
     val navigationIcon = @Composable {
         when {
             canNavigateBack -> {
@@ -119,13 +125,13 @@ fun VipExamAppBar(
                 IconButton(onClick = {
                     if (isInBookmark) viewModel.removeFromBookmarks(
                         bookmark = uiState.first {
-                            it.examId == appBarTitle.examId
+                            it.examId == appBarTitle.exam.examID
                                     && it.question == appBarTitle.question
                         }
                     )
                     else viewModel.addToBookmark(
-                        appBarTitle.examName,
-                        appBarTitle.examId,
+                        appBarTitle.exam.examName,
+                        appBarTitle.exam.examID,
                         appBarTitle.question,
                     )
                 }) {
@@ -168,6 +174,18 @@ fun VipExamAppBar(
                             showMenu = false
                         }
                     )
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.submit),
+                                modifier = Modifier
+                                    .padding(horizontal = 24.dp)
+                            )
+                        },
+                        onClick = {
+                            viewModel.submit(appBarTitle.exam, myAnswer)
+                        }
+                    )
                 }
             }
 
@@ -188,6 +206,35 @@ fun VipExamAppBar(
             navigationIcon = navigationIcon,
             actions = { actions() },
             modifier = modifier
+        )
+    }
+
+    if (submitState is SubmitState.Success || submitState is SubmitState.Failed) {
+        AlertDialog(
+            text = {
+                when (submitState) {
+                    is SubmitState.Success -> {
+                        Column {
+                            Text(
+                                style = MaterialTheme.typography.bodyLarge,
+                                text = "${stringResource(id = R.string.total)}: ${(submitState as SubmitState.Success).grade}"
+                            )
+                            Text(
+                                text = (submitState as SubmitState.Success).gradeCount.split(";")
+                                    .joinToString("\n")
+                            )
+                        }
+                    }
+
+                    is SubmitState.Failed -> {
+                        Text(text = (submitState as SubmitState.Failed).msg)
+                    }
+
+                    else -> {}
+                }
+            },
+            onDismissRequest = { viewModel.resetSubmitState() },
+            confirmButton = { }
         )
     }
 }

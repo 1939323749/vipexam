@@ -40,6 +40,7 @@ import app.xlei.vipexam.preference.LocalVibrate
 
 @Composable
 fun QreadView(
+    submitMyAnswer: (String, String) -> Unit,
     viewModel: QreadViewModel = hiltViewModel(),
     muban: Muban,
 ) {
@@ -69,6 +70,10 @@ fun QreadView(
             if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         onOptionClicked = { selectedArticleIndex, option ->
+            submitMyAnswer(
+                muban.shiti[selectedArticleIndex].children[selectedQuestionIndex].questionCode,
+                option
+            )
             viewModel.setOption(selectedArticleIndex, selectedQuestionIndex, option)
             if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },

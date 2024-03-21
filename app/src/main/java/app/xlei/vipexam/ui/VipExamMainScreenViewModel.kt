@@ -11,6 +11,7 @@ import app.xlei.vipexam.core.domain.AddUserUseCase
 import app.xlei.vipexam.core.domain.DeleteUserUseCase
 import app.xlei.vipexam.core.domain.GetAllUsersUseCase
 import app.xlei.vipexam.core.network.module.NetWorkRepository
+import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.ui.appbar.AppBarTitle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,10 @@ class VipExamMainScreenViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(vipexamUiState)
     val uiState: StateFlow<VipexamUiState> = _uiState.asStateFlow()
+
+    private val _myAnswer = MutableStateFlow(mutableMapOf<String, String>())
+    val myAnswer
+        get() = _myAnswer.asStateFlow()
 
     init {
         _uiState.update {
@@ -219,10 +224,8 @@ class VipExamMainScreenViewModel @Inject constructor(
      * @param question
      */
     fun setQuestion(
-        examName: String,
-        examId: String,
         question: String,
-        questionCode: String,
+        exam: GetExamResponse,
     ) {
         val questionListUiState =
             (_uiState.value.questionListUiState as UiState.Success<VipexamUiState.QuestionListUiState>).uiState
@@ -234,9 +237,8 @@ class VipExamMainScreenViewModel @Inject constructor(
                     )
                 ),
                 title = AppBarTitle.Exam(
-                    examName = examName,
-                    examId = examId,
                     question = question,
+                    exam = exam,
                 )
             )
         }
@@ -307,5 +309,9 @@ class VipExamMainScreenViewModel @Inject constructor(
                 }
                 return
             }
+    }
+
+    fun submitMyAnswer(questionCode: String, myAnswer: String) {
+        _myAnswer.value[questionCode] = myAnswer
     }
 }

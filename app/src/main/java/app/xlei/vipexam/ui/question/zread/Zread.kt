@@ -34,6 +34,7 @@ import app.xlei.vipexam.preference.LocalShowAnswer
 
 @Composable
 fun ZreadView(
+    submitMyAnswer: (String, String) -> Unit,
     muban: Muban,
     viewModel: ZreadViewModel = hiltViewModel(),
 ){
@@ -60,6 +61,10 @@ fun ZreadView(
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
         onOptionClicked = { selectedArticleIndex, option ->
+            submitMyAnswer(
+                muban.shiti[selectedArticleIndex].children[selectedQuestionIndex].questionCode,
+                option
+            )
             viewModel.setOption(selectedArticleIndex, selectedQuestionIndex, option)
             viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)

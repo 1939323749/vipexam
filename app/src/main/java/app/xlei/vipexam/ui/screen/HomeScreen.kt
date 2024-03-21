@@ -78,6 +78,7 @@ fun HomeScreen(
                         navigateUp = { navController.navigateUp() },
                         openDrawer = openDrawer,
                         scrollBehavior = scrollBehavior,
+                        myAnswer = viewModel.myAnswer.collectAsState().value,
                     )
 
                 WindowWidthSizeClass.Medium -> {
@@ -87,6 +88,7 @@ fun HomeScreen(
                         navigateUp = { navController.navigateUp() },
                         openDrawer = openDrawer,
                         scrollBehavior = scrollBehavior,
+                        myAnswer = viewModel.myAnswer.collectAsState().value,
                     )
                 }
 
@@ -99,6 +101,7 @@ fun HomeScreen(
                                 navigateUp = { navController.navigateUp() },
                                 openDrawer = openDrawer,
                                 scrollBehavior = scrollBehavior,
+                                myAnswer = viewModel.myAnswer.collectAsState().value,
                             )
                         }
 
@@ -110,6 +113,7 @@ fun HomeScreen(
                                 openDrawer = openDrawer,
                                 scrollBehavior = scrollBehavior,
                                 scrollable = false,
+                                myAnswer = viewModel.myAnswer.collectAsState().value,
                             )
                         }
                     }

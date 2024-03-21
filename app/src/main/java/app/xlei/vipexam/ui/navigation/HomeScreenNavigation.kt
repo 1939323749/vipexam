@@ -183,9 +183,8 @@ fun MainScreenNavigation(
                     val questionListUiState = (uiState.questionListUiState as UiState.Success<VipexamUiState.QuestionListUiState>).uiState
                     questionListUiState.question?.let {
                         AppBarTitle.Exam(
-                            questionListUiState.exam.examName,
-                            questionListUiState.exam.examID,
-                            it
+                            it,
+                            questionListUiState.exam
                         )
                     }?.let {
                         viewModel.setTitle(it)
@@ -194,6 +193,7 @@ fun MainScreenNavigation(
                         questionListUiState = questionListUiState,
                         setQuestion = viewModel::setQuestion,
                         widthSizeClass = widthSizeClass,
+                        submitMyAnswer = viewModel::submitMyAnswer,
                         modifier = Modifier
                             .fillMaxSize()
                     )
@@ -246,9 +246,8 @@ fun MainScreenNavigation(
                 question?.let { q ->
                     viewModel.setTitle(
                         AppBarTitle.Exam(
-                            examName = exam!!.examName,
-                            examId = exam!!.examID,
                             question = q,
+                            exam = exam!!
                         ) )
                     Column(
                         modifier = Modifier
@@ -256,7 +255,8 @@ fun MainScreenNavigation(
                     ) {
                         QuestionMapToView(
                             question = exam!!.muban.first { it.cname == question }.ename,
-                            muban = exam!!.muban.first { it.cname == question }
+                            muban = exam!!.muban.first { it.cname == question },
+                            submitMyAnswer = viewModel::submitMyAnswer
                         )
                     }
                 }

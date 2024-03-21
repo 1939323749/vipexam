@@ -1,6 +1,7 @@
 package app.xlei.vipexam.ui.question.cloze
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
@@ -45,7 +46,7 @@ class ClozeViewModel @Inject constructor(
     fun SetClozes(){
         val clozes = mutableListOf<ClozeUiState.Cloze>()
 
-        _uiState.value.muban!!.shiti.forEach {
+        _uiState.collectAsState().value.muban!!.shiti.forEach {
             clozes.add(
                 ClozeUiState.Cloze(
                     article = getClickableArticle(it.primQuestion),

@@ -48,6 +48,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun ListeningView(
+    submitMyAnswer: (String, String) -> Unit,
     muban: Muban,
     viewModel: ListeningViewModel = hiltViewModel(),
 ){
@@ -69,8 +70,15 @@ fun ListeningView(
             viewModel.toggleOptionsSheet()
             if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
-        onOptionClick = {selectedListeningIndex,option->
-            viewModel.setOption(selectedListeningIndex,selectedQuestionIndex,option)
+        onOptionClick = { selectedListeningIndex, option ->
+            if (selectedListeningIndex == 0)
+                submitMyAnswer(muban.shiti[selectedListeningIndex].questionCode, option)
+            else
+                submitMyAnswer(
+                    muban.shiti[selectedListeningIndex].children[selectedQuestionIndex - 1].questionCode,
+                    option
+                )
+            viewModel.setOption(selectedListeningIndex, selectedQuestionIndex, option)
             viewModel.toggleOptionsSheet()
             if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },

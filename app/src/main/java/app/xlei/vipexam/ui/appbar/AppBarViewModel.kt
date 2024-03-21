@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.BookmarkRepository
 import app.xlei.vipexam.core.database.module.Bookmark
+import app.xlei.vipexam.core.network.module.NetWorkRepository
+import app.xlei.vipexam.core.network.module.TiJiaoTest.TestQuestion
+import app.xlei.vipexam.core.network.module.TiJiaoTest.TiJiaoTestPayload
+import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +29,10 @@ class AppBarViewModel @Inject constructor(
 ) : ViewModel() {
     private val _bookmarks = MutableStateFlow(emptyList<Bookmark>())
     val bookmarks = _bookmarks.asStateFlow()
+
+    private val _submitState = MutableStateFlow<SubmitState<Nothing>>(SubmitState.Default)
+    val submitState
+        get() = _submitState.asStateFlow()
 
     init {
         getBookmarks()
@@ -82,4 +90,104 @@ class AppBarViewModel @Inject constructor(
                 )
         }
     }
+
+    fun submit(exam: GetExamResponse, myAnswer: Map<String, String>) {
+        println(myAnswer)
+        viewModelScope.launch {
+            _submitState.update {
+                SubmitState.Submitted
+            }
+            NetWorkRepository.tiJiaoTest(
+                payload = TiJiaoTestPayload(
+                    count = exam.count.toString(),
+                    examID = exam.examID,
+                    examName = exam.examName,
+                    examStyle = exam.examstyle,
+                    examTypeCode = exam.examTypeCode,
+                    testQuestion = exam.muban.flatMap { muban ->
+                        muban.shiti.flatMap { shiti ->
+                            listOf(
+                                TestQuestion(
+                                    basic = muban.basic,
+                                    grade = muban.grade,
+                                    questiontype = muban.ename,
+                                    questionCode = shiti.questionCode,
+                                    refAnswer = myAnswer[shiti.questionCode] ?: ""
+                                )
+                            ) + shiti.children.map { child ->
+                                TestQuestion(
+                                    basic = muban.basic,
+                                    grade = muban.grade,
+                                    questiontype = muban.ename,
+                                    questionCode = child.questionCode,
+                                    refAnswer = myAnswer[child.questionCode] ?: ""
+                                )
+                            }
+                        }
+                    }
+                )
+            ).onSuccess {
+                _submitState.update {
+                    SubmitState.Success(
+                        grade = exam.muban.flatMap { muban ->
+                            muban.shiti.flatMap { shiti ->
+                                listOf(
+                                    if (shiti.refAnswer != "" && shiti.refAnswer == (myAnswer[shiti.questionCode]
+                                            ?: "")
+                                    )
+                                        1 else 0
+                                ) + shiti.children.map { child ->
+                                    if (child.refAnswer != "" && child.refAnswer == (myAnswer[child.questionCode]
+                                            ?: "")
+                                    )
+                                        1 else 0
+                                }
+                            }
+                        }.sum(),
+                        gradeCount = exam.muban.joinToString(";") {
+                            it.cname + ": " + it.shiti.flatMap { shiti ->
+                                listOf(
+                                    if (shiti.refAnswer != "" && shiti.refAnswer == (myAnswer[shiti.questionCode]
+                                            ?: "")
+                                    )
+                                        1 else 0
+                                ) + shiti.children.map { child ->
+                                    if (child.refAnswer != "" && child.refAnswer == (myAnswer[child.questionCode]
+                                            ?: "")
+                                    )
+                                        1 else 0
+                                }
+                            }.sum().toString() + "/" + it.shiti.flatMap { shiti ->
+                                listOf(
+                                    if (shiti.refAnswer != "")
+                                        1 else 0
+                                ) + shiti.children.map { child ->
+                                    if (child.refAnswer != "")
+                                        1 else 0
+                                }
+                            }.sum().toString()
+                        }
+                    )
+                }
+            }.onFailure { err ->
+                _submitState.update { SubmitState.Failed(msg = err.toString()) }
+            }
+        }
+    }
+
+    fun resetSubmitState() {
+        _submitState.update {
+            SubmitState.Default
+        }
+    }
+}
+
+sealed class SubmitState<out T> {
+    data object Default : SubmitState<Nothing>()
+
+    data object Submitted : SubmitState<Nothing>()
+
+    data class Success(val grade: Int, val gradeCount: String) : SubmitState<Nothing>()
+
+    data class Failed(val msg: String) : SubmitState<Nothing>()
 }

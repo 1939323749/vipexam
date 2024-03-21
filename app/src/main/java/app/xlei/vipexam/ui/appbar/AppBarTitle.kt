@@ -1,6 +1,7 @@
 package app.xlei.vipexam.ui.appbar
 
 import app.xlei.vipexam.R
+import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 
 /**
  * App bar title
@@ -20,14 +21,12 @@ sealed class AppBarTitle(
      * 试卷页面的标题，由于附加了收藏功能，
      * 所以需要提供用于记录收藏的试卷名称、
      * ID、问题
-     * @property examName
-     * @property examId
      * @property question
+     * @property exam
      * @constructor Create empty Exam
      */
     data class Exam(
-        var examName: String,
-        var examId: String,
         var question: String,
+        var exam: GetExamResponse
     ) : AppBarTitle(R.string.exam)
 }

@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.expanded.ExamScreenSupportingPane
 import app.xlei.vipexam.ui.page.ExamPage
@@ -28,17 +29,19 @@ import app.xlei.vipexam.ui.page.ExamPage
 @Composable
 fun ExamScreen(
     questionListUiState: VipexamUiState.QuestionListUiState,
-    setQuestion: (String, String, String, String) -> Unit,
+    setQuestion: (String, GetExamResponse) -> Unit,
     widthSizeClass: WindowWidthSizeClass,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    submitMyAnswer: (String, String) -> Unit
 ) {
     when (widthSizeClass) {
         WindowWidthSizeClass.Compact -> {
             ExamPage(
                 questionListUiState = questionListUiState,
                 setQuestion = setQuestion,
-                navController = navController
+                navController = navController,
+                submitMyAnswer = submitMyAnswer
             )
         }
 
@@ -46,7 +49,8 @@ fun ExamScreen(
             ExamPage(
                 questionListUiState = questionListUiState,
                 setQuestion = setQuestion,
-                navController = navController
+                navController = navController,
+                submitMyAnswer = submitMyAnswer
             )
         }
 
@@ -63,7 +67,8 @@ fun ExamScreen(
                         questionListUiState = questionListUiState,
                         setQuestion = setQuestion,
                         navController = navController,
-                        showFab = false
+                        showFab = false,
+                        submitMyAnswer = submitMyAnswer
                     )
                 }
                 ExamScreenSupportingPane(

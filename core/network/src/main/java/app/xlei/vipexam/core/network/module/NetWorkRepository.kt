@@ -1,6 +1,8 @@
 package app.xlei.vipexam.core.network.module
 
 import android.os.Environment
+import app.xlei.vipexam.core.network.module.TiJiaoTest.TiJiaoTestPayload
+import app.xlei.vipexam.core.network.module.TiJiaoTest.TiJiaoTestResponse
 import app.xlei.vipexam.core.network.module.addQCollect.AddQCollectResponse
 import app.xlei.vipexam.core.network.module.deleteQCollect.DeleteQCollectResponse
 import app.xlei.vipexam.core.network.module.getExamList.GetExamListResponse
@@ -19,6 +21,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsChannel
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
@@ -26,6 +29,8 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 
 
@@ -259,6 +264,31 @@ object NetWorkRepository {
                 }.body()
             )
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun tiJiaoTest(payload: TiJiaoTestPayload): Result<TiJiaoTestResponse> {
+        return try {
+            println(Json.encodeToString(payload))
+            Result.success(
+                httpClient.post("https://vipexam.cn/exam/TiJiaoTest") {
+                    vipExamHeaders("https://vipexam.cn/begin_testing.html?id=${payload.examID}")
+                    setBody(
+                        "data=" + Json.encodeToString(
+                            payload.copy(
+                                account = account,
+                                token = token,
+                            )
+                        )
+                    )
+                }.run {
+                    println(this.bodyAsText())
+                    this.body<TiJiaoTestResponse>()
+                }
+            )
+        } catch (e: Exception) {
+            println(e)
             Result.failure(e)
         }
     }

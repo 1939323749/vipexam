@@ -37,6 +37,7 @@ import app.xlei.vipexam.preference.LocalVibrate
 
 @Composable
 fun ReadClozeView(
+    submitMyAnswer: (String, String) -> Unit,
     viewModel: ReadClozeViewModel = hiltViewModel(),
     muban: Muban,
 ) {
@@ -63,6 +64,10 @@ fun ReadClozeView(
             if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },
         onOptionClicked = { selectedArticleIndex, option ->
+            submitMyAnswer(
+                muban.shiti[selectedArticleIndex].children[selectedQuestionIndex].questionCode,
+                option
+            )
             viewModel.setOption(selectedArticleIndex, selectedQuestionIndex, option)
             if (vibrate) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         },

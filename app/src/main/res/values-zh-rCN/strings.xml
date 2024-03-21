@@ -39,4 +39,6 @@
     <string name="login_error">登录出错</string>
     <string name="add_to_word_list_success">Add to word list success!</string>
     <string name="lastViewd">Last viewed</string>
+    <string name="submit">交卷</string>
+    <string name="total">总分</string>
 </resources>

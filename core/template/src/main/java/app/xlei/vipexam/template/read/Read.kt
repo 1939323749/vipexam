@@ -35,6 +35,7 @@ import app.xlei.vipexam.preference.LocalShowAnswer
 
 @Composable
 fun ReadView(
+    submitMyAnswer: (String, String) -> Unit,
     muban: Muban,
     viewModel: ReadViewModel = hiltViewModel(),
 ) {
@@ -61,6 +62,10 @@ fun ReadView(
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
         },
         onOptionClicked = { selectedArticleIndex, option ->
+            submitMyAnswer(
+                muban.shiti[selectedArticleIndex].children[selectedQuestionIndex].questionCode,
+                option
+            )
             viewModel.setOption(selectedArticleIndex, selectedQuestionIndex, option)
             viewModel.toggleBottomSheet()
             haptics.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)

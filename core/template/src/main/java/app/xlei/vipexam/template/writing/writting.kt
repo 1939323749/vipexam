@@ -1,4 +1,4 @@
-package app.xlei.vipexam.ui.question.writing
+package app.xlei.vipexam.template.writing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -23,6 +23,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
 import app.xlei.vipexam.preference.LocalShowAnswer
+import app.xlei.vipexam.ui.question.writing.WritingUiState
+import app.xlei.vipexam.ui.question.writing.WritingViewModel
 import coil.compose.AsyncImage
 
 

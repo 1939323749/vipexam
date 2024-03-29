@@ -14,7 +14,7 @@ import app.xlei.vipexam.template.cloze.ClozeView
 import app.xlei.vipexam.template.read.ReadView
 import app.xlei.vipexam.template.readCloze.ReadClozeView
 import app.xlei.vipexam.template.translate.TranslateView
-import app.xlei.vipexam.ui.question.writing.WritingView
+import app.xlei.vipexam.template.writing.WritingView
 
 @Composable
 fun Render(

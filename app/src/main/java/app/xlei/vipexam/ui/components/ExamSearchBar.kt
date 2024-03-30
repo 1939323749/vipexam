@@ -50,16 +50,20 @@ fun ExamSearchBar(
         onSearch = { viewModel.search(queryString) },
         active = isActive,
         onActiveChange = { isActive = it },
-        leadingIcon = { IconButton(onClick = { isActive = true }) {
-            Icon(imageVector = FeatherIcons.Search, contentDescription = null)
-        } },
+        leadingIcon = {
+            IconButton(onClick = { isActive = true }) {
+                Icon(imageVector = FeatherIcons.Search, contentDescription = null)
+            }
+        },
         trailingIcon = {
             if (isActive)
                 IconButton(onClick = {
                     isActive = false
                     queryString = ""
                 }) {
-                    Icon(imageVector = FeatherIcons.X, contentDescription = null) } },
+                    Icon(imageVector = FeatherIcons.X, contentDescription = null)
+                }
+        },
         modifier = modifier,
     ) {
         val results = viewModel.examListState.collectAsLazyPagingItems()

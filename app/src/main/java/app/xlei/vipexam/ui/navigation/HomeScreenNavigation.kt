@@ -195,7 +195,10 @@ fun MainScreenNavigation(
                         widthSizeClass = widthSizeClass,
                         submitMyAnswer = viewModel::submitMyAnswer,
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxSize(),
+                        onExamClick = {
+                            navHostController.navigate(Screen.Exam.createRoute(it))
+                        }
                     )
                 }
 

@@ -33,7 +33,8 @@ fun ExamScreen(
     widthSizeClass: WindowWidthSizeClass,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    submitMyAnswer: (String, String) -> Unit
+    submitMyAnswer: (String, String) -> Unit,
+    onExamClick: (String) -> Unit,
 ) {
     when (widthSizeClass) {
         WindowWidthSizeClass.Compact -> {
@@ -77,7 +78,8 @@ fun ExamScreen(
                     modifier = Modifier
                         .width(360.dp)
                         .padding(end = 24.dp)
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    onExamClick = onExamClick
                 )
             }
         }

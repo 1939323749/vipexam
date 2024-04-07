@@ -1,6 +1,9 @@
 package app.xlei.vipexam.template.cloze
 
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -26,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +37,7 @@ import app.xlei.vipexam.core.network.module.getExamResponse.Muban
 import app.xlei.vipexam.core.ui.VipexamArticleContainer
 import app.xlei.vipexam.preference.LocalShowAnswer
 import app.xlei.vipexam.preference.LocalVibrate
+import app.xlei.vipexam.template.R
 
 @Composable
 fun ClozeView(
@@ -77,12 +82,13 @@ fun ClozeView(
         },
         toggleBottomSheet = { viewModel.toggleBottomSheet() },
         showAnswer = showAnswer,
+        addToWordList = viewModel::addToWordList,
     )
 }
 
 @OptIn(
     ExperimentalMaterial3Api::class,
-    ExperimentalLayoutApi::class
+    ExperimentalLayoutApi::class, ExperimentalFoundationApi::class
 )
 @Composable
 private fun cloze(
@@ -92,7 +98,9 @@ private fun cloze(
     onOptionClicked: (Int, String) -> Unit,
     toggleBottomSheet: () -> Unit,
     showAnswer: Boolean,
+    addToWordList: (String) -> Unit,
 ) {
+    val context = LocalContext.current
     val scrollState = rememberLazyListState()
     var selectedClozeIndex by rememberSaveable { mutableStateOf(0) }
     var selectedOption by rememberSaveable { mutableStateOf(0) }
@@ -116,6 +124,7 @@ private fun cloze(
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ),
                             onClick = {
+                                println(clozes[clozeIndex].article.article)
                                 clozes[clozeIndex].article.tags.forEachIndexed { index, tag ->
                                     clozes[clozeIndex].article.article.getStringAnnotations(
                                         tag = tag,
@@ -178,16 +187,39 @@ private fun cloze(
             ModalBottomSheet(
                 onDismissRequest = toggleBottomSheet,
             ) {
+                Text(
+                    text = clozes[selectedClozeIndex].article.article.toString().split(".")
+                        .first { it.contains(clozes[selectedClozeIndex].options[selectedOption].index) } + ".",
+                    modifier = Modifier.padding(24.dp)
+                )
+                Text(
+                    text = clozes[selectedClozeIndex].options[selectedOption].index,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 24.dp)
+                )
                 FlowRow(
                     horizontalArrangement = Arrangement.Start,
                     maxItemsInEachRow = 2,
                     modifier = Modifier
-                        .padding(bottom = 24.dp)
+                        .padding(24.dp)
                 ) {
                     clozes[selectedClozeIndex].options[selectedOption].words.forEach {
                         Column(
                             modifier = Modifier
                                 .weight(1f)
+                                .combinedClickable(
+                                    onClick = {},
+                                    onLongClick = {
+                                        addToWordList(it.word)
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                context.getText(R.string.add_to_word_list_success),
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                    }
+                                )
                         ) {
                             SuggestionChip(
                                 onClick = {

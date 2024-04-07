@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="not_supported">Not supported</string>
+    <string name="add_to_word_list_success">Added to word list</string>
 </resources>

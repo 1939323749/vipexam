@@ -10,6 +10,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.Repository
 import app.xlei.vipexam.core.database.module.Word
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -163,5 +165,15 @@ class ClozeViewModel @Inject constructor(
     ) {
         _uiState.value.clozes[selectedClozeIndex].blanks[selectedQuestionIndex].choice.value =
             option
+    }
+
+    fun addToWordList(word: String) {
+        viewModelScope.launch {
+            repository.add(
+                Word(
+                    word = word
+                )
+            )
+        }
     }
 }

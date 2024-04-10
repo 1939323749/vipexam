@@ -39,4 +39,6 @@ class TranslationSheetViewModel @Inject constructor(
         searchJob?.cancel()
         _phrases.value = PagingData.empty()
     }
+
+    suspend fun refresh(keyword: String) = search(keyword)
 }

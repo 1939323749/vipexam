@@ -38,11 +38,20 @@ class MomoLookUpRepositoryImpl @Inject constructor(
     }
 }
 
+enum class Source(val value: String, val displayName: String) {
+    ALL("ALL", "全部"),
+    CET4("CET4", "四级"),
+    CET6("CET6", "六级"),
+    KAOYAN("POSTGRADUATE", "考研")
+}
+
+
 object MomoLookUpApi {
     var keyword = ""
+    var source = Source.ALL
 
     suspend fun search(offset: Int) =
-        NetWorkRepository.momoLookUp(offset = offset, keyword = keyword)
+        NetWorkRepository.momoLookUp(offset = offset, keyword = keyword, paperType = source.value)
 }
 
 class MomoLookUpRemoteDataSourceImpl : MomoLookUpRemoteDataSource {

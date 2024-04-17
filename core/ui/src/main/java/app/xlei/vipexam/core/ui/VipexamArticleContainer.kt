@@ -75,7 +75,7 @@ fun VipexamArticleContainer(
                                     flags = View.DRAG_FLAG_GLOBAL,
                                 )
                             )
-                        }
+                        },
                     )
                 }
         ){

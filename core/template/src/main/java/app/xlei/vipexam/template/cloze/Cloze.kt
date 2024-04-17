@@ -111,13 +111,13 @@ private fun cloze(
             modifier = Modifier
         ) {
             items(clozes.size) { clozeIndex ->
-                Column(
-                    modifier = Modifier
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    VipexamArticleContainer {
+                VipexamArticleContainer {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                    ) {
                         ClickableText(
                             text = clozes[clozeIndex].article.article,
                             style = LocalTextStyle.current.copy(
@@ -142,42 +142,52 @@ private fun cloze(
                         )
                     }
                 }
-                FlowRow(
-                    horizontalArrangement = Arrangement.Start,
-                    maxItemsInEachRow = 2,
-                ) {
-                    clozes[clozeIndex].blanks.forEachIndexed { index, blank ->
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                        ) {
-                            SuggestionChip(
-                                onClick = {
-                                    selectedClozeIndex = clozeIndex
-                                    selectedOption = index
-                                    onBlankClick(index)
-                                },
-                                label = {
-                                    Text(
-                                        text = blank.index + blank.choice.value
-                                    )
-                                }
-                            )
+                VipexamArticleContainer (
+                    onDragContent = clozes[clozeIndex].article.article.text
+                            + "\n\n" + clozes[clozeIndex].options.mapIndexed { index, option ->
+                        "${index+1}\n${option.words.joinToString { it.index + ". " + it.word }}"
+                    }.joinToString("\n\n")
+                ){
+                    FlowRow(
+                        horizontalArrangement = Arrangement.Start,
+                        maxItemsInEachRow = 2,
+                    ) {
+                        clozes[clozeIndex].blanks.forEachIndexed { index, blank ->
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                            ) {
+                                SuggestionChip(
+                                    onClick = {
+                                        selectedClozeIndex = clozeIndex
+                                        selectedOption = index
+                                        onBlankClick(index)
+                                    },
+                                    label = {
+                                        Text(
+                                            text = blank.index + blank.choice.value
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
+
                 if (showAnswer)
                     clozes[clozeIndex].blanks.forEach { blank ->
-                        Text(
-                            text = blank.index + blank.refAnswer,
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp)
-                        )
-                        Text(
-                            text = blank.description,
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp)
-                        )
+                        VipexamArticleContainer {
+                            Text(
+                                text = blank.index + blank.refAnswer,
+                                modifier = Modifier
+                                    .padding(horizontal = 24.dp)
+                            )
+                            Text(
+                                text = blank.description,
+                                modifier = Modifier
+                                    .padding(horizontal = 24.dp)
+                            )
+                        }
                     }
 
             }

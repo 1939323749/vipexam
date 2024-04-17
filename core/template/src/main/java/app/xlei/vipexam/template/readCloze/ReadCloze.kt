@@ -123,46 +123,50 @@ private fun ReadCloze(
                     }
                 }
                 items(article.questions.size) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .clickable {
-                                onQuestionClicked(it)
-                                toggleOptionsSheet()
-                            }
-                    ) {
+                    VipexamArticleContainer {
                         Column(
                             modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(16.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .clickable {
+                                    onQuestionClicked(it)
+                                    toggleOptionsSheet()
+                                }
                         ) {
-                            Text(
-                                text = "${article.questions[it].index}. ${article.questions[it].question}",
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                            if (article.questions[it].choice.value != "") {
-                                SuggestionChip(
-                                    onClick = toggleOptionsSheet,
-                                    label = { Text(article.questions[it].choice.value) }
+                            Column(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "${article.questions[it].index}. ${article.questions[it].question}",
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 )
+                                if (article.questions[it].choice.value != "") {
+                                    SuggestionChip(
+                                        onClick = toggleOptionsSheet,
+                                        label = { Text(article.questions[it].choice.value) }
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    if (showAnswer)
-                        articles[articleIndex].questions[it].let { question ->
-                            Text(
-                                text = question.index + question.refAnswer,
-                                modifier = Modifier.padding(horizontal = 24.dp)
-                            )
-                            Text(
-                                text = question.description,
-                                modifier = Modifier
-                                    .padding(horizontal = 24.dp)
-                            )
-                        }
+                        if (showAnswer)
+                            articles[articleIndex].questions[it].let { question ->
+                                VipexamArticleContainer {
+                                    Text(
+                                        text = question.index + question.refAnswer,
+                                        modifier = Modifier.padding(horizontal = 24.dp)
+                                    )
+                                    Text(
+                                        text = question.description,
+                                        modifier = Modifier
+                                            .padding(horizontal = 24.dp)
+                                    )
+                                }
+                            }
+                    }
                 }
             }
 

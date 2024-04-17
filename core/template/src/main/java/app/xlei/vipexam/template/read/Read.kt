@@ -101,6 +101,10 @@ private fun Read(
                             selectedArticle = articleIndex
                             onArticleLongClick(articleIndex)
                             toggleQuestionsSheet.invoke()
+                        },
+                        onDragContent = articles[articleIndex].content
+                                + "\n" + articles[articleIndex].questions.joinToString("") { it ->
+                            "\n\n${it.index}. ${it.question}" + "\n" + it.options.joinToString("\n") { "[${it.index}] ${it.option}" }
                         }
                     ) {
                         Column(
@@ -137,49 +141,54 @@ private fun Read(
                                 onQuestionClicked(index)
                             }
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                        ) {
-                            Text(
-                                text = "${ti.questions[index].index}. " + ti.questions[index].question,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                fontWeight = FontWeight.Bold
-                            )
-                            HorizontalDivider(
+                        VipexamArticleContainer {
+                            Column(
                                 modifier = Modifier
-                                    .padding(start = 16.dp, end = 16.dp),
-                                thickness = 1.dp,
-                                color = Color.Gray
-                            )
-
-                            ti.questions[index].options.forEach { option ->
-                                option.option.takeIf { it != "" }?.let {
-                                    Text(
-                                        text = "[${option.index}]" + option.option,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    )
-                                }
-                            }
-                            if (ti.questions[index].choice.value != "")
-                                SuggestionChip(
-                                    onClick = {},
-                                    label = { Text(ti.questions[index].choice.value) }
+                                    .padding(16.dp)
+                            ) {
+                                Text(
+                                    text = "${ti.questions[index].index}. " + ti.questions[index].question,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    fontWeight = FontWeight.Bold
                                 )
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .padding(start = 16.dp, end = 16.dp),
+                                    thickness = 1.dp,
+                                    color = Color.Gray
+                                )
+
+                                ti.questions[index].options.forEach { option ->
+                                    option.option.takeIf { it != "" }?.let {
+                                        Text(
+                                            text = "[${option.index}]" + option.option,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        )
+                                    }
+                                }
+                                if (ti.questions[index].choice.value != "")
+                                    SuggestionChip(
+                                        onClick = {},
+                                        label = { Text(ti.questions[index].choice.value) }
+                                    )
+                            }
                         }
+
                     }
                     if (showAnswer)
                         articles[articleIndex].questions[index].let {
-                            Text(
-                                text = "${it.index}." + it.refAnswer,
-                                modifier = Modifier
-                                    .padding(horizontal = 24.dp)
-                            )
-                            Text(
-                                text = it.description,
-                                modifier = Modifier
-                                    .padding(horizontal = 24.dp)
-                            )
+                            VipexamArticleContainer {
+                                Text(
+                                    text = "${it.index}." + it.refAnswer,
+                                    modifier = Modifier
+                                        .padding(horizontal = 24.dp)
+                                )
+                                Text(
+                                    text = it.description,
+                                    modifier = Modifier
+                                        .padding(horizontal = 24.dp)
+                                )
+                            }
                         }
                 }
             }

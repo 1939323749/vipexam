@@ -144,7 +144,9 @@ private fun Listening(
                         },
                         state = question.tooltipState
                     ) {
-                        VipexamArticleContainer {
+                        VipexamArticleContainer(
+                            onDragContent = listenings[selectedListening].originalText
+                        ) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()

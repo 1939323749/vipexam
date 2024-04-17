@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.xlei.vipexam.core.network.module.getExamResponse.Muban
+import app.xlei.vipexam.core.ui.VipexamArticleContainer
 import app.xlei.vipexam.preference.LocalShowAnswer
 
 @Composable
@@ -44,21 +45,9 @@ private fun Translate(
         state = scrollState
     ) {
         items(translations.size) {
-
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+            VipexamArticleContainer(
+                onDragContent = translations[it].content.text
             ) {
-                Text(
-                    text = translations[it].content,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            translations[it].sentences.forEach { sentence ->
                 Column(
                     modifier = Modifier
                         .padding(16.dp)
@@ -66,18 +55,39 @@ private fun Translate(
                         .background(MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Text(
-                        text = "${sentence.index}. ${sentence.sentence}",
+                        text = translations[it].content,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.padding(16.dp)
                     )
                 }
+            }
 
-                if (showAnswer)
-                    Text(
-                        text = sentence.refAnswer,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(16.dp)
-                    )
+
+            translations[it].sentences.forEach { sentence ->
+                VipexamArticleContainer(
+                    onDragContent = sentence.sentence + "\n\n" + sentence.refAnswer
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                    ) {
+                        Text(
+                            text = "${sentence.index}. ${sentence.sentence}",
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+
+                    if (showAnswer)
+                        Text(
+                            text = sentence.refAnswer,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                }
+
 
             }
         }

@@ -307,9 +307,13 @@ class VipExamMainScreenViewModel @Inject constructor(
                         }
                     }
                 }
-                withContext(Dispatchers.IO){
-                    examHistoryRepository.insertHistory(examName = exam.examName, examId = examId)
-                }
+                if (exam.count > 0)
+                    withContext(Dispatchers.IO) {
+                        examHistoryRepository.insertHistory(
+                            examName = exam.examName,
+                            examId = examId
+                        )
+                    }
             }.onFailure {
                 _uiState.update {
                     it.copy(

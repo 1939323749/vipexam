@@ -47,10 +47,18 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    fun setFilter(question: String?=null) {
+    fun setFilter(question: String? = null) {
         _filter.update {
-            question?: ""
+            question ?: ""
         }
         getBookmarks()
+    }
+
+    fun delete(index: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            bookmarkRepository.deleteBookmark(
+                _bookmarks.value[index]
+            )
+        }
     }
 }

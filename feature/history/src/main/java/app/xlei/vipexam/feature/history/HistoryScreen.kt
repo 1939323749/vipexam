@@ -1,7 +1,8 @@
 package app.xlei.vipexam.feature.history
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -35,7 +36,7 @@ import compose.icons.feathericons.Menu
 import compose.icons.feathericons.Trash2
 
 @OptIn(
-    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
 )
 @Composable
 fun HistoryScreen(
@@ -96,9 +97,15 @@ fun HistoryScreen(
                         headlineContent = { Text(examHistoryState[index].examName) },
                         supportingContent = { DateText(examHistoryState[index].lastOpen) },
                         modifier = Modifier
-                            .clickable {
-                                showLoginAlert = onHistoryClick.invoke(examHistoryState[index].examId).not()
-                            }
+                            .combinedClickable(
+                                onClick = {
+                                    showLoginAlert =
+                                        onHistoryClick.invoke(examHistoryState[index].examId).not()
+                                },
+                                onLongClick = {
+                                    viewModel.delete(index)
+                                }
+                            )
                     )
                 }
                 item {

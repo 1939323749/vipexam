@@ -42,4 +42,5 @@
     <string name="submit">Submit</string>
     <string name="total">Total</string>
     <string name="related_exam">Related</string>
+    <string name="resource_not_exist">resource not exist</string>
 </resources>

@@ -38,9 +38,16 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun cleanHistory() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             examHistoryRepository
                 .removeAllHistory()
+        }
+    }
+
+    fun delete(index: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            examHistoryRepository
+                .removeHistory(_examHistory.value[index])
         }
     }
 }

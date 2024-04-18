@@ -28,6 +28,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import app.xlei.vipexam.R
 import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.core.ui.OnError
@@ -255,21 +256,45 @@ fun MainScreenNavigation(
                 }
             }
             if (exam!=null) {
-                question?.let { q ->
-                    viewModel.setTitle(
-                        AppBarTitle.Exam(
-                            question = q,
-                            exam = exam!!
-                        ) )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        QuestionMapToView(
-                            question = exam!!.muban.first { it.cname == question }.ename,
-                            muban = exam!!.muban.first { it.cname == question },
-                            submitMyAnswer = viewModel::submitMyAnswer
-                        )
+                when {
+                    exam!!.count > 0 -> {
+                        question?.let { q ->
+                            viewModel.setTitle(
+                                AppBarTitle.Exam(
+                                    question = q,
+                                    exam = exam!!
+                                )
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            ) {
+                                exam!!.muban.firstOrNull { it.cname == question }.let {
+                                    when (it) {
+                                        null -> {
+                                            OnError(
+                                                textId = R.string.internet_error,
+                                                error = stringResource(
+                                                    id = R.string.resource_not_exist
+                                                )
+                                            )
+                                        }
+
+                                        else -> {
+                                            QuestionMapToView(
+                                                question = it.ename,
+                                                muban = it,
+                                                submitMyAnswer = viewModel::submitMyAnswer
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    else -> {
+                        OnError(textId = R.string.unknown_error, error = exam!!.msg)
                     }
                 }
             } else {

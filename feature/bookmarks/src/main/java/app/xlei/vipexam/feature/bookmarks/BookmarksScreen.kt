@@ -2,7 +2,7 @@ package app.xlei.vipexam.feature.bookmarks
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -154,9 +154,18 @@ fun BookmarksScreen(
                             ) },
                         trailingContent = { DateText(bookmarksState[index].created) },
                         modifier = Modifier
-                            .clickable {
-                                showLoginAlert = onBookmarkClick.invoke(bookmarksState[index].examId,bookmarksState[index].question).not()
-                            }
+                            .combinedClickable(
+                                onClick = {
+                                    showLoginAlert = onBookmarkClick
+                                        .invoke(
+                                            bookmarksState[index].examId,
+                                            bookmarksState[index].question
+                                        ).not()
+                                },
+                                onLongClick = {
+                                    viewModel.delete(index)
+                                }
+                            )
                     )
                 }
                 item {

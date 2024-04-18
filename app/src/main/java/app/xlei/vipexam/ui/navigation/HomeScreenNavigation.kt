@@ -215,6 +215,15 @@ fun MainScreenNavigation(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
+                            it.msg?.let {
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                     }
                 }

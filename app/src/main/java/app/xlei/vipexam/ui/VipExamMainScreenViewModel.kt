@@ -283,14 +283,23 @@ class VipExamMainScreenViewModel @Inject constructor(
                     }
 
                     else -> {
-                        val questionListUiState = UiState.Success(
-                            VipexamUiState.QuestionListUiState(
-                                exam = exam,
-                                questions = NetWorkRepository.getQuestions(exam.muban),
-                                question = exam.muban.map {muban->
-                                    muban.ename }.first()
-                            )
-                        )
+                        val questionListUiState = when {
+                            exam.count > 0 -> {
+                                UiState.Success(
+                                    VipexamUiState.QuestionListUiState(
+                                        exam = exam,
+                                        questions = NetWorkRepository.getQuestions(exam.muban),
+                                        question = exam.muban.map { muban ->
+                                            muban.ename
+                                        }.first()
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                UiState.Error(R.string.unknown_error, exam.msg)
+                            }
+                        }
                         _uiState.update {
                             it.copy(
                                 questionListUiState = questionListUiState,

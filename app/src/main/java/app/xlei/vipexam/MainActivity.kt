@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
             ?: intent.getCharSequenceExtra(Intent.ACTION_SEND)?.toString()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
         handleIntentData()

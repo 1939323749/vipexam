@@ -136,12 +136,13 @@ private fun Read(
                             .padding(16.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.primaryContainer)
-                            .clickable {
+                    ) {
+                        VipexamArticleContainer(
+                            onClick = {
                                 selectedArticle = articleIndex
                                 onQuestionClicked(index)
                             }
-                    ) {
-                        VipexamArticleContainer {
+                        ) {
                             Column(
                                 modifier = Modifier
                                     .padding(16.dp)

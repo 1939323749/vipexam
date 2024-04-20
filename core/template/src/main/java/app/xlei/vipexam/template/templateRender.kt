@@ -38,6 +38,49 @@ fun Render(
         "kewritingb" -> WritingView(muban = muban)
         "ketclose" -> ClozeView(muban = muban, submitMyAnswer = submitMyAnswer)
         "ketread" -> ReadView(muban = muban, submitMyAnswer = submitMyAnswer)
+
+        "kzjsjzhchoose" -> {
+            Template {
+                Questions(muban.shiti.size) {
+                    muban.shiti[it].let { shiti ->
+                        Question(shiti.primQuestion)
+                        if (shiti.primQuestion.contains("[*]"))
+                            QuestionPic(shiti.primPic)
+                        OptionA(shiti.first)
+                        OptionB(shiti.second)
+                        OptionC(shiti.third)
+                        OptionD(shiti.fourth)
+                        Answer(shiti.refAnswer)
+                        if (shiti.refAnswer.contains("[*]"))
+                            AnswerPic(shiti.answerPic)
+                        Description(shiti.discription)
+                        if (shiti.discription.contains("[*]"))
+                            DescriptionPic(shiti.discPic)
+                    }
+                }
+            }
+        }
+
+        "kzjsjzhbig" -> {
+            Template {
+                Questions(muban.shiti.size) {
+                    muban.shiti[it].let { shiti ->
+                        Question(shiti.primQuestion + "\n" + shiti.children.mapIndexed { index, child ->
+                            "${index + 1}" + child.secondQuestion
+                        }.joinToString("\n"))
+                        if (shiti.primQuestion.contains("[*]"))
+                            QuestionPic(shiti.primPic)
+                        Answer(shiti.refAnswer + shiti.children.joinToString("\n") { it.refAnswer })
+                        if (shiti.refAnswer.contains("[*]"))
+                            AnswerPic(shiti.answerPic)
+                        Description(shiti.discription)
+                        if (shiti.discription.contains("[*]"))
+                            DescriptionPic(shiti.discPic)
+                    }
+                }
+            }
+        }
+
         else -> {
             Box(
                 modifier = Modifier

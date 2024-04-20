@@ -13,5 +13,6 @@ enum class ExamType(
     KAOYAN_ENGLISH_I_REAL("ve03001", 5, "考研英语一真题", true),
     KAOYAN_ENGLISH_I_PRACTICE("ve03001", 4, "考研英语一模拟试题", false),
     KAOYAN_ENGLISH_II_REAL("ve03002", 5, "考研英语二真题", true),
-    KAOYAN_ENGLISH_II_PRACTICE("ve03002", 4, "考研英语二模拟试题", false)
+    KAOYAN_ENGLISH_II_PRACTICE("ve03002", 4, "考研英语二模拟试题", false),
+    KAOYAN_408("ve03201003", 4, "考研408模拟试题", false),
 }

@@ -3,6 +3,7 @@ package app.xlei.vipexam.core.ui
 import android.content.ClipData
 import android.view.View
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -32,6 +33,7 @@ import app.xlei.vipexam.preference.LongPressAction
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun VipexamArticleContainer(
+    onClick: (() -> Unit)? = {},
     onArticleLongClick: (() -> Unit)? = {},
     onDragContent: String? = null,
     content: @Composable () -> Unit
@@ -48,7 +50,11 @@ fun VipexamArticleContainer(
                     showTranslateDialog = true
                 }
             ) {
-                SelectionContainer {
+                SelectionContainer(
+                    modifier = Modifier.clickable {
+                        onClick?.invoke()
+                    }
+                ) {
                     content()
                 }
             }
@@ -57,7 +63,7 @@ fun VipexamArticleContainer(
             Column(
                 modifier = Modifier
                     .combinedClickable(
-                        onClick = {},
+                        onClick = { onClick?.invoke() },
                         onLongClick = onArticleLongClick
                     )
             ) {
@@ -68,6 +74,7 @@ fun VipexamArticleContainer(
             modifier = Modifier
                 .dragAndDropSource {
                     detectTapGestures(
+                        onPress = { onClick?.invoke() },
                         onLongPress = {
                             startTransfer(
                                 DragAndDropTransferData(

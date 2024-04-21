@@ -2,6 +2,7 @@ package app.xlei.vipexam.template
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,7 +15,6 @@ import app.xlei.vipexam.template.cloze.ClozeView
 import app.xlei.vipexam.template.read.ReadView
 import app.xlei.vipexam.template.readCloze.ReadClozeView
 import app.xlei.vipexam.template.translate.TranslateView
-import app.xlei.vipexam.template.writing.WritingView
 
 @Composable
 fun Render(
@@ -23,23 +23,19 @@ fun Render(
     muban: Muban,
 ) {
     when (question) {
-        "keread" -> ReadView(muban = muban, submitMyAnswer = submitMyAnswer)
-        "keclozea" -> ClozeView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "keread", "ketread" -> ReadView(muban = muban, submitMyAnswer = submitMyAnswer)
+        "keclozea", "ketclose" -> ClozeView(muban = muban, submitMyAnswer = submitMyAnswer)
         "kereadcloze" -> ReadClozeView(muban = muban, submitMyAnswer = submitMyAnswer)
         "kereadf" -> TranslateView(muban = muban)
         //"kewritinga" -> WritingView(muban = muban)
-        "kewritinga" -> Template {
+        "kewritinga", "kewritingb" -> Template {
             Questions(muban.shiti.size) { index ->
                 Question(muban.shiti[index].primQuestion)
                 Answer(muban.shiti[index].refAnswer)
             }
         }
 
-        "kewritingb" -> WritingView(muban = muban)
-        "ketclose" -> ClozeView(muban = muban, submitMyAnswer = submitMyAnswer)
-        "ketread" -> ReadView(muban = muban, submitMyAnswer = submitMyAnswer)
-
-        "kzjsjzhchoose" -> {
+        "kzjsjzhchoose", "crmsdschoosecn", "kpchoose", "kpmchoose" -> {
             Template {
                 Questions(muban.shiti.size) {
                     muban.shiti[it].let { shiti ->
@@ -61,7 +57,7 @@ fun Render(
             }
         }
 
-        "kzjsjzhbig" -> {
+        "kzjsjzhbig", "crmsdxzuti", "crmsdxprogx" -> {
             Template {
                 Questions(muban.shiti.size) {
                     muban.shiti[it].let { shiti ->
@@ -76,6 +72,40 @@ fun Render(
                         Description(shiti.discription)
                         if (shiti.discription.contains("[*]"))
                             DescriptionPic(shiti.discPic)
+                    }
+                }
+            }
+        }
+
+        "crmsdschoosecnz2", "crmsdschoosecnz3", "crmsdschooseenz5", "kpdataaNAlysis" -> {
+            LazyColumn {
+                muban.shiti.forEachIndexed { index, shiti ->
+                    item {
+                        Template(
+                            isSubQuestion = true,
+                            index = index + 1
+                        ) {
+                            Article {
+                                Content(shiti.primQuestion.removeSuffix("[*]"))
+                                if (shiti.primQuestion.contains("[*]"))
+                                    ContentPic(shiti.primPic)
+                            }
+                            Questions(shiti.children.size) {
+                                shiti.children[it].let { child ->
+                                    if (child.secondQuestion != "") Question(child.secondQuestion)
+                                    OptionA(child.first)
+                                    OptionB(child.second)
+                                    OptionC(child.third)
+                                    OptionD(child.fourth)
+                                    Answer(child.refAnswer)
+                                    if (child.refAnswer.contains("[*]"))
+                                        AnswerPic(child.answerPic)
+                                    Description(child.discription)
+                                    if (child.discription.contains("[*]"))
+                                        DescriptionPic(child.discPic)
+                                }
+                            }
+                        }
                     }
                 }
             }

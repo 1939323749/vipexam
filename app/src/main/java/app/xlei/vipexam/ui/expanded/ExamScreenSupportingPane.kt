@@ -39,6 +39,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -105,7 +106,15 @@ fun ExamScreenSupportingPane(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = questionListUiState.exam.examName) })
+            TopAppBar(
+                title = {
+                    Text(
+                        text = questionListUiState.exam.examName,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            )
         },
         bottomBar = {
             Card(

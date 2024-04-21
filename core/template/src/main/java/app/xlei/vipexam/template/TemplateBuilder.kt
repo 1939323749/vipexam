@@ -41,16 +41,20 @@ class TemplateBuilder {
     inner class ArticleBuilder {
         lateinit var title: String
         lateinit var content: String
+        lateinit var contentPic: String
 
         fun Title(title: String) = this.apply { this.title = title }
         fun Content(content: String) = this.apply { this.content = content }
+        fun ContentPic(contentPic: String) = this.apply { this.contentPic = contentPic }
 
         @Composable
-        fun Render() {
-            Card(
+        fun Render(index: Int? = null) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
+                    .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
@@ -58,12 +62,36 @@ class TemplateBuilder {
                         Text(
                             text = title,
                             style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.End
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.padding(start = 4.dp)
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
                 }
-                if (::content.isInitialized) Text(content)
+                if (::content.isInitialized) {
+                    Text(
+                        text = (if (index != null && !::title.isInitialized) "$index. " else "") + content
+                    )
+                }
+
+                if (::contentPic.isInitialized) {
+                    contentPic.split(",").forEach {
+                        Row {
+                            Spacer(Modifier.weight(2f))
+                            AsyncImage(
+                                model = "https://rang.vipexam.org/images/$it.jpg",
+                                contentDescription = null,
+                                contentScale = ContentScale.FillWidth,
+                                modifier = Modifier
+                                    .padding(top = 12.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .weight(6f)
+                                    .fillMaxWidth()
+                            )
+                            Spacer(Modifier.weight(2f))
+                        }
+                    }
+                }
             }
         }
     }
@@ -168,28 +196,28 @@ class TemplateBuilder {
                             choice.takeIf { it.value != "" }?.let {
                                 SuggestionChip(onClick = { }, label = { Text(choice.value) })
                             }
-                            if (::optionA.isInitialized) Column(
+                            if (::optionA.isInitialized && optionA != "") Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 12.dp)
                                     .clickable { choice.value = "A" }
                             ) { Text(text = "A. $optionA") }
 
-                            if (::optionB.isInitialized) Column(
+                            if (::optionB.isInitialized && optionB != "") Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 12.dp)
                                     .clickable { choice.value = "B" }
                             ) { Text("B. $optionB") }
 
-                            if (::optionC.isInitialized) Column(
+                            if (::optionC.isInitialized && optionC != "") Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 12.dp)
                                     .clickable { choice.value = "C" }
                             ) { Text("C. $optionC") }
 
-                            if (::optionD.isInitialized) Column(
+                            if (::optionD.isInitialized && optionD != "") Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 12.dp)
@@ -250,22 +278,28 @@ class TemplateBuilder {
                             }
                         }
                     }
-
                 }
+
                 if (showOptions) ModalBottomSheet(onDismissRequest = { showOptions = false }) {
-                    if (::optionA.isInitialized) Button(onClick = {
+                    if (::optionA.isInitialized && optionA != "") Button(onClick = {
                         choice.value = optionA
                         showOptions = false
                     }) {
                         Text("A. $optionA")
                     }
-                    if (::optionB.isInitialized) Button(onClick = { choice.value = optionB }) {
+                    if (::optionB.isInitialized && optionB != "") Button(onClick = {
+                        choice.value = optionB
+                    }) {
                         Text("B. $optionB")
                     }
-                    if (::optionC.isInitialized) Button(onClick = { choice.value = optionC }) {
+                    if (::optionC.isInitialized && optionC != "") Button(onClick = {
+                        choice.value = optionC
+                    }) {
                         Text("C. $optionC")
                     }
-                    if (::optionD.isInitialized) Button(onClick = { choice.value = optionD }) {
+                    if (::optionD.isInitialized && optionD != "") Button(onClick = {
+                        choice.value = optionD
+                    }) {
                         Text("D. $optionD")
                     }
                 }
@@ -275,13 +309,17 @@ class TemplateBuilder {
     }
 
     @Composable
-    fun Render(modifier: Modifier, isSubQuestion: Boolean) {
+    fun Render(
+        modifier: Modifier,
+        isSubQuestion: Boolean,
+        index: Int? = null
+    ) {
         Column(
             modifier = modifier
         ) {
             if (isSubQuestion) {
                 Column {
-                    article.Render()
+                    article.Render(index)
                     question.Render()
                     questions.forEachIndexed { index, question ->
                         question.Render(index + 1)
@@ -289,7 +327,7 @@ class TemplateBuilder {
                 }
             } else {
                 LazyColumn {
-                    item { article.Render() }
+                    item { article.Render(index) }
                     item { question.Render() }
                     questions.forEachIndexed { index, question ->
                         item { question.Render(index + 1) }
@@ -304,9 +342,10 @@ class TemplateBuilder {
 fun Template(
     modifier: Modifier = Modifier,
     isSubQuestion: Boolean = false,
+    index: Int? = null,
     block: TemplateBuilder.() -> Unit
 ) =
-    TemplateBuilder().apply(block).Render(modifier, isSubQuestion)
+    TemplateBuilder().apply(block).Render(modifier, isSubQuestion, index)
 
 @Composable
 private fun TemplateBuilderSample() {

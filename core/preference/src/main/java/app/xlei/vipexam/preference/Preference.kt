@@ -17,6 +17,7 @@ fun Preferences.toSettings(): Settings {
         showAnswerOptionPreference = ShowAnswerOptionPreference.fromPreferences(this),
         organization = Organization.fromPreferences(this),
         language = LanguagePreference.fromPreferences(this),
-        localEudicApiKey = EudicApiKey.fromPreferences(this)
+        localEudicApiKey = EudicApiKey.fromPreferences(this),
+        pinnedExams = PinnedExams.fromPreferences(this),
     )
 }

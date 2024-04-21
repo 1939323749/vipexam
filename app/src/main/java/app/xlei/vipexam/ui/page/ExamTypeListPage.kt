@@ -1,6 +1,7 @@
 package app.xlei.vipexam.ui.page
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,13 +11,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,11 +30,18 @@ import app.xlei.vipexam.core.ui.Banner
 import app.xlei.vipexam.core.ui.OnError
 import app.xlei.vipexam.core.ui.OnLoading
 import app.xlei.vipexam.feature.history.HistoryViewModel
+import app.xlei.vipexam.preference.DataStoreKeys
+import app.xlei.vipexam.preference.LocalPinnedExams
+import app.xlei.vipexam.preference.dataStore
+import app.xlei.vipexam.preference.put
 import app.xlei.vipexam.ui.UiState
 import app.xlei.vipexam.ui.VipexamUiState
 import app.xlei.vipexam.ui.components.ExamSearchBar
 import compose.icons.FeatherIcons
+import compose.icons.TablerIcons
 import compose.icons.feathericons.Clock
+import compose.icons.tablericons.Pin
+import kotlinx.coroutines.launch
 
 /**
  * Exam type list view
@@ -40,6 +51,7 @@ import compose.icons.feathericons.Clock
  * @param modifier
  * @receiver
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ExamTypeListView(
     examTypeListUiState: UiState<VipexamUiState.ExamTypeListUiState>,
@@ -48,9 +60,17 @@ fun ExamTypeListView(
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = hiltViewModel(),
 ) {
-    Column (
+    val localPinnedExams = LocalPinnedExams.current
+
+    val examTypes =
+        ExamType.entries.sortedByDescending { localPinnedExams.value.contains(it.examTypeName) }
+
+    val context = LocalContext.current
+    val coroutine = rememberCoroutineScope()
+
+    Column(
         modifier = modifier
-    ){
+    ) {
         ExamSearchBar(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,17 +103,40 @@ fun ExamTypeListView(
                             }
                         }
                     }
-                    items(ExamType.entries.size) {
+                    items(examTypes.size) {
                         ListItem(
-                            headlineContent = { Text(ExamType.entries[it].examTypeName) },
+                            headlineContent = { Text(examTypes[it].examTypeName) },
                             colors = ListItemDefaults.colors(
                                 containerColor = MaterialTheme.colorScheme.surface,
                                 headlineColor = MaterialTheme.colorScheme.onSurface
                             ),
-                            modifier = Modifier
-                                .clickable {
-                                    onExamTypeClick(ExamType.entries[it])
+                            trailingContent = {
+                                if (examTypes[it].examTypeName == localPinnedExams.value) IconButton(
+                                    onClick = {
+                                        coroutine.launch {
+                                            context.dataStore.put(
+                                                DataStoreKeys.PinnedExams,
+                                                ""
+                                            )
+                                        }
+                                    }) {
+                                    Icon(imageVector = TablerIcons.Pin, contentDescription = null)
                                 }
+                            },
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {
+                                        onExamTypeClick(ExamType.entries[it])
+                                    },
+                                    onLongClick = {
+                                        coroutine.launch {
+                                            context.dataStore.put(
+                                                DataStoreKeys.PinnedExams,
+                                                examTypes[it].examTypeName
+                                            )
+                                        }
+                                    }
+                                )
                         )
                         HorizontalDivider()
                     }

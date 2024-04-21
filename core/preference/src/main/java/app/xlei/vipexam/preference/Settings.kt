@@ -18,6 +18,7 @@ val LocalShowAnswerOption =
 val LocalOrganization = compositionLocalOf<Organization> { Organization.default }
 val LocalLanguage = compositionLocalOf<LanguagePreference> { LanguagePreference.default }
 val LocalEudicApiKey = compositionLocalOf<EudicApiKey> { EudicApiKey.default }
+val LocalPinnedExams = compositionLocalOf<PinnedExams> { PinnedExams.default }
 
 data class Settings(
     val themeMode: ThemeModePreference = ThemeModePreference.default,
@@ -28,6 +29,7 @@ data class Settings(
     val organization: Organization = Organization.default,
     val language: LanguagePreference = LanguagePreference.default,
     val localEudicApiKey: EudicApiKey = EudicApiKey.default,
+    val pinnedExams: PinnedExams = PinnedExams.default
 )
 
 @Composable
@@ -50,6 +52,7 @@ fun SettingsProvider(
         LocalOrganization provides settings.organization,
         LocalLanguage provides settings.language,
         LocalEudicApiKey provides settings.localEudicApiKey,
+        LocalPinnedExams provides settings.pinnedExams,
     ) {
         content()
     }

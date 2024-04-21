@@ -126,7 +126,7 @@ fun ExamTypeListView(
                             modifier = Modifier
                                 .combinedClickable(
                                     onClick = {
-                                        onExamTypeClick(ExamType.entries[it])
+                                        onExamTypeClick(examTypes[it])
                                     },
                                     onLongClick = {
                                         coroutine.launch {

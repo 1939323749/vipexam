@@ -153,7 +153,11 @@ class TemplateBuilder {
 
             Column {
                 VipexamArticleContainer(
-                    onDragContent = (if (::question.isInitialized) question else "" + "\n\n") +
+                    onDragContent = (if (::question.isInitialized) question else "" + "\n") + "\n" +
+                            (if (::optionA.isInitialized) "\nA. $optionA" else "") +
+                            (if (::optionB.isInitialized) "\nB. $optionB" else "") +
+                            (if (::optionC.isInitialized) "\nC. $optionC" else "") +
+                            (if (::optionD.isInitialized) "\nD. $optionD" else "") +
                             (if (::answer.isInitialized && showAnswer) run {
                                 answer + "\n" + if (::description.isInitialized) description else ""
                             } else "")

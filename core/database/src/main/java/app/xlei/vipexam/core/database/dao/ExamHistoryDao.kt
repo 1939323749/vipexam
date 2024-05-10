@@ -30,4 +30,7 @@ interface ExamHistoryDao {
 
     @Query("DELETE FROM exam_history WHERE examHistoryId IN (SELECT examHistoryId FROM exam_history)")
     suspend fun removeAllHistory()
+
+    @Query("SELECT * FROM exam_history WHERE lastOpen BETWEEN :start AND :end")
+    fun getHistoryByDateRange(start: Long, end: Long): List<ExamHistory>
 }

@@ -49,6 +49,8 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.ui)
 
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.compose.calander)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.feather)
     implementation(libs.material3)

@@ -1,5 +1,7 @@
 package app.xlei.vipexam.feature.history
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.xlei.vipexam.core.data.repository.ExamHistoryRepository
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,5 +52,12 @@ class HistoryViewModel @Inject constructor(
             examHistoryRepository
                 .removeHistory(_examHistory.value[index])
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getHistoryByDateRange(): List<ExamHistory> {
+        val endDate = LocalDate.now()
+        val startDate = endDate.minusMonths(12)
+        return examHistoryRepository.getHistoryByDateRange(startDate, endDate)
     }
 }

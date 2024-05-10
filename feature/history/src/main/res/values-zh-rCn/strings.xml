@@ -2,4 +2,7 @@
 <resources>
     <string name="history">历史</string>
     <string name="empty_history_tips">历史记录为空</string>
+    <string name="check_delete_history">确定要删除吗，操作不可恢复！</string>
+    <string name="cancel">取消</string>
+    <string name="ok">确定</string>
 </resources>

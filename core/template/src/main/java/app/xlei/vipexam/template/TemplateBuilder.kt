@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -125,7 +126,6 @@ class TemplateBuilder {
         private lateinit var answerPic: String
         private lateinit var descriptionPic: String
 
-        var choice = mutableStateOf("")
         fun Question(question: String) =
             this.apply { this@QuestionBuilder.question = question.removeSuffix("[*]") }
 
@@ -148,6 +148,9 @@ class TemplateBuilder {
         fun Render(index: Int? = null) {
             var showOptions by remember {
                 mutableStateOf(false)
+            }
+            var choice by rememberSaveable {
+                mutableStateOf("")
             }
             val showAnswer = LocalShowAnswer.current.isShowAnswer()
 
@@ -197,42 +200,42 @@ class TemplateBuilder {
                                 }
                             }
 
-                            choice.takeIf { it.value != "" }?.let {
-                                SuggestionChip(onClick = { }, label = { Text(choice.value) })
+                            choice.takeIf { it != "" }?.let {
+                                SuggestionChip(onClick = { }, label = { Text(choice) })
                             }
                             if (::optionA.isInitialized && optionA != "") Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 12.dp)
-                                    .clickable { choice.value = "A" }
+                                    .clickable { choice = "A" }
                             ) { Text(text = "A. $optionA") }
 
                             if (::optionB.isInitialized && optionB != "") Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 12.dp)
-                                    .clickable { choice.value = "B" }
+                                    .clickable { choice = "B" }
                             ) { Text("B. $optionB") }
 
                             if (::optionC.isInitialized && optionC != "") Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 12.dp)
-                                    .clickable { choice.value = "C" }
+                                    .clickable { choice = "C" }
                             ) { Text("C. $optionC") }
 
                             if (::optionD.isInitialized && optionD != "") Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(start = 12.dp)
-                                    .clickable { choice.value = "D" }
+                                    .clickable { choice = "D" }
                             ) { Text("D. $optionD") }
 
                             if (::options.isInitialized)
                                 options.forEach { option ->
                                     Card(
                                         modifier = Modifier
-                                            .clickable { choice.value = option }
+                                            .clickable { choice = option }
                                     ) { Text(option) }
                                 }
                         }
@@ -286,23 +289,23 @@ class TemplateBuilder {
 
                 if (showOptions) ModalBottomSheet(onDismissRequest = { showOptions = false }) {
                     if (::optionA.isInitialized && optionA != "") Button(onClick = {
-                        choice.value = optionA
+                        choice = optionA
                         showOptions = false
                     }) {
                         Text("A. $optionA")
                     }
                     if (::optionB.isInitialized && optionB != "") Button(onClick = {
-                        choice.value = optionB
+                        choice = optionB
                     }) {
                         Text("B. $optionB")
                     }
                     if (::optionC.isInitialized && optionC != "") Button(onClick = {
-                        choice.value = optionC
+                        choice = optionC
                     }) {
                         Text("C. $optionC")
                     }
                     if (::optionD.isInitialized && optionD != "") Button(onClick = {
-                        choice.value = optionD
+                        choice = optionD
                     }) {
                         Text("D. $optionD")
                     }

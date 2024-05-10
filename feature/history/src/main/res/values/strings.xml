@@ -2,4 +2,7 @@
 <resources>
     <string name="history">History</string>
     <string name="empty_history_tips">History is empty</string>
+    <string name="check_delete_history">Are you sure you want to delete it? The operation cannot be restored!</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
 </resources>

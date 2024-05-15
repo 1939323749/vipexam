@@ -1,4 +1,4 @@
-package app.xlei.vipexam.core.ui
+package app.xlei.vipexam.core.ui.container
 
 import android.content.ClipData
 import android.view.View
@@ -19,6 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
+import app.xlei.vipexam.core.ui.AddToWordListButton
+import app.xlei.vipexam.core.ui.TranslateDialog
+import app.xlei.vipexam.core.ui.VipexamTextToolbar
 import app.xlei.vipexam.preference.LocalLongPressAction
 import app.xlei.vipexam.preference.LongPressAction
 

@@ -54,6 +54,7 @@ dependencies {
     implementation(projects.core.database)
     implementation(projects.core.preference)
 
+    implementation(libs.coil.compose)
     kapt(libs.hilt.android.compiler)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)

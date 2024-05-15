@@ -1,4 +1,4 @@
-package app.xlei.vipexam.core.ui
+package app.xlei.vipexam.core.ui.container
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope

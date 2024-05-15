@@ -39,7 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import app.xlei.vipexam.core.ui.DateText
 import app.xlei.vipexam.core.ui.LoginAlert
-import app.xlei.vipexam.core.ui.slideInSlideOutNavigationContainer
+import app.xlei.vipexam.core.ui.container.slideInSlideOutNavigationContainer
 import app.xlei.vipexam.feature.history.component.HistoryHeatMapCalendar
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Activity

@@ -1,5 +1,6 @@
 package app.xlei.vipexam.template
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -22,15 +23,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import app.xlei.vipexam.core.ui.VipexamArticleContainer
+import app.xlei.vipexam.core.ui.container.VipexamArticleContainer
+import app.xlei.vipexam.core.ui.container.VipexamImageContainer
 import app.xlei.vipexam.preference.LocalShowAnswer
-import coil.compose.AsyncImage
 
 /**
  * Template builder
@@ -48,48 +47,40 @@ class TemplateBuilder {
         fun Content(content: String) = this.apply { this.content = content }
         fun ContentPic(contentPic: String) = this.apply { this.contentPic = contentPic }
 
+        @OptIn(ExperimentalFoundationApi::class)
         @Composable
         fun Render(index: Int? = null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+            VipexamArticleContainer(
+                onDragContent = if (::content.isInitialized) content else null
             ) {
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    if (::title.isInitialized) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Row {
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (::title.isInitialized) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleLarge,
+                                textAlign = TextAlign.End,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                    if (::content.isInitialized) {
                         Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.End,
-                            modifier = Modifier.padding(start = 4.dp)
+                            text = (if (index != null && !::title.isInitialized) "$index. " else "") + content
                         )
                     }
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-                if (::content.isInitialized) {
-                    Text(
-                        text = (if (index != null && !::title.isInitialized) "$index. " else "") + content
-                    )
-                }
 
-                if (::contentPic.isInitialized) {
-                    contentPic.split(",").forEach {
-                        Row {
-                            Spacer(Modifier.weight(2f))
-                            AsyncImage(
-                                model = "https://rang.vipexam.org/images/$it.jpg",
-                                contentDescription = null,
-                                contentScale = ContentScale.FillWidth,
-                                modifier = Modifier
-                                    .padding(top = 12.dp)
-                                    .align(Alignment.CenterVertically)
-                                    .weight(6f)
-                                    .fillMaxWidth()
-                            )
-                            Spacer(Modifier.weight(2f))
+                    if (::contentPic.isInitialized) {
+                        contentPic.split(",").forEach {
+                            VipexamImageContainer(imageId = it)
                         }
                     }
                 }
@@ -143,7 +134,7 @@ class TemplateBuilder {
         fun Description(desc: String) = this.apply { this.description = desc.removeSuffix("[*]") }
         fun DescriptionPic(descPic: String) = this.apply { this.descriptionPic = descPic }
 
-        @OptIn(ExperimentalMaterial3Api::class)
+        @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
         @Composable
         fun Render(index: Int? = null) {
             var showOptions by remember {
@@ -183,20 +174,7 @@ class TemplateBuilder {
 
                             if (::questionPic.isInitialized) {
                                 questionPic.split(",").forEach {
-                                    Row {
-                                        Spacer(Modifier.weight(2f))
-                                        AsyncImage(
-                                            model = "https://rang.vipexam.org/images/$it.jpg",
-                                            contentDescription = null,
-                                            contentScale = ContentScale.FillWidth,
-                                            modifier = Modifier
-                                                .padding(top = 12.dp)
-                                                .align(Alignment.CenterVertically)
-                                                .weight(6f)
-                                                .fillMaxWidth()
-                                        )
-                                        Spacer(Modifier.weight(2f))
-                                    }
+                                    VipexamImageContainer(imageId = it)
                                 }
                             }
 
@@ -246,20 +224,7 @@ class TemplateBuilder {
                                 if (::descriptionPic.isInitialized) {
                                     val pics = descriptionPic.split(',')
                                     pics.forEach {
-                                        Row {
-                                            Spacer(Modifier.weight(2f))
-                                            AsyncImage(
-                                                model = "https://rang.vipexam.org/images/$it.jpg",
-                                                contentDescription = null,
-                                                contentScale = ContentScale.FillWidth,
-                                                modifier = Modifier
-                                                    .padding(top = 24.dp)
-                                                    .align(Alignment.CenterVertically)
-                                                    .weight(6f)
-                                                    .fillMaxWidth()
-                                            )
-                                            Spacer(Modifier.weight(2f))
-                                        }
+                                        VipexamImageContainer(imageId = it)
                                     }
                                 }
                             }
@@ -267,20 +232,7 @@ class TemplateBuilder {
                             if (::answerPic.isInitialized) {
                                 val pics = answerPic.split(',')
                                 pics.forEach {
-                                    Row {
-                                        Spacer(Modifier.weight(2f))
-                                        AsyncImage(
-                                            model = "https://rang.vipexam.org/images/$it.jpg",
-                                            contentDescription = null,
-                                            contentScale = ContentScale.FillWidth,
-                                            modifier = Modifier
-                                                .padding(top = 24.dp)
-                                                .align(Alignment.CenterVertically)
-                                                .weight(6f)
-                                                .fillMaxWidth()
-                                        )
-                                        Spacer(Modifier.weight(2f))
-                                    }
+                                    VipexamImageContainer(imageId = it)
                                 }
                             }
                         }

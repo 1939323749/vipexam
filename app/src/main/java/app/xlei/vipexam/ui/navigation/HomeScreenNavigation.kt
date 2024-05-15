@@ -25,7 +25,7 @@ import app.xlei.vipexam.core.network.module.NetWorkRepository
 import app.xlei.vipexam.core.network.module.getExamResponse.GetExamResponse
 import app.xlei.vipexam.core.ui.OnError
 import app.xlei.vipexam.core.ui.OnLoading
-import app.xlei.vipexam.core.ui.slideInSlideOutNavigationContainer
+import app.xlei.vipexam.core.ui.container.slideInSlideOutNavigationContainer
 import app.xlei.vipexam.preference.LocalOrganization
 import app.xlei.vipexam.ui.UiState
 import app.xlei.vipexam.ui.VipExamMainScreenViewModel

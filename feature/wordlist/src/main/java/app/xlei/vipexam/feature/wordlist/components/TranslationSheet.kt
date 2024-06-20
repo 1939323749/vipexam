@@ -57,7 +57,10 @@ fun TranslationSheet(
                 code = 200,
                 id = "",
                 data = "",
-                emptyList()
+                alternatives = emptyList(),
+                sourceLang = "en",
+                targetLang = "zh",
+                method = "vipexam translate"
             )
         )
     }

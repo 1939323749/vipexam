@@ -171,7 +171,7 @@ object NetWorkRepository {
     suspend fun translateToZH(text: String): Result<TranslationResponse> {
         return try {
             Result.success(
-                httpClient.post("https://api.deeplx.org/translate") {
+                httpClient.post("https://deeplx-next.netlify.app/api/translate") {
                     header("Accept", "application/json, text/javascript, */*; q=0.01")
                     contentType(ContentType.Application.Json)
                     setBody(

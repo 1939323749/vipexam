@@ -179,16 +179,18 @@ private fun Read(
                     if (showAnswer)
                         articles[articleIndex].questions[index].let {
                             VipexamArticleContainer {
-                                Text(
-                                    text = "${it.index}." + it.refAnswer,
-                                    modifier = Modifier
-                                        .padding(horizontal = 24.dp)
-                                )
-                                Text(
-                                    text = it.description,
-                                    modifier = Modifier
-                                        .padding(horizontal = 24.dp)
-                                )
+                                Column {
+                                    Text(
+                                        text = "${it.index}." + it.refAnswer,
+                                        modifier = Modifier
+                                            .padding(horizontal = 24.dp)
+                                    )
+                                    Text(
+                                        text = it.description,
+                                        modifier = Modifier
+                                            .padding(horizontal = 24.dp)
+                                    )
+                                }
                             }
                         }
                 }

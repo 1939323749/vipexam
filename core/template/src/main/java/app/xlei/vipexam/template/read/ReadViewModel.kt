@@ -39,7 +39,25 @@ class ReadViewModel @Inject constructor(
                 ReadUiState.Article(
                     index = "${index + 1}",
                     content = it.primQuestion,
-                    questions = getQuestions(it.children)
+                    questions = getQuestions(it.children).apply {
+                        if (it.secondQuestion != null) {
+                            add(
+                                0, ReadUiState.Question(
+                                    index = "1",
+                                    question = it.secondQuestion!!,
+                                    options = mutableListOf(
+                                        ReadUiState.Option(index = "A", option = it.first),
+                                        ReadUiState.Option(index = "B", option = it.second),
+                                        ReadUiState.Option(index = "C", option = it.third),
+                                        ReadUiState.Option(index = "D", option = it.fourth),
+                                    ),
+                                    choice = rememberSaveable { mutableStateOf("") },
+                                    refAnswer = it.refAnswer,
+                                    description = it.discription,
+                                )
+                            )
+                        }
+                    }
                 )
             )
         }
@@ -64,7 +82,7 @@ class ReadViewModel @Inject constructor(
             options.add(it.fourth)
             questions.add(
                 ReadUiState.Question(
-                    index = "${index + 1}",
+                    index = "${index + 2}",
                     question = it.secondQuestion,
                     options = getOptions(it),
                     choice = rememberSaveable { mutableStateOf("") },

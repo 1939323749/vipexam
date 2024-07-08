@@ -227,7 +227,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesGetMoviesUseCase(
+    fun providesGetExamListUseCase(
         examListRepository: ExamListRepository
     ): GetExamListUseCase {
         return GetExamListUseCase(examListRepository)

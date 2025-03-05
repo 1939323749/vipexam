@@ -1,5 +1,9 @@
 # VipExam
+<div align="center">
 
+  <a href="">![loc](https://sloc.xyz/github/1939323749/vipexam)</a>
+
+</div>
 VipExam is a Material You style third-party Android client for vipexam. It provides a simple and
 intuitive interface for users to conveniently access various features
 of [vipexam.cn](https://vipexam.cn).
@@ -12,7 +16,7 @@ vipexam.cn, including following exams and subjects:
 - [x] CET4/6
 - [x] Postgraduate Entrance Examination English I/II
 - [ ] Postgraduate Entrance Examination Math I/II
-- [ ] Postgraduate Entrance Examination 408
+- [x] Postgraduate Entrance Examination 408
 
 Mock exams: Users can take mock exams to assess their exam preparation.
 
